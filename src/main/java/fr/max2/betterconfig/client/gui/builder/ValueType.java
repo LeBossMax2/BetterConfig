@@ -2,26 +2,66 @@ package fr.max2.betterconfig.client.gui.builder;
 
 import java.util.List;
 
-import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
+import fr.max2.betterconfig.ConfigProperty;
 
-public class ValueType<T>
+public enum ValueType
 {
-	public static final ValueType<?>[] VALUE_TYPES =
+	BOOLEAN(Boolean.class)
 	{
-		new ValueType<>(Boolean.class, ValueUIBuilder::buildBoolean),
-		new ValueType<>(Number.class, ValueUIBuilder::buildNumber),
-		new ValueType<>(String.class, ValueUIBuilder::buildString),
-		new ValueType<>(Enum.class, ValueUIBuilder::buildEnum),
-		new ValueType<>(List.class, ValueUIBuilder::buildList)
+		@SuppressWarnings("unchecked")
+		@Override
+		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		{
+			return builder.buildBoolean((ConfigProperty<Boolean>)property);
+		}
+	},
+	NUMBER(Number.class)
+	{
+		@SuppressWarnings("unchecked")
+		@Override
+		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		{
+			return builder.buildNumber((ConfigProperty<? extends Number>)property);
+		}
+	},
+	STRING(String.class)
+	{
+		@SuppressWarnings("unchecked")
+		@Override
+		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		{
+			return builder.buildString((ConfigProperty<String>)property);
+		}
+	},
+	ENUM(Enum.class)
+	{		
+		@SuppressWarnings("unchecked")
+		private <E extends Enum<E>, P> P callEnumBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		{
+			return builder.buildEnum((ConfigProperty<E>) property);
+		}
+		
+		@Override
+		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		{
+			return callEnumBuilder(builder, property);
+		}
+	},
+	LIST(List.class)
+	{
+		@SuppressWarnings("unchecked")
+		@Override
+		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		{
+			return builder.buildList((ConfigProperty<? extends List<?>>)property);
+		}
 	};
 	
-	private final Class<T> superClass;
-	private final BuilderFunction<T> builderFunc;
+	private final Class<?> superClass;
 	
-	protected ValueType(Class<T> clazz, BuilderFunction<T> builderFunc)
+	private ValueType(Class<?> clazz)
 	{
 		this.superClass = clazz;
-		this.builderFunc = builderFunc;
 	}
 
 	public boolean matches(Class<?> valueClass)
@@ -29,13 +69,17 @@ public class ValueType<T>
 		return this.superClass.isAssignableFrom(valueClass);
 	}
 	
-	public <P> P callBuilder(ValueUIBuilder<P> builder, ValueSpec spec, Object value)
+	public abstract <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property);
+	
+	public static ValueType getType(Class<?> valueClass)
 	{
-		return this.builderFunc.build(builder, spec, this.superClass.cast(value));
-	}
-
-	protected static interface BuilderFunction<T>
-	{
-		<P> P build(ValueUIBuilder<P> builder, ValueSpec spec, T value);
+		for (ValueType type : ValueType.values())
+		{
+			if (type.matches(valueClass))
+			{
+				return type;
+			}
+		}
+		return null;
 	}
 }

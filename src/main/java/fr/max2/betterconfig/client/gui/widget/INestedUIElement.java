@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.client.gui;
+package fr.max2.betterconfig.client.gui.widget;
 
 import java.util.List;
 

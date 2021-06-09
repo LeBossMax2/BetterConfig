@@ -17,5 +17,6 @@ public class BetterConfig
 	{
 		// Marks this mod as one-sided
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+        TestConfig.registerConfigs();
 	}
 }

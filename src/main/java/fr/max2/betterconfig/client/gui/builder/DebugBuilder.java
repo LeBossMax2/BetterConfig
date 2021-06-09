@@ -7,20 +7,21 @@ import java.util.stream.Collectors;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 
+import fr.max2.betterconfig.ConfigProperty;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.IUIElement;
-import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
+import fr.max2.betterconfig.client.gui.widget.IUIElement;
+import net.minecraft.client.gui.FontRenderer;
 
-public class DebugBuilder implements ConfigUIBuilder<DebugBuilder.DebugUI>
+public class DebugBuilder implements IConfigUIBuilder<DebugBuilder.DebugUI>
 {
 
 	@Override
-	public TableUIBuilder<DebugUI> start(BetterConfigScreen screen)
+	public ITableUIBuilder<DebugUI> start(BetterConfigScreen screen)
 	{
 		return new Table(screen, "");
 	}
 	
-	private static class Table implements TableUIBuilder<DebugUI>
+	private static class Table implements ITableUIBuilder<DebugUI>
 	{
 		private final BetterConfigScreen parent;
 		private final String prefix;
@@ -32,13 +33,13 @@ public class DebugBuilder implements ConfigUIBuilder<DebugBuilder.DebugUI>
 		}
 
 		@Override
-		public TableUIBuilder<DebugUI> subTableBuilder(String path, String comment)
+		public ITableUIBuilder<DebugUI> subTableBuilder(String path, String comment)
 		{
 			return new Table(this.parent, this.prefix + path + ".");
 		}
 
 		@Override
-		public ValueUIBuilder<DebugUI> tableEntryBuilder(String path, String comment)
+		public IValueUIBuilder<DebugUI> tableEntryBuilder(String path, String comment)
 		{
 			return new Value(this.parent, this.prefix + path);
 		}
@@ -51,7 +52,7 @@ public class DebugBuilder implements ConfigUIBuilder<DebugBuilder.DebugUI>
 		
 	}
 	
-	private static class Value implements ValueUIBuilder<DebugUI>
+	private static class Value implements IValueUIBuilder<DebugUI>
 	{
 		private final BetterConfigScreen parent;
 		private final String path;
@@ -63,33 +64,34 @@ public class DebugBuilder implements ConfigUIBuilder<DebugBuilder.DebugUI>
 		}
 
 		@Override
-		public DebugUI buildBoolean(ValueSpec spec, boolean value)
+		public DebugUI buildBoolean(ConfigProperty<Boolean> property)
 		{
-			return new DebugUI(this.parent, this.path + " : " + "BOOL" + " = " + value);
+			return new DebugUI(this.parent, this.path + " : " + "BOOL" + " = " + property.getValue());
 		}
 
 		@Override
-		public DebugUI buildNumber(ValueSpec spec, Number value)
+		public DebugUI buildNumber(ConfigProperty<? extends Number> property)
 		{
-			return new DebugUI(this.parent, this.path + " : " + "NUMBER" + " = " + value);
+			return new DebugUI(this.parent, this.path + " : " + "NUMBER" + " = " + property.getValue());
 		}
 
 		@Override
-		public DebugUI buildString(ValueSpec spec, String value)
+		public DebugUI buildString(ConfigProperty<String> property)
 		{
-			return new DebugUI(this.parent, this.path + " : " + "STRING" + " = " + value);
+			return new DebugUI(this.parent, this.path + " : " + "STRING" + " = " + property.getValue());
 		}
 
 		@Override
-		public DebugUI buildEnum(ValueSpec spec, Enum<?> value)
+		public <E extends Enum<E>> DebugUI buildEnum(ConfigProperty<E> property)
 		{
-			return new DebugUI(this.parent, this.path + " : " + "ENUM" + " = " + value);
+			return new DebugUI(this.parent, this.path + " : " + "ENUM" + " = " + property.getValue());
 		}
 
 		@Override
-		public DebugUI buildList(ValueSpec spec, List<?> value)
+		public DebugUI buildList(ConfigProperty<? extends List<?>> property)
 		{
 			StringBuilder str = new StringBuilder();
+			List<?> value = property.getValue();
 			for (int i = 0; i < value.size(); i++)
 			{
 				Object obj = value.get(i);
@@ -102,9 +104,9 @@ public class DebugBuilder implements ConfigUIBuilder<DebugBuilder.DebugUI>
 		}
 
 		@Override
-		public DebugUI buildUnknown(ValueSpec spec, Object value)
+		public DebugUI buildUnknown(ConfigProperty<?> property)
 		{
-			return new DebugUI(this.parent, this.path + " : " + "UNKNOWN" + " = " + value);
+			return new DebugUI(this.parent, this.path + " : " + "UNKNOWN" + " = " + property.getValue());
 		}
 		
 	}
@@ -128,13 +130,17 @@ public class DebugBuilder implements ConfigUIBuilder<DebugBuilder.DebugUI>
 		@Override
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
+			FontRenderer font = this.parent.getFont(); 
 			this.parent.renderBackground(matrixStack);
-			this.parent.getFont().drawString(matrixStack, "Better Config !", 1, 1, 0xFFFFFFFF);
-			int y = 10;
+			int y = 1;
+			font.drawString(matrixStack, "Better Config Debug", 1, y, 0xFFFFFFFF);
+			y += font.FONT_HEIGHT + 2;
+			font.drawString(matrixStack, "Configs : " + this.parent.getModConfigs().stream().map(config -> "'" + config.getFileName() + "'").collect(Collectors.joining(", ")), 1, y, 0xFFFFFFFF);
+			y += font.FONT_HEIGHT + 2;
 			for (String txt : this.labels)
 			{
-				this.parent.getFont().drawString(matrixStack, txt, 1, y, 0xFFFFFFFF);
-				y += 10;
+				font.drawString(matrixStack, txt, 1, y, 0xFFFFFFFF);
+				y += font.FONT_HEIGHT + 2;
 			}
 		}
 

@@ -8,21 +8,23 @@ import java.util.function.BiFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
+import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.client.gui.builder.DebugBuilder;
-import fr.max2.betterconfig.client.gui.builder.ConfigUIBuilder;
-import fr.max2.betterconfig.client.gui.builder.TableUIBuilder;
+import fr.max2.betterconfig.ConfigProperty;
+import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
+import fr.max2.betterconfig.client.gui.builder.IConfigUIBuilder;
+import fr.max2.betterconfig.client.gui.builder.ITableUIBuilder;
 import fr.max2.betterconfig.client.gui.builder.ValueType;
-import fr.max2.betterconfig.client.gui.builder.ValueUIBuilder;
+import fr.max2.betterconfig.client.gui.widget.IUIElement;
+import fr.max2.betterconfig.client.gui.builder.IValueUIBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ModConfig;
@@ -31,7 +33,7 @@ public class BetterConfigScreen extends Screen
 {
 	public static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
 	
-	private final ConfigUIBuilder<? extends IUIElement> uiBuilder;
+	private final IConfigUIBuilder<? extends IUIElement> uiBuilder;
 	private final ModContainer mod;
 	
 	private final List<ModConfig> modConfigs;
@@ -42,7 +44,7 @@ public class BetterConfigScreen extends Screen
 	
 	private IUIElement ui;
 	
-	protected BetterConfigScreen(ConfigUIBuilder<? extends IUIElement> uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
+	protected BetterConfigScreen(IConfigUIBuilder<? extends IUIElement> uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
 	{
 		super(new StringTextComponent(mod.getModId() + " configuration : " + configs.get(index).getFileName()));
 		this.uiBuilder = uiBuilder;
@@ -55,15 +57,14 @@ public class BetterConfigScreen extends Screen
 	@Override
 	protected void init()
 	{
-		// TODO use result
-		this.ui = this.buildTableUI(this.uiBuilder.start(this), this.currentConfig.getSpec().getSpec(), this.currentConfig.getConfigData());
+		this.ui = this.buildTableUI(this.uiBuilder.start(this), this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues());
 		this.addListener(this.ui);
 	}
 	
-	protected <P> P buildTableUI(TableUIBuilder<P> builder, UnmodifiableConfig spec, CommentedConfig config)
+	protected <P> P buildTableUI(ITableUIBuilder<P> builder, UnmodifiableConfig spec, UnmodifiableConfig values)
 	{
         Map<String, Object> specMap = spec.valueMap();
-        Map<String, Object> configMap = config.valueMap();
+        Map<String, Object> configMap = values.valueMap();
 
     	List<P> tableContent = new ArrayList<>();
 
@@ -73,48 +74,33 @@ public class BetterConfigScreen extends Screen
             Object specValue = specEntry.getValue();
             Object configValue = configMap.get(key);
 
-            if (specValue instanceof Config)
+            if (specValue instanceof UnmodifiableConfig)
             {
-            	String comment = config.getComment(key);
-                if (!(configValue instanceof CommentedConfig))
-                {
-                	// Wrong value, replace the config with a new one
-                    CommentedConfig newValue = config.createSubConfig();
-                    configMap.put(key, newValue);
-                    configValue = newValue;
-                }
-                tableContent.add(this.buildTableUI(builder.subTableBuilder(key, comment), (Config)specValue, (CommentedConfig)configValue));
+            	String comment = ""; //TODO find a way to replace 'values.getComment(key);'
+                tableContent.add(this.buildTableUI(builder.subTableBuilder(key, comment), (UnmodifiableConfig)specValue, (UnmodifiableConfig)configValue));
             }
             else
             {
                 ValueSpec valueSpec = (ValueSpec)specValue;
-                if (!valueSpec.test(configValue))
-                {
-                	// Wrong value, correct the value to a valid one
-                    Object newValue = valueSpec.correct(configValue);
-                    configMap.put(key, newValue);
-                    configValue = newValue;
-                }
-                tableContent.add(this.buildValueIU(builder.tableEntryBuilder(key, valueSpec.getComment()), valueSpec, configValue));
+                tableContent.add(this.buildValueIU(builder.tableEntryBuilder(key, valueSpec.getComment()), new ConfigProperty<>(valueSpec, (ConfigValue<?>)configValue)));
             }
         }
         
         return builder.buildTable(tableContent);
 	}
 
-	protected <P> P buildValueIU(ValueUIBuilder<P> builder, ValueSpec spec, Object value)
+	protected <P> P buildValueIU(IValueUIBuilder<P> builder, ConfigProperty<?> property)
 	{
-		Class<?> specClass = spec.getClazz();
-		for (ValueType<?> type : ValueType.VALUE_TYPES)
+		Class<?> specClass = property.getValueClass();
+		ValueType type = ValueType.getType(specClass);
+		
+		if (type == null)
 		{
-			if (type.matches(specClass))
-			{
-				return type.callBuilder(builder, spec, value);
-			}
+			LOGGER.info("Configuration value of unknown type: " + specClass);
+			return builder.buildUnknown(property);
 		}
 
-		LOGGER.info("Configuration value of unknown type: " + specClass);
-		return builder.buildUnknown(spec, value);
+		return type.callBuilder(builder, property);
 	}
 	
 	@Override
@@ -138,7 +124,6 @@ public class BetterConfigScreen extends Screen
 		if (this.configChanged())
 		{
 			// Save config and send config update event
-            this.currentConfig.getSpec().afterReload();
             // TODO send config reloading event
             //this.currentConfig.fireEvent(new ModConfig.Reloading(this.currentConfig));
             this.currentConfig.save();
@@ -147,6 +132,7 @@ public class BetterConfigScreen extends Screen
 	
 	protected boolean configChanged()
 	{
+		// TODO only save when needed
 		return true;
 	}
 	
@@ -155,25 +141,32 @@ public class BetterConfigScreen extends Screen
 		this.prevScreen = prevScreen;
 	}
 	
-	public ModContainer getMod()
+	public void openConfig(int index)
 	{
-		return mod;
+		Preconditions.checkElementIndex(index, this.modConfigs.size(), "index must be insize mod config list");
+		BetterConfigScreen newScreen = new BetterConfigScreen(this.uiBuilder, this.mod, this.modConfigs, index);
+		newScreen.setPrevScreen(this.prevScreen);
+		this.minecraft.displayGuiScreen(newScreen);
 	}
 	
+	public ModContainer getMod()
+	{
+		return this.mod;
+	}
 	
 	public List<ModConfig> getModConfigs()
 	{
-		return modConfigs;
+		return this.modConfigs;
 	}
 	
 	public int getCurrentConfigIndex()
 	{
-		return configIndex;
+		return this.configIndex;
 	}
 	
 	public ModConfig getCurrentConfig()
 	{
-		return currentConfig;
+		return this.currentConfig;
 	}
 	
 	public FontRenderer getFont()
@@ -191,7 +184,7 @@ public class BetterConfigScreen extends Screen
 		return (mc, prevScreen) ->
 		{
 			// TODO get from mod properties
-			ConfigUIBuilder<? extends IUIElement> uiBuilder = new DebugBuilder();
+			IConfigUIBuilder<? extends IUIElement> uiBuilder = new BetterConfigBuilder();
 			BetterConfigScreen screen = new BetterConfigScreen(uiBuilder, mod, configs, 0);
 			screen.setPrevScreen(prevScreen);
 			return screen;

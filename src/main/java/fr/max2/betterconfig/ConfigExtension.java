@@ -1,8 +1,9 @@
 package fr.max2.betterconfig;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,17 +41,28 @@ public class ConfigExtension
 		if (mod.getCustomExtension(ExtensionPoint.CONFIGGUIFACTORY).isPresent())
 			return;
 
-		Collection<ModConfig> configs = getModConfigs(mod);
+		List<ModConfig> configs = getModConfigs(mod);
 		if (configs.isEmpty())
 			return;
 		
 		LOGGER.debug("Registering extension point for " + modId);
-		mod.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> BetterConfigScreen.factory(mod, new ArrayList<>(configs)));
+		mod.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> BetterConfigScreen.factory(mod, configs));
 	}
 
-	@SuppressWarnings("unchecked")
-	private static Collection<ModConfig> getModConfigs(ModContainer mod)
+	private static List<ModConfig> getModConfigs(ModContainer mod)
 	{
-		return ((Map<ModConfig.Type, ModConfig>)ObfuscationReflectionHelper.getPrivateValue(ModContainer.class, mod, "configs")).values();
+		Map<ModConfig.Type, ModConfig> configMap = ObfuscationReflectionHelper.getPrivateValue(ModContainer.class, mod, "configs");
+		if (configMap == null)
+		{
+			return Collections.emptyList();
+		}
+		
+		return configMap.values().stream().filter(ConfigExtension::isConfigEditable).collect(Collectors.toList());
+	}
+	
+	private static boolean isConfigEditable(ModConfig config)
+	{
+		// TODO allow default server config to be changed
+		return config.getSpec().isLoaded();
 	}
 }
