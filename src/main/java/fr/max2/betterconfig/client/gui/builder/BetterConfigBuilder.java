@@ -501,7 +501,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		}
 	}
 	
-	/** The container for table entrys */
+	/** The container for table entries */
 	private static class ValueContainer extends FocusableGui implements INestedUIElement, IBetterElement
 	{
 		/** The parent screen */
@@ -567,8 +567,16 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 			INestedUIElement.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 			if (this.isMouseOver(mouseX, mouseY))
 			{
-				FontRenderer font = this.screen.getFont(); 
-				GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY, this.screen.width, this.screen.height, 200, font);
+				FontRenderer font = this.screen.getFont();
+				if (mouseX >= this.screen.width - X_PADDING - VALUE_WIDTH)
+				{
+					// Fixes the overlay text covering the text on the content
+					GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY + 24, this.screen.width, this.screen.height, 200, font);
+				}
+				else
+				{
+					GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY, this.screen.width, this.screen.height, 200, font);
+				}
 			}
 		}
 		
@@ -664,7 +672,6 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		}
 	}
 
-	// TODO Fix the overlay text covering the text in the number input field when the mouse is over the '+' and '-' buttons
 	/** The widget for number properties */
 	private static class NumberInputField<N extends Number> extends NumberField<N> implements IBetterElement
 	{
