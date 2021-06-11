@@ -31,17 +31,24 @@ import net.minecraftforge.fml.config.ModConfig;
 
 public class BetterConfigScreen extends Screen
 {
-	public static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
+	private static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
 	
+	/** The config user interface builder */
 	private final IConfigUIBuilder<? extends IUIElement> uiBuilder;
+	/** The mod this configuration is from */
 	private final ModContainer mod;
 	
+	/** The list of available configurations in the mod */
 	private final List<ModConfig> modConfigs;
+	/** The index of the current edited configuration in the list */
 	private final int configIndex;
+	/** The current edited configuration */
 	private final ModConfig currentConfig;
 	
-	private Screen prevScreen;
+	/** The screen to open when this screen closes */
+	private Screen prevScreen = null;
 	
+	/** The current user interface */
 	private IUIElement ui;
 	
 	protected BetterConfigScreen(IConfigUIBuilder<? extends IUIElement> uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
@@ -57,10 +64,19 @@ public class BetterConfigScreen extends Screen
 	@Override
 	protected void init()
 	{
+		// Builds the user interface
 		this.ui = this.buildTableUI(this.uiBuilder.start(this), this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues());
 		this.addListener(this.ui);
 	}
 	
+	/**
+	 * Builds the user interface for a config table
+	 * @param <P> the type of user interface primitives
+	 * @param builder the user interface builder
+	 * @param spec the specification of the table
+	 * @param values the values in the table
+	 * @return the user interface primitive to draw the table
+	 */
 	protected <P> P buildTableUI(ITableUIBuilder<P> builder, UnmodifiableConfig spec, UnmodifiableConfig values)
 	{
         Map<String, Object> specMap = spec.valueMap();
@@ -89,6 +105,13 @@ public class BetterConfigScreen extends Screen
         return builder.buildTable(tableContent);
 	}
 
+	/**
+	 * Builds the user interface for a config property
+	 * @param <P> the type of user interface primitives
+	 * @param builder the user interface builder
+	 * @param property the configuration property
+	 * @return the user interface primitive to draw the property
+	 */
 	protected <P> P buildValueIU(IValueUIBuilder<P> builder, ConfigProperty<?> property)
 	{
 		Class<?> specClass = property.getValueClass();
@@ -130,17 +153,29 @@ public class BetterConfigScreen extends Screen
 		}
 	}
 	
+	/**
+	 * Gets whether the configuration has been edited
+	 * @return true if the configuration changed, false otherwise
+	 */
 	protected boolean configChanged()
 	{
 		// TODO only save when needed
 		return true;
 	}
 	
+	/**
+	 * Sets the screen to show when this screen closes
+	 * @param prevScreen the screen to show after
+	 */
 	public void setPrevScreen(Screen prevScreen)
 	{
 		this.prevScreen = prevScreen;
 	}
 	
+	/**
+	 * Opens the configuration with the given index in the list
+	 * @param index the index of the configuration to edit
+	 */
 	public void openConfig(int index)
 	{
 		Preconditions.checkElementIndex(index, this.modConfigs.size(), "index must be insize mod config list");
@@ -148,27 +183,32 @@ public class BetterConfigScreen extends Screen
 		newScreen.setPrevScreen(this.prevScreen);
 		this.minecraft.displayGuiScreen(newScreen);
 	}
-	
+
+	/** Gets the mod this configuration is from */
 	public ModContainer getMod()
 	{
 		return this.mod;
 	}
-	
+
+	/** Gets the list of available configurations in the mod */
 	public List<ModConfig> getModConfigs()
 	{
 		return this.modConfigs;
 	}
-	
+
+	/** Gets the index of the current edited configuration in the list */
 	public int getCurrentConfigIndex()
 	{
 		return this.configIndex;
 	}
-	
+
+	/** Gets the current edited configuration */
 	public ModConfig getCurrentConfig()
 	{
 		return this.currentConfig;
 	}
-	
+
+	/** Gets the font renderer of the screen */
 	public FontRenderer getFont()
 	{
 		return this.font;

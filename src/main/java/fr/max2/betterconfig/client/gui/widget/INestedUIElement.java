@@ -6,8 +6,14 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 import net.minecraft.client.gui.INestedGuiEventHandler;
 
+/**
+ * Represents a component of user interface composed of other component
+ */
 public interface INestedUIElement extends IUIElement, INestedGuiEventHandler
 {
+	/**
+	 * Gets the list of children user interface components
+	 */
 	@Override
 	List<? extends IUIElement> getEventListeners();
 

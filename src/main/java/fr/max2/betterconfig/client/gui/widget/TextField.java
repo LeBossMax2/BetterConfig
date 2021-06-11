@@ -6,7 +6,10 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.text.ITextComponent;
 
-public abstract class TextField extends TextFieldWidget implements IUIElement
+/**
+ * A widget for entering text
+ */
+public class TextField extends TextFieldWidget implements IUIElement
 {
 	public TextField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent title)
 	{
@@ -62,6 +65,11 @@ public abstract class TextField extends TextFieldWidget implements IUIElement
 			this.onValidate(this.getText());
 		}
 	}
-	
-	protected abstract void onValidate(String text);
+
+	/**
+	 * A function called when a new value is validated by the user.
+	 * This is called when the user presses enter or unfocuses the widget
+	 */
+	protected void onValidate(String text)
+	{ }
 }

@@ -16,6 +16,7 @@ import net.minecraftforge.common.data.LanguageProvider;
 
 public class ModLanguagesProvider implements IDataProvider 
 {
+	/** The list of supported languages */
 	private final List<PartialLanguageProvider> languages = new ArrayList<>();
 	
 	protected ModLanguagesProvider(DataGenerator gen, String modId, String... locales)
@@ -49,6 +50,7 @@ public class ModLanguagesProvider implements IDataProvider
 		}
 	}
 	
+	/** Add the translations of the given key for all languages */
 	protected void add(String key, String... values)
 	{
 		Preconditions.checkArgument(this.languages.size() == values.length, "The number of provided values should be equal to the number of languages");

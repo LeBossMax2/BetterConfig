@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.util;
+package fr.max2.betterconfig.client.util;
 
 import java.util.function.Function;
 
@@ -9,7 +9,9 @@ public final class IntegerType<N extends Number> implements INumberType<N>
 	public static final IntegerType<Integer> INTERGER = new IntegerType<>(Integer::parseInt, Number::intValue);
 	public static final IntegerType<Long> LONG = new IntegerType<>(Long::parseLong, Number::longValue);
 	
+	/** The function to parse the number */
 	private final Function<String, N> parser;
+	/** The function to convert a number into the represented integer */
 	private final Function<Number, N> converter;
 
 	private IntegerType(Function<String, N> parser, Function<Number, N> converter)

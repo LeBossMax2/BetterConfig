@@ -12,6 +12,9 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.widget.IUIElement;
 import net.minecraft.client.gui.FontRenderer;
 
+/**
+ * A user interface builder that only shows the available configuration properties but doesn't allow edition
+ */
 public class DebugBuilder implements IConfigUIBuilder<DebugBuilder.DebugUI>
 {
 

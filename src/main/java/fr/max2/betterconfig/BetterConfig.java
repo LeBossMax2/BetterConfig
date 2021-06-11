@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.network.FMLNetworkConstants;
 
 @Mod(BetterConfig.MODID)
@@ -16,7 +17,10 @@ public class BetterConfig
 	public BetterConfig()
 	{
 		// Marks this mod as one-sided
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
-        TestConfig.registerConfigs();
+		ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+		
+		// Register testing config when in dev env
+		if(!FMLLoader.isProduction())
+			TestConfig.registerConfigs();
 	}
 }

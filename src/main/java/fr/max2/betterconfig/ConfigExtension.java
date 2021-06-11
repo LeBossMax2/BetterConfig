@@ -23,7 +23,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @EventBusSubscriber(modid = BetterConfig.MODID, bus = Bus.MOD, value = Dist.CLIENT)
 public class ConfigExtension
 {
-	public static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
+	private static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
 	
 	@SubscribeEvent
 	public static void registerExtensions(FMLClientSetupEvent event)
@@ -32,34 +32,35 @@ public class ConfigExtension
 	}
 	
 	/**
-	 * Configures the CONFIGGUIFACTORY extension point of the given mod to the custom gui config
+	 * Configures the CONFIGGUIFACTORY extension point of the given mod to the custom config screen
 	 * @param modId the id of the mod
 	 * @param mod the container of the mod
 	 */
 	private static void setupConfigExtensionPoint(String modId, ModContainer mod)
 	{
 		if (mod.getCustomExtension(ExtensionPoint.CONFIGGUIFACTORY).isPresent())
-			return;
+			return; // No custom config screen if one already registered
 
 		List<ModConfig> configs = getModConfigs(mod);
 		if (configs.isEmpty())
-			return;
+			return; // No config screen if the mod has no config
 		
 		LOGGER.debug("Registering extension point for " + modId);
 		mod.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> BetterConfigScreen.factory(mod, configs));
 	}
 
+	/** Gets the list of modifiable configurations for the fiven mod */
 	private static List<ModConfig> getModConfigs(ModContainer mod)
 	{
 		Map<ModConfig.Type, ModConfig> configMap = ObfuscationReflectionHelper.getPrivateValue(ModContainer.class, mod, "configs");
+		
 		if (configMap == null)
-		{
 			return Collections.emptyList();
-		}
 		
 		return configMap.values().stream().filter(ConfigExtension::isConfigEditable).collect(Collectors.toList());
 	}
 	
+	/** Checks if the given config can be edited */
 	private static boolean isConfigEditable(ModConfig config)
 	{
 		// TODO allow default server config to be changed

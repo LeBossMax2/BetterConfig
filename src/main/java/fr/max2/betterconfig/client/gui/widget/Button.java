@@ -5,16 +5,26 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.client.gui.widget.ExtendedButton;
 
+/**
+ * A basic button
+ */
 public class Button extends ExtendedButton implements IUIElement 
 {
+	/** An empty overlay */
 	public static final Button.ITooltip NO_TOOLTIP = EMPTY_TOOLTIP;
 
+	/** The overlay to show when the mouse is over the button */
 	private final ITooltip overlay;
 
-	public Button(int xPos, int yPos, int width, int height, ITextComponent displayString, IPressable handler, ITooltip overlay)
+	public Button(int xPos, int yPos, int width, int height, ITextComponent displayString, IPressable pressedHandler, ITooltip overlay)
 	{
-		super(xPos, yPos, width, height, displayString, handler);
+		super(xPos, yPos, width, height, displayString, pressedHandler);
 		this.overlay = overlay;
+	}
+
+	public Button(int xPos, int yPos, int width, int height, ITextComponent displayString, IPressable pressedHandler)
+	{
+		this(xPos, yPos, width, height, displayString, pressedHandler, NO_TOOLTIP);
 	}
 	
 	@Override

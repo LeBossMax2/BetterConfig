@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.util;
+package fr.max2.betterconfig.client.util;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 
 public class NumberTypes
 {
+	/** The map of number type for each number class */
 	private static final Map<Class<?>, INumberType<?>> TYPES = new IdentityHashMap<>();
 	
 	static
@@ -19,6 +20,7 @@ public class NumberTypes
 		register(Double.class, RealType.DOUBLE);
 	}
 	
+	/** Registers a number type */
 	public static <N> void register(Class<N> numberClass, INumberType<N> numberType)
 	{
 		Preconditions.checkNotNull(numberClass, "The number class shouldn't be null");
@@ -26,6 +28,7 @@ public class NumberTypes
 		TYPES.put(numberClass, numberType);
 	}
 	
+	/** Gets the number type associated with the given class */
 	@SuppressWarnings("unchecked")
 	public static <T> INumberType<T> getType(Class<T> numberClass)
 	{
