@@ -8,7 +8,7 @@ import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
-import fr.max2.betterconfig.client.gui.widget.CycleOptionButton;
+import fr.max2.betterconfig.client.gui.component.CycleOptionButton;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;

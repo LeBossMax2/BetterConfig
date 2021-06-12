@@ -15,14 +15,16 @@ import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.ConfigProperty;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
-import fr.max2.betterconfig.client.gui.widget.Button;
-import fr.max2.betterconfig.client.gui.widget.CycleOptionButton;
-import fr.max2.betterconfig.client.gui.widget.INestedUIElement;
-import fr.max2.betterconfig.client.gui.widget.IUIElement;
-import fr.max2.betterconfig.client.gui.widget.NumberField;
-import fr.max2.betterconfig.client.gui.widget.TextField;
+import fr.max2.betterconfig.client.gui.component.Button;
+import fr.max2.betterconfig.client.gui.component.CycleOptionButton;
+import fr.max2.betterconfig.client.gui.component.IGuiComponent;
+import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
+import fr.max2.betterconfig.client.gui.component.NumberField;
+import fr.max2.betterconfig.client.gui.component.ScrollPane;
+import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FocusableGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.IReorderingProcessor;
@@ -47,6 +49,8 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 	private static final int X_PADDING = 10;
 	/** The top and bottom padding around the screen */
 	private static final int Y_PADDING = 10;
+	/** The right padding around the screen */
+	private static final int RIGHT_PADDING = 10;
 	/** The height of the value entries */
 	private static final int VALUE_CONTAINER_HEIGHT = 24;
 	/** The height of the value widget */
@@ -62,25 +66,21 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 	@Override
 	public ITableUIBuilder<IBetterElement> start(BetterConfigScreen screen)
 	{
-		Layout l = new Layout();
-		return new Table(screen, l, content -> new UIContainer(screen, l, content), X_PADDING);
+		return new Table(screen, content -> new UIContainer(screen, content), 0);
 	}
 	
 	private static class Table implements ITableUIBuilder<IBetterElement>
 	{
 		/** The parent screen */
 		private final BetterConfigScreen screen;
-		/** The parent layout */
-		private final ILayoutManager layout;
 		/** The function to call to finalize the creation of the table ui */
 		private final UnaryOperator<IBetterElement> finalize;
 		/** The x offset of the created elements */
 		private final int xOffset;
 
-		private Table(BetterConfigScreen screen, ILayoutManager layout, UnaryOperator<IBetterElement> finalize, int xOffset)
+		private Table(BetterConfigScreen screen, UnaryOperator<IBetterElement> finalize, int xOffset)
 		{
 			this.screen = screen;
-			this.layout = layout;
 			this.finalize = finalize;
 			this.xOffset = xOffset;
 		}
@@ -88,7 +88,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public ITableUIBuilder<IBetterElement> subTableBuilder(String path, String comment)
 		{
-			return new Table(this.screen, this.layout, content -> new UIFoldout(this.screen, this.layout, content, path, linesToTextProperties(splitText(comment)), this.xOffset), this.xOffset + SECTION_TAB_SIZE);
+			return new Table(this.screen, content -> new UIFoldout(this.screen, content, path, linesToTextProperties(splitText(comment)), this.xOffset), this.xOffset + SECTION_TAB_SIZE);
 		}
 
 		@Override
@@ -100,7 +100,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public IBetterElement buildTable(List<IBetterElement> tableContent)
 		{
-			return this.finalize.apply(new UITable(tableContent));
+			return this.finalize.apply(new UITable(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - this.xOffset,tableContent));
 		}
 	}
 	
@@ -108,6 +108,8 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 	{
 		/** The parent builder */
 		private final Table parent;
+		
+		private static final int OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4;
 
 		private Value(Table parent, String path, String comment)
 		{
@@ -117,25 +119,25 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public IBetterElement buildBoolean(ConfigProperty<Boolean> property)
 		{
-			return finalizeBuild(OptionButton.booleanOption(this.parent.screen.width - Y_PADDING - VALUE_WIDTH, property), property);
+			return finalizeBuild(OptionButton.booleanOption(this.parent.screen.width - OFFSET, property), property);
 		}
 
 		@Override
 		public IBetterElement buildNumber(ConfigProperty<? extends Number> property)
 		{
-			return finalizeBuild(NumberInputField.numberOption(this.parent.screen, this.parent.screen.width - Y_PADDING - VALUE_WIDTH, property), property);
+			return finalizeBuild(NumberInputField.numberOption(this.parent.screen, this.parent.screen.width - OFFSET, property), property);
 		}
 
 		@Override
 		public IBetterElement buildString(ConfigProperty<String> property)
 		{
-			return finalizeBuild(StringInputField.stringOption(this.parent.screen, this.parent.screen.width - Y_PADDING - VALUE_WIDTH, property), property);
+			return finalizeBuild(StringInputField.stringOption(this.parent.screen, this.parent.screen.width - OFFSET, property), property);
 		}
 
 		@Override
 		public <E extends Enum<E>> IBetterElement buildEnum(ConfigProperty<E> property)
 		{
-			return finalizeBuild(OptionButton.enumOption(this.parent.screen.width - Y_PADDING - VALUE_WIDTH, property), property);
+			return finalizeBuild(OptionButton.enumOption(this.parent.screen.width - OFFSET, property), property);
 		}
 
 		@Override
@@ -148,7 +150,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public IBetterElement buildUnknown(ConfigProperty<?> property)
 		{
-			return finalizeBuild(new UnknownOptionWidget(this.parent.screen.width - Y_PADDING - VALUE_WIDTH, property), property);
+			return finalizeBuild(new UnknownOptionWidget(this.parent.screen.width - OFFSET, property), property);
 		}
 		
 		/** Finalizes the creating of a property edit ui element */
@@ -174,8 +176,9 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 	}
 	
 	/** An interface for ui elements with a simple layout system */
-	public static interface IBetterElement extends IUIElement
+	public static interface IBetterElement extends IGuiComponent
 	{
+		// TODO add filter parameter for search bar
 		/**
 		 * Sets the y coordinate of this component to the given one and computes the height
 		 * @param y the new y coordinate
@@ -184,44 +187,22 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		int setYgetHeight(int y);
 	}
 	
-	/** Controls when the layout should be updated */
-	private static class Layout implements ILayoutManager
-	{
-		/** Indicates whether the layout is dirty */
-		private boolean dirty = true;
-		
-		@Override
-		public void marksLayoutDirty()
-		{
-			this.dirty = true;
-		}
-		
-		/** Marks the layout as not dirty */
-		private void clean()
-		{
-			this.dirty = false;
-		}
-		
-		/** Indicates whether the layout is dirty */
-		private boolean isDirty()
-		{
-			return this.dirty;
-		}
-	}
-	
 	/** The ui for a config table */
-	private static class UITable extends FocusableGui implements INestedUIElement, IBetterElement
+	private static class UITable extends FocusableGui implements INestedGuiComponent, IBetterElement
 	{
 		/** The list of entries of the table */
 		private final List<IBetterElement> content;
+		private final int width;
+		private int height = 0;
 
-		public UITable(List<IBetterElement> content)
+		public UITable(int width, List<IBetterElement> content)
 		{
 			this.content = content;
+			this.width = width;
 		}
 
 		@Override
-		public List<? extends IUIElement> getEventListeners()
+		public List<? extends IGuiComponent> getEventListeners()
 		{
 			return this.content;
 		}
@@ -234,47 +215,61 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 			{
 				h += elem.setYgetHeight(y + h);
 			}
+			this.height = h;
 			return h;
+		}
+
+		@Override
+		public int getWidth()
+		{
+			return this.width;
+		}
+
+		@Override
+		public int getHeight()
+		{
+			return this.height;
 		}
 	}
 	
 	/** The ui for a expand/collapse subsection */
-	private static class UIFoldout extends FocusableGui implements INestedUIElement, IBetterElement
+	private static class UIFoldout extends FocusableGui implements INestedGuiComponent, IBetterElement
 	{
 		/** The height of the fouldout header */
 		private static final int FOLDOUT_HEADER_HEIGHT = 20;
 		/** The parent screen */
 		private final BetterConfigScreen screen;
-		/** The layout to notify for layout update */
-		private final ILayoutManager layout;
 		/** The content that will be collapsed */
 		private final IBetterElement content;
 		/** The title on the header */
 		private final IReorderingProcessor sectionName;
 		/** The extra info to show on the tooltip */
 		private final List<? extends ITextProperties> extraInfo;
+		/** The layout to notify for layout update */
+		private ILayoutManager layout;
 		/** The x coordinate of this component */
-		private final int x;
+		private final int baseX;
 		/** The y coordinate of this component */
-		private int y = 0;
+		private int baseY = 0;
 		/** The current height of this component */
 		private int height = 0;
 		
 		/** {@code true} when the content is collapsed, {@code false} otherwise */
 		private boolean folded = false;
 
-		public UIFoldout(BetterConfigScreen screen, ILayoutManager layout, IBetterElement content, String path, List<? extends ITextProperties> comment, int x)
+		public UIFoldout(BetterConfigScreen screen, IBetterElement content, String path, List<? extends ITextProperties> comment, int x)
 		{
 			this.screen = screen;
-			this.layout = layout;
 			this.content = content;
 			this.sectionName = IReorderingProcessor.fromString(path, Style.EMPTY.mergeWithFormatting(TextFormatting.BOLD, TextFormatting.YELLOW));
 			this.extraInfo = comment;
-			this.x = x;
+			this.baseX = x;
 		}
+		
+		// Layout
 
 		@Override
-		public List<? extends IUIElement> getEventListeners()
+		public List<? extends IGuiComponent> getEventListeners()
 		{
 			return this.folded ? Collections.emptyList() : Arrays.asList(this.content);
 		}
@@ -282,7 +277,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public int setYgetHeight(int y)
 		{
-			this.y = y;
+			this.baseY = y;
 			int contentHeight = this.content.setYgetHeight(y + FOLDOUT_HEADER_HEIGHT);
 
 			if (this.folded)
@@ -293,6 +288,33 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 			this.height = contentHeight + FOLDOUT_HEADER_HEIGHT;
 			return this.height;
 		}
+		
+		@Override
+		public void setLayoutManager(ILayoutManager manager)
+		{
+			this.layout = manager;
+			this.content.setLayoutManager(manager);
+		}
+		
+		@Override
+		public void onLayoutChanged()
+		{
+			this.content.onLayoutChanged();
+		}
+
+		@Override
+		public int getWidth()
+		{
+			return this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
+		}
+
+		@Override
+		public int getHeight()
+		{
+			return this.height;
+		}
+		
+		// Mouse interaction
 		
 		public void toggleFolding()
 		{
@@ -318,36 +340,48 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public boolean isMouseOver(double mouseX, double mouseY)
 		{
-			return mouseX >= this.x && mouseY >= this.y && mouseX < this.screen.width - X_PADDING && mouseY < this.y + this.height;
+			int y = this.baseY  + this.layout.getLayoutY();
+			return mouseX >= this.baseX + this.layout.getLayoutX()
+			    && mouseY >= y
+			    && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING
+			    && mouseY < y + this.height;
 		}
 		
 		private boolean isOverHeader(double mouseX, double mouseY)
 		{
-			return mouseX >= this.x && mouseY >= this.y && mouseX < this.screen.width - X_PADDING && mouseY < this.y + FOLDOUT_HEADER_HEIGHT;
+			int y = this.baseY  + this.layout.getLayoutY();
+			return mouseX >= this.baseX + this.layout.getLayoutX()
+			    && mouseY >= y
+			    && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING
+			    && mouseY < y + FOLDOUT_HEADER_HEIGHT;
 		}
+		
+		// Rendering
 		
 		@Override
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
-			INestedUIElement.super.render(matrixStack, mouseX, mouseY, partialTicks);
+			INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
 			this.renderFoldoutHeader(matrixStack, mouseX, mouseY, partialTicks);
 		}
 		
 		protected void renderFoldoutHeader(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
+			int x = this.baseX  + this.layout.getLayoutX();
+			int y = this.baseY  + this.layout.getLayoutY();
 			// Draw background
-			fill(matrixStack, this.x, this.y, this.screen.width - X_PADDING, this.y + FOLDOUT_HEADER_HEIGHT, 0x55_00_00_00);
+			fill(matrixStack, x, y, this.screen.width - X_PADDING - RIGHT_PADDING, y + FOLDOUT_HEADER_HEIGHT, 0xC0_33_33_33);
 			// Draw foreground
 			String arrow = this.folded ? ">" : "v";
 			FontRenderer font = this.screen.getFont(); 
-			font.drawString(matrixStack, arrow, this.x + 1, this.y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
-			font.func_238422_b_(matrixStack, this.sectionName, this.x + 11, this.y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+			font.drawString(matrixStack, arrow, x + 1, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+			font.func_238422_b_(matrixStack, this.sectionName, x + 11, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
 		}
 		
 		@Override
 		public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
-			INestedUIElement.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+			INestedGuiComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 			if (this.isOverHeader(mouseX, mouseY))
 			{
 				FontRenderer font = this.screen.getFont();
@@ -358,26 +392,23 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 	
 	//TODO add search bar
 	/** The container for the main section */
-	private static class UIContainer extends FocusableGui implements INestedUIElement, IBetterElement
+	private static class UIContainer extends FocusableGui implements INestedGuiComponent, IBetterElement
 	{
 		/** The the height of the header */
 		private static final int CONTAINER_HEADER_HEIGHT = 30;
 		/** The parent screen */
 		private final BetterConfigScreen screen;
-		/** The layout updated by the content of the container */
-		private final Layout contentLayout;
 		/** The contained section */
 		private final IBetterElement content;
 		/** The tab buttons */
-		private final List<IUIElement> configTabs = new ArrayList<>();
+		private final List<IGuiComponent> configTabs = new ArrayList<>();
 		/** The y coordinate of this widget */
 		private int y;
 
-		public UIContainer(BetterConfigScreen screen, Layout layout, IBetterElement content)
+		public UIContainer(BetterConfigScreen screen, IBetterElement content)
 		{
 			this.screen = screen;
-			this.contentLayout = layout;
-			this.content = content;
+			this.content = new UIScrollPane(screen.getMinecraft(), X_PADDING, Y_PADDING + CONTAINER_HEADER_HEIGHT, screen.width - 2 * X_PADDING, screen.height - 2 * Y_PADDING - CONTAINER_HEADER_HEIGHT, content);
 			int x = X_PADDING;
 			int buttonWidth = (this.screen.width - 2 * X_PADDING) / ModConfig.Type.values().length;
 			int i = 0;
@@ -391,12 +422,14 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 				x += buttonWidth;
 				i++;
 			}
-			this.configTabs.add(content);
+			this.configTabs.add(this.content);
 			this.setYgetHeight(Y_PADDING);
 		}
+		
+		// Layout
 
 		@Override
-		public List<? extends IUIElement> getEventListeners()
+		public List<? extends IGuiComponent> getEventListeners()
 		{
 			return this.configTabs;
 		}
@@ -404,24 +437,97 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public int setYgetHeight(int y)
 		{
-			//TODO create scroll pane
 			this.y = y;
-			int h = this.content.setYgetHeight(y + CONTAINER_HEADER_HEIGHT) + CONTAINER_HEADER_HEIGHT;
-			
-			this.contentLayout.clean();
-			return h; 
+			this.content.setYgetHeight(y + CONTAINER_HEADER_HEIGHT);
+			return this.getHeight(); 
 		}
+		
+		@Override
+		public boolean isMouseOver(double mouseX, double mouseY)
+		{
+			return true;
+		}
+		
+		@Override
+		public void setLayoutManager(ILayoutManager manager)
+		{ }
+
+		@Override
+		public int getWidth()
+		{
+			return this.screen.width;
+		}
+
+		@Override
+		public int getHeight()
+		{
+			return this.screen.height;
+		}
+		
+		// Rendering
 		
 		@Override
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
 			this.screen.renderBackground(matrixStack);
-			INestedUIElement.super.render(matrixStack, mouseX, mouseY, partialTicks);
+			INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
 			this.renderHeader(matrixStack, mouseX, mouseY, partialTicks);
 		}
 		
 		protected void renderHeader(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{ }
+		
+	}
+	
+	private static class UIScrollPane extends ScrollPane implements IBetterElement
+	{
+		/** Indicates whether the layout is dirty */
+		private boolean dirty = true;
+
+		public UIScrollPane(Minecraft minecraft, int x, int y, int w, int h, IBetterElement content)
+		{
+			super(minecraft, x, y, w, h, content);
+		}
+		
+		// Layout
+
+		@Override
+		public int setYgetHeight(int y)
+		{
+			this.baseY = y;
+			this.checkLayout();
+			
+			return this.getHeight();
+		}
+		
+		protected void checkLayout()
+		{
+			if (this.isDirty())
+			{
+				((IBetterElement)this.content).setYgetHeight(0);
+				this.clean();
+			}
+		}
+		
+		@Override
+		public void marksLayoutDirty()
+		{
+			this.dirty = true;
+		}
+		
+		/** Marks the layout as not dirty */
+		private void clean()
+		{
+			this.dirty = false;
+		}
+		
+		/** Indicates whether the layout is dirty */
+		private boolean isDirty()
+		{
+			return this.dirty;
+		}
+		
+		// User interaction
 		
 		@Override
 		public void mouseMoved(double mouseX, double mouseY)
@@ -486,23 +592,17 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 			return res;
 		}
 		
-		protected void checkLayout()
+		/*@Override
+		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
-			if (this.contentLayout.isDirty())
-			{
-				this.setYgetHeight(this.y);
-			}
-		}
+			checkLayout();
+			super.render(matrixStack, mouseX, mouseY, partialTicks);
+		}*/
 		
-		@Override
-		public boolean isMouseOver(double mouseX, double mouseY)
-		{
-			return true;
-		}
 	}
 	
 	/** The container for table entries */
-	private static class ValueContainer extends FocusableGui implements INestedUIElement, IBetterElement
+	private static class ValueContainer extends FocusableGui implements INestedGuiComponent, IBetterElement
 	{
 		/** The parent screen */
 		private final BetterConfigScreen screen;
@@ -512,10 +612,12 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		private final List<IReorderingProcessor> nameLines;
 		/** The extra info to show on the tooltip */
 		private final List<ITextProperties> extraInfo = new ArrayList<>();
+		/** The parent layout */
+		private ILayoutManager layout = ILayoutManager.NONE;
 		/** The x coordinate of the component */
-		private final int x;
+		private final int baseX;
 		/** The y coordinate of the component */
-		private int y = 0;
+		private int baseY = 0;
 		/** The height of the component */
 		private int height = 0;
 
@@ -524,17 +626,19 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 			this.screen = screen;
 			this.content = content;
 			FontRenderer font = this.screen.getFont();
-			this.nameLines = font.trimStringToWidth(property.getDisplayName(), screen.width - x - VALUE_WIDTH - X_PADDING);
+			this.nameLines = font.trimStringToWidth(property.getDisplayName(), screen.width - x - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - 4);
 			List<String> path = property.getPath();
 			if (!path.isEmpty())
 				this.extraInfo.add(ITextProperties.func_240653_a_(path.get(path.size() - 1), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
 			this.extraInfo.addAll(property.getDisplayComment());
 			this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(property.getDefaultValue().toString()))).mergeStyle(TextFormatting.GRAY));
-			this.x = x;
+			this.baseX = x;
 		}
+		
+		// Layout
 
 		@Override
-		public List<? extends IUIElement> getEventListeners()
+		public List<? extends IGuiComponent> getEventListeners()
 		{
 			return Arrays.asList(this.content);
 		}
@@ -542,21 +646,49 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public int setYgetHeight(int y)
 		{
-			this.y = y;
+			this.baseY = y;
 			this.height = Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().FONT_HEIGHT);
 			this.content.setYgetHeight(y + (this.height - VALUE_HEIGHT) / 2);
 			return this.height;
 		}
+
+		@Override
+		public void setLayoutManager(ILayoutManager manager)
+		{
+			this.layout = manager;
+			INestedGuiComponent.super.setLayoutManager(manager);
+		}
+
+		@Override
+		public int getWidth()
+		{
+			return this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutY();
+		}
+
+		@Override
+		public int getHeight()
+		{
+			return this.height;
+		}
+		
+		@Override
+		public boolean isMouseOver(double mouseX, double mouseY)
+		{
+			int y = this.baseY + this.layout.getLayoutY();
+			return mouseX >= this.baseX + this.layout.getLayoutX() && mouseY >= y && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING && mouseY < y + this.height;
+		}
+		
+		// Rendering
 		
 		@Override
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
-			INestedUIElement.super.render(matrixStack, mouseX, mouseY, partialTicks);
+			INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
 			FontRenderer font = this.screen.getFont();
-			int y = this.y + (this.height - this.nameLines.size() * this.screen.getFont().FONT_HEIGHT) / 2;
+			int y = this.baseY + this.layout.getLayoutY() + (this.height - this.nameLines.size() * this.screen.getFont().FONT_HEIGHT) / 2;
 			for(IReorderingProcessor line : this.nameLines)
 			{
-				font.func_238422_b_(matrixStack, line, this.x + 1, y, 0xFF_FF_FF_FF);
+				font.func_238422_b_(matrixStack, line, this.baseX + this.layout.getLayoutX() + 1, y, 0xFF_FF_FF_FF);
 				y += 9;
 			}
 		}
@@ -564,26 +696,16 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
-			INestedUIElement.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+			INestedGuiComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 			if (this.isMouseOver(mouseX, mouseY))
 			{
 				FontRenderer font = this.screen.getFont();
-				if (mouseX >= this.screen.width - X_PADDING - VALUE_WIDTH)
-				{
-					// Fixes the overlay text covering the text on the content
-					GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY + 24, this.screen.width, this.screen.height, 200, font);
-				}
-				else
-				{
-					GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY, this.screen.width, this.screen.height, 200, font);
-				}
+				int yOffset = 0;
+				if (mouseX >= this.screen.width - X_PADDING - VALUE_WIDTH - RIGHT_PADDING)
+					yOffset = 24; // Fixes the overlay text covering the text on the content
+				
+				GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY + yOffset, this.screen.width, this.screen.height, 200, font);
 			}
-		}
-		
-		@Override
-		public boolean isMouseOver(double mouseX, double mouseY)
-		{
-			return mouseX >= this.x && mouseY >= this.y && mouseX < this.screen.width - X_PADDING && mouseY < this.y + this.height;
 		}
 	}
 	
@@ -603,7 +725,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public int setYgetHeight(int y)
 		{
-			this.y = y;
+			this.setY(y);
 			return this.height;
 		}
 		
@@ -652,7 +774,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public int setYgetHeight(int y)
 		{
-			this.y = y + 1;
+			this.setY(y + 1);
 			return this.height + 2;
 		}
 		
@@ -694,9 +816,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		@Override
 		public int setYgetHeight(int y)
 		{
-			this.inputField.y = y + 1;
-			this.minusButton.y = y;
-			this.plusButton.y = y;
+			this.setY(y);
 			return VALUE_HEIGHT;
 		}
 		

@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.client.gui.widget;
+package fr.max2.betterconfig.client.gui.component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.Optional;
 import com.google.common.base.Strings;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
+import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.INumberType.Increment;
 import fr.max2.betterconfig.client.util.INumberType.Operator;
@@ -19,14 +20,14 @@ import net.minecraft.util.text.ITextComponent;
  * A widget for entering a number
  * @param <N> the type of accepted number
  */
-public abstract class NumberField<N> extends FocusableGui implements INestedUIElement
+public abstract class NumberField<N> extends FocusableGui implements INestedGuiComponent
 {
 	/** The default width of the '+' and '-' buttons */
 	protected static final int BUTTON_SIZE = 20;
 	/** The spacing between the buttons and the text field */
 	protected static final int SPACING = 2;
 	/** The list of children ui components */
-	protected final List<IUIElement> elements;
+	protected final List<IGuiComponent> elements;
 	/** The text field to directly enter the number */
 	protected final TextField inputField;
 	/** The minus button to decrement the number */
@@ -37,10 +38,17 @@ public abstract class NumberField<N> extends FocusableGui implements INestedUIEl
 	protected final INumberType<N> numberType;
 	/** The current increment for each button click */
 	protected Increment currentIncrement = Increment.NORMAL;
+	
+	protected int baseX, baseY, w, h;
+	protected ILayoutManager layout;
 
 	public NumberField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent title, INumberType<N> numberType, N value)
 	{
 		this.numberType = numberType;
+		this.baseX = x;
+		this.baseY = y;
+		this.w = width;
+		this.h = height;
 		this.inputField = new TextField(fontRenderer, x + BUTTON_SIZE + SPACING + 1, y + 1, width - 2 * (BUTTON_SIZE + SPACING + 1), height - 2, title)
 		{
 			@Override
@@ -70,18 +78,72 @@ public abstract class NumberField<N> extends FocusableGui implements INestedUIEl
 		this.setValue(value);
 	}
 	
+	// Layout
+	
 	@Override
-	public List<? extends IUIElement> getEventListeners()
+	public void setLayoutManager(ILayoutManager manager)
+	{
+		this.layout = manager;
+		INestedGuiComponent.super.setLayoutManager(manager);
+	}
+
+	@Override
+	public int getWidth()
+	{
+		return this.w;
+	}
+
+	@Override
+	public int getHeight()
+	{
+		return this.h;
+	}
+
+	/** Sets the x position of this button relative to the layout position */
+	public void setX(int x)
+	{
+		this.baseX = x;
+		this.inputField.setX(x + BUTTON_SIZE + SPACING + 1);
+		this.minusButton.setX(x);
+		this.plusButton.setX(x + this.w - BUTTON_SIZE);
+	}
+
+	/** Sets the y position of this button relative to the layout position */
+	public void setY(int y)
+	{
+		this.baseY = y;
+		this.inputField.setY(y + 1);
+		this.minusButton.setY(y);
+		this.plusButton.setY(y);
+	}
+	
+	@Override
+	public List<? extends IGuiComponent> getEventListeners()
 	{
 		return this.elements;
 	}
 	
 	@Override
+	public boolean isMouseOver(double mouseX, double mouseY)
+	{
+		int x = this.baseX + this.layout.getLayoutX();
+		int y = this.baseY + this.layout.getLayoutY();
+		return mouseX >= x
+		    && mouseY >= y
+		    && mouseX < x + this.w
+		    && mouseY < y + this.h;
+	}
+	
+	// Rendering
+	
+	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.updateIncrement();
-		INestedUIElement.super.render(matrixStack, mouseX, mouseY, partialTicks);
+		INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
+	
+	// Value manipulation methods
 	
 	/** Updates the button text with the correct increment */
 	protected void updateIncrement()

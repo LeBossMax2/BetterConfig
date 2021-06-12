@@ -9,7 +9,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 import fr.max2.betterconfig.ConfigProperty;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.widget.IUIElement;
+import fr.max2.betterconfig.client.gui.ILayoutManager;
+import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import net.minecraft.client.gui.FontRenderer;
 
 /**
@@ -114,7 +115,7 @@ public class DebugBuilder implements IConfigUIBuilder<DebugBuilder.DebugUI>
 		
 	}
 	
-	public static class DebugUI implements IUIElement
+	public static class DebugUI implements IGuiComponent
 	{
 		private final BetterConfigScreen parent;
 		private final List<String> labels;
@@ -150,6 +151,22 @@ public class DebugBuilder implements IConfigUIBuilder<DebugBuilder.DebugUI>
 		@Override
 		public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{ }
+
+		@Override
+		public void setLayoutManager(ILayoutManager manager)
+		{ }
+
+		@Override
+		public int getWidth()
+		{
+			return this.parent.width;
+		}
+
+		@Override
+		public int getHeight()
+		{
+			return this.parent.height;
+		}
 		
 	}
 }

@@ -18,7 +18,7 @@ import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.builder.IConfigUIBuilder;
 import fr.max2.betterconfig.client.gui.builder.ITableUIBuilder;
 import fr.max2.betterconfig.client.gui.builder.ValueType;
-import fr.max2.betterconfig.client.gui.widget.IUIElement;
+import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.client.gui.builder.IValueUIBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -34,7 +34,7 @@ public class BetterConfigScreen extends Screen
 	private static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
 	
 	/** The config user interface builder */
-	private final IConfigUIBuilder<? extends IUIElement> uiBuilder;
+	private final IConfigUIBuilder<? extends IGuiComponent> uiBuilder;
 	/** The mod this configuration is from */
 	private final ModContainer mod;
 	
@@ -49,9 +49,9 @@ public class BetterConfigScreen extends Screen
 	private Screen prevScreen = null;
 	
 	/** The current user interface */
-	private IUIElement ui;
+	private IGuiComponent ui;
 	
-	protected BetterConfigScreen(IConfigUIBuilder<? extends IUIElement> uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
+	protected BetterConfigScreen(IConfigUIBuilder<? extends IGuiComponent> uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
 	{
 		super(new StringTextComponent(mod.getModId() + " configuration : " + configs.get(index).getFileName()));
 		this.uiBuilder = uiBuilder;
@@ -224,7 +224,7 @@ public class BetterConfigScreen extends Screen
 		return (mc, prevScreen) ->
 		{
 			// TODO get from mod properties
-			IConfigUIBuilder<? extends IUIElement> uiBuilder = new BetterConfigBuilder();
+			IConfigUIBuilder<? extends IGuiComponent> uiBuilder = new BetterConfigBuilder();
 			BetterConfigScreen screen = new BetterConfigScreen(uiBuilder, mod, configs, 0);
 			screen.setPrevScreen(prevScreen);
 			return screen;
