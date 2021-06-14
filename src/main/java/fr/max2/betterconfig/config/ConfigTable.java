@@ -1,6 +1,7 @@
 package fr.max2.betterconfig.config;
 
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
@@ -19,12 +20,15 @@ public class ConfigTable extends ConfigNode
 	private final UnmodifiableConfig configValues;
 	/** The comment associated with the table */
 	private final String comment;
+	/** The function to call then the value of a property is changed */
+	private Consumer<ConfigProperty<?>> changeListener;
 	
-	public ConfigTable(UnmodifiableConfig spec, UnmodifiableConfig configValues, String comment)
+	public ConfigTable(UnmodifiableConfig spec, UnmodifiableConfig configValues, String comment, Consumer<ConfigProperty<?>> changeListener)
 	{
 		this.spec = spec;
 		this.configValues = configValues;
 		this.comment = comment;
+		this.changeListener = changeListener;
 	}
 	
 	@Override
@@ -64,12 +68,12 @@ public class ConfigTable extends ConfigNode
             if (specValue instanceof UnmodifiableConfig)
             {
             	String comment = ""; //TODO find a way to replace 'values.getComment(key);'
-            	return visitor.visitSubTable(key, new ConfigTable((UnmodifiableConfig)specValue, (UnmodifiableConfig)configValue, comment), param);
+            	return visitor.visitSubTable(key, new ConfigTable((UnmodifiableConfig)specValue, (UnmodifiableConfig)configValue, comment, this.changeListener), param);
             }
             else
             {
                 ValueSpec valueSpec = (ValueSpec)specValue;
-                return visitor.visitValue(key, new ConfigProperty<>(valueSpec, (ConfigValue<?>)configValue), param);
+                return visitor.visitValue(key, new ConfigProperty<>(valueSpec, (ConfigValue<?>)configValue, this.changeListener), param);
             }
         });
 	}

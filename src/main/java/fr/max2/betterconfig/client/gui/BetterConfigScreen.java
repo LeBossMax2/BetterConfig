@@ -1,6 +1,8 @@
 package fr.max2.betterconfig.client.gui;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 import com.google.common.base.Preconditions;
@@ -8,6 +10,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
+import fr.max2.betterconfig.config.ConfigProperty;
 import fr.max2.betterconfig.config.ConfigTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -29,6 +32,8 @@ public class BetterConfigScreen extends Screen
 	private final int configIndex;
 	/** The current edited configuration */
 	private final ModConfig currentConfig;
+	/** The set of properties that changed and need to be saved */
+	private final Set<ConfigProperty<?>> modifiedProperties = new HashSet<>();
 	
 	/** The screen to open when this screen closes */
 	private Screen prevScreen = null;
@@ -49,8 +54,9 @@ public class BetterConfigScreen extends Screen
 	@Override
 	protected void init()
 	{
+		this.modifiedProperties.clear();
 		// Builds the user interface
-		this.ui = this.uiBuilder.build(this, new ConfigTable(this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues(), this.mod.getModInfo().getDescription()));
+		this.ui = this.uiBuilder.build(this, new ConfigTable(this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues(), this.mod.getModInfo().getDescription(), this::onPropertyChanged));
 		this.addListener(this.ui);
 	}
 	
@@ -74,9 +80,12 @@ public class BetterConfigScreen extends Screen
 	{
 		if (this.configChanged())
 		{
-			// Save config and send config update event
-            // TODO send config reloading event
-            //this.currentConfig.fireEvent(new ModConfig.Reloading(this.currentConfig));
+			// Save changes to config
+			for (ConfigProperty<?> property : this.modifiedProperties)
+			{
+				property.sendChanges();
+			}
+			// After a save, ConfigFileTypeHandler automatically sends config update event if you're lucky
             this.currentConfig.save();
 		}
 	}
@@ -87,8 +96,23 @@ public class BetterConfigScreen extends Screen
 	 */
 	protected boolean configChanged()
 	{
-		// TODO only save when needed
-		return true;
+		return !this.modifiedProperties.isEmpty();
+	}
+	
+	/**
+	 * Called when a the value property changes to tracks which property should be saved
+	 * @param property the property that changed
+	 */
+	protected void onPropertyChanged(ConfigProperty<?> property)
+	{
+		if (property.valueChanged())
+		{
+			this.modifiedProperties.add(property);
+		}
+		else
+		{
+			this.modifiedProperties.remove(property);
+		}
 	}
 	
 	/**

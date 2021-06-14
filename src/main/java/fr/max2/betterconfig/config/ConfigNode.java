@@ -19,12 +19,12 @@ public abstract class ConfigNode
 	private List<? extends ITextComponent> commentLines = null;
 
 	/**
-	 * Gets the comment associated with the property
+	 * Gets the comment associated with the config node
 	 */
 	abstract String getCommentString();
 	
 	/**
-	 * Gets the comment associated with the property for display
+	 * Gets the comment associated with the config node for display
 	 * @return an unmodifiable list containing the comments
 	 */
 	public List<? extends ITextComponent> getDisplayComment()

@@ -3,6 +3,7 @@ package fr.max2.betterconfig.config;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,13 +27,19 @@ public class ConfigProperty<T> extends ConfigNode
 	
 	/** The specification */
 	private final ValueSpec spec;
-	/** The configuration value */
+	/** The configuration value currently saved */
 	private final ConfigValue<T> configValue;
+	/** The function to call then the value is changed */
+	private final Consumer<ConfigProperty<?>> changeListener;
+	/** The current temporary value of the property */
+	private T currentValue;
 	
-	public ConfigProperty(ValueSpec spec, ConfigValue<T> configValue)
+	public ConfigProperty(ValueSpec spec, ConfigValue<T> configValue, Consumer<ConfigProperty<?>> changeListener)
 	{
 		this.spec = spec;
 		this.configValue = configValue;
+		this.changeListener = changeListener;
+		this.currentValue = configValue.get();
 	}
 	
 	/**
@@ -55,8 +62,8 @@ public class ConfigProperty<T> extends ConfigNode
 	}
 	
 	/**
-	 * Gets the path of this value in configuration spec
-	 * @return
+	 * Gets the path of this property in the configuration spec
+	 * @return the path of the property is a list
 	 */
 	public List<String> getPath()
 	{
@@ -86,10 +93,11 @@ public class ConfigProperty<T> extends ConfigNode
 	
 	/**
 	 * Gets the current configuration value
+	 * @return the current temporary value
 	 */
 	public T getValue()
 	{
-		return this.configValue.get();
+		return this.currentValue;
 	}
 	
 	/**
@@ -99,7 +107,10 @@ public class ConfigProperty<T> extends ConfigNode
 	public void setValue(T value)
 	{
 		if (!Objects.equals(this.getValue(), value))
-			this.configValue.set(value);
+		{
+			this.currentValue = value;
+			this.changeListener.accept(this);
+		}
 	}
 	
 	/**
@@ -109,6 +120,24 @@ public class ConfigProperty<T> extends ConfigNode
 	public T getDefaultValue()
 	{
 		return (T)this.spec.getDefault();
+	}
+	
+	/**
+	 * Checks if the value changed compared to the saved value
+	 * @return true if the value is different, false otherwise
+	 */
+	public boolean valueChanged()
+	{
+		return !Objects.equals(this.configValue.get(), this.currentValue);
+	}
+	
+	/**
+	 * Saves the changes to the configuration file
+	 */
+	public void sendChanges()
+	{
+		if (this.valueChanged())
+			this.configValue.set(this.currentValue);
 	}
 	
 	@Override
@@ -126,7 +155,7 @@ public class ConfigProperty<T> extends ConfigNode
 		if (specClass != Object.class)
 			return specClass;
 		
-		T value = this.configValue.get();
+		T value = this.getValue();
 		if (value != null)
 			return value.getClass();
 		
