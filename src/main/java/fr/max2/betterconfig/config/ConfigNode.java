@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -15,8 +16,24 @@ import net.minecraft.util.text.StringTextComponent;
  */
 public abstract class ConfigNode
 {
+	/** The path of this node in the configuration spec */
+	private final List<String> path;
 	/** The comments describing the property */
 	private List<? extends ITextComponent> commentLines = null;
+	
+	protected ConfigNode(Iterable<String> path)
+	{
+		this.path = ImmutableList.copyOf(path);
+	}
+	
+	/**
+	 * Gets the path of this property in the configuration spec
+	 * @return the path of the property is an immutable list
+	 */
+	public List<String> getPath()
+	{
+		return this.path;
+	}
 
 	/**
 	 * Gets the comment associated with the config node

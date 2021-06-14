@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -55,11 +56,12 @@ public class BetterConfigScreen extends Screen
 	protected void init()
 	{
 		this.modifiedProperties.clear();
+		ForgeConfigSpec spec = this.currentConfig.getSpec();
 		// Builds the user interface
-		this.ui = this.uiBuilder.build(this, new ConfigTable(this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues(), this.mod.getModInfo().getDescription(), this::onPropertyChanged));
+		this.ui = this.uiBuilder.build(this, new ConfigTable(spec, this::onPropertyChanged));
 		this.addListener(this.ui);
 	}
-	
+
 	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{

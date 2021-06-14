@@ -36,6 +36,7 @@ public class ConfigProperty<T> extends ConfigNode
 	
 	public ConfigProperty(ValueSpec spec, ConfigValue<T> configValue, Consumer<ConfigProperty<?>> changeListener)
 	{
+		super(configValue.getPath());
 		this.spec = spec;
 		this.configValue = configValue;
 		this.changeListener = changeListener;
@@ -53,21 +54,12 @@ public class ConfigProperty<T> extends ConfigNode
 			return new TranslationTextComponent(translationKey);
 		
 		// Try getting name from path
-		List<String> path = this.configValue.getPath();
+		List<String> path = this.getPath();
 		if (!path.isEmpty())
 			return new StringTextComponent(path.get(path.size() - 1));
 		
 		// No name found :(
 		return StringTextComponent.EMPTY;
-	}
-	
-	/**
-	 * Gets the path of this property in the configuration spec
-	 * @return the path of the property is a list
-	 */
-	public List<String> getPath()
-	{
-		return this.configValue.getPath();
 	}
 	
 	/**
