@@ -2,7 +2,7 @@ package fr.max2.betterconfig;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import fr.max2.betterconfig.client.gui.builder.ValueType;
+import fr.max2.betterconfig.config.ValueType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;

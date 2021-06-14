@@ -1,8 +1,6 @@
-package fr.max2.betterconfig.client.gui.builder;
+package fr.max2.betterconfig.config;
 
 import java.util.List;
-
-import fr.max2.betterconfig.ConfigProperty;
 
 /**
  * Represents the type of values inside a config
@@ -13,50 +11,50 @@ public enum ValueType
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		public <P, R> R exploreProperty(IConfigPropertyVisitor<P, R> visitor, ConfigProperty<?> property, P param)
 		{
-			return builder.buildBoolean((ConfigProperty<Boolean>)property);
+			return visitor.visitBoolean((ConfigProperty<Boolean>)property, param);
 		}
 	},
 	NUMBER(Number.class)
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		public <P, R> R exploreProperty(IConfigPropertyVisitor<P, R> visitor, ConfigProperty<?> property, P param)
 		{
-			return builder.buildNumber((ConfigProperty<? extends Number>)property);
+			return visitor.visitNumber((ConfigProperty<? extends Number>)property, param);
 		}
 	},
 	STRING(String.class)
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		public <P, R> R exploreProperty(IConfigPropertyVisitor<P, R> visitor, ConfigProperty<?> property, P param)
 		{
-			return builder.buildString((ConfigProperty<String>)property);
+			return visitor.visitString((ConfigProperty<String>)property, param);
 		}
 	},
 	ENUM(Enum.class)
 	{		
 		@SuppressWarnings("unchecked")
-		private <E extends Enum<E>, P> P callEnumBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		private <E extends Enum<E>, P, R> R exploreEnum(IConfigPropertyVisitor<P, R> visitor, ConfigProperty<?> property, P param)
 		{
-			return builder.buildEnum((ConfigProperty<E>) property);
+			return visitor.visitEnum((ConfigProperty<E>)property, param);
 		}
 		
 		@Override
-		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		public <P, R> R exploreProperty(IConfigPropertyVisitor<P, R> visitor, ConfigProperty<?> property, P param)
 		{
-			return callEnumBuilder(builder, property);
+			return exploreEnum(visitor, property, param);
 		}
 	},
 	LIST(List.class)
 	{
 		@SuppressWarnings("unchecked")
 		@Override
-		public <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+		public <P, R> R exploreProperty(IConfigPropertyVisitor<P, R> visitor, ConfigProperty<?> property, P param)
 		{
-			return builder.buildList((ConfigProperty<? extends List<?>>)property);
+			return visitor.visitList((ConfigProperty<? extends List<?>>)property, param);
 		}
 	};
 	
@@ -85,7 +83,7 @@ public enum ValueType
 	 * @param property
 	 * @return the primitive corresponding to the value user interface
 	 */
-	public abstract <P> P callBuilder(IValueUIBuilder<P> builder, ConfigProperty<?> property);
+	public abstract <P, R> R exploreProperty(IConfigPropertyVisitor<P, R> visitor, ConfigProperty<?> property, P param);
 	
 	/**
 	 * Gets the {@code ValueType} corresponding to the given class

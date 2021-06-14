@@ -79,9 +79,7 @@ public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILa
 	
 	@Override
 	public void marksLayoutDirty()
-	{
-		// TODO Auto-generated method stub
-	}
+	{ }
 	
 	@Override
 	public int getLayoutX()

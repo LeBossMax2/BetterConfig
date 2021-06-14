@@ -1,14 +1,15 @@
-package fr.max2.betterconfig;
+package fr.max2.betterconfig.config;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Strings;
 
+import fr.max2.betterconfig.BetterConfig;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -19,14 +20,14 @@ import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
  * A property for a configuration value and its specification
  * @param <T> the type of value contained in the property
  */
-public class ConfigProperty<T>
+public class ConfigProperty<T> extends ConfigNode
 {
+	private static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
+	
 	/** The specification */
 	private final ValueSpec spec;
 	/** The configuration value */
 	private final ConfigValue<T> configValue;
-	/** The comments describing the property */
-	private List<? extends ITextComponent> commentLines = null;
 	
 	public ConfigProperty(ValueSpec spec, ConfigValue<T> configValue)
 	{
@@ -110,25 +111,10 @@ public class ConfigProperty<T>
 		return (T)this.spec.getDefault();
 	}
 	
-	/**
-	 * Gets the comment associated with the property
-	 * @return an unmodifiable list containing the comments
-	 */
-	public List<? extends ITextComponent> getDisplayComment()
+	@Override
+	String getCommentString()
 	{
-		if (this.commentLines == null)
-		{
-			String comment = this.spec.getComment();
-			if (Strings.isNullOrEmpty(comment))
-			{
-				this.commentLines = Collections.emptyList();
-			}
-			else
-			{
-				this.commentLines = Stream.of(comment.split("\n")).map(StringTextComponent::new).collect(Collectors.toList());
-			}
-		}
-		return this.commentLines;
+		return this.spec.getComment();
 	}
 	
 	/**
@@ -161,6 +147,37 @@ public class ConfigProperty<T>
 			return Optional.of((ConfigProperty<? extends R>)this);
 		}
 		return Optional.empty();
+	}
+	
+	/**
+	 * Explores this property using the given visitor
+	 * @param <R> the result type of the visitor
+	 * @param visitor
+	 * @return the result of the visitor
+	 */
+	public <R> R explore(IConfigPropertyVisitor<Void, R> visitor)
+	{
+		return this.explore(visitor, null);
+	}
+
+	/**
+	 * Explores this property using the given visitor
+	 * @param <R> the result type of the visitor
+	 * @param visitor
+	 * @return the result of the visitor
+	 */
+	public <P, R> R explore(IConfigPropertyVisitor<P, R> visitor, P param)
+	{
+		Class<?> specClass = this.getValueClass();
+		ValueType type = ValueType.getType(specClass);
+		
+		if (type == null)
+		{
+			LOGGER.info("Configuration value of unknown type: " + specClass);
+			return visitor.visitUnknown(this, param);
+		}
+
+		return type.exploreProperty(visitor, this, param);
 	}
 	
 }

@@ -1,40 +1,25 @@
 package fr.max2.betterconfig.client.gui;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.ConfigProperty;
 import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
-import fr.max2.betterconfig.client.gui.builder.IConfigUIBuilder;
-import fr.max2.betterconfig.client.gui.builder.ITableUIBuilder;
-import fr.max2.betterconfig.client.gui.builder.ValueType;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.client.gui.builder.IValueUIBuilder;
+import fr.max2.betterconfig.config.ConfigTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ModConfig;
 
 public class BetterConfigScreen extends Screen
 {
-	private static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
-	
 	/** The config user interface builder */
-	private final IConfigUIBuilder<? extends IGuiComponent> uiBuilder;
+	private final IConfigUIBuilder uiBuilder;
 	/** The mod this configuration is from */
 	private final ModContainer mod;
 	
@@ -51,7 +36,7 @@ public class BetterConfigScreen extends Screen
 	/** The current user interface */
 	private IGuiComponent ui;
 	
-	protected BetterConfigScreen(IConfigUIBuilder<? extends IGuiComponent> uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
+	protected BetterConfigScreen(IConfigUIBuilder uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
 	{
 		super(new StringTextComponent(mod.getModId() + " configuration : " + configs.get(index).getFileName()));
 		this.uiBuilder = uiBuilder;
@@ -65,7 +50,8 @@ public class BetterConfigScreen extends Screen
 	protected void init()
 	{
 		// Builds the user interface
-		this.ui = this.buildTableUI(this.uiBuilder.start(this), this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues());
+		this.ui = this.uiBuilder.build(this, new ConfigTable(this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues(), this.mod.getModInfo().getDescription()));
+		//this.ui = this.buildTableUI(this.uiBuilder.start(this), this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues());
 		this.addListener(this.ui);
 	}
 	
@@ -77,7 +63,7 @@ public class BetterConfigScreen extends Screen
 	 * @param values the values in the table
 	 * @return the user interface primitive to draw the table
 	 */
-	protected <P> P buildTableUI(ITableUIBuilder<P> builder, UnmodifiableConfig spec, UnmodifiableConfig values)
+	/*protected <P> P buildTableUI(ITableUIBuilder<P> builder, UnmodifiableConfig spec, UnmodifiableConfig values)
 	{
         Map<String, Object> specMap = spec.valueMap();
         Map<String, Object> configMap = values.valueMap();
@@ -103,7 +89,7 @@ public class BetterConfigScreen extends Screen
         }
         
         return builder.buildTable(tableContent);
-	}
+	}*/
 
 	/**
 	 * Builds the user interface for a config property
@@ -112,7 +98,7 @@ public class BetterConfigScreen extends Screen
 	 * @param property the configuration property
 	 * @return the user interface primitive to draw the property
 	 */
-	protected <P> P buildValueIU(IValueUIBuilder<P> builder, ConfigProperty<?> property)
+	/*protected <P> P buildValueIU(IValueUIBuilder<P> builder, ConfigProperty<?> property)
 	{
 		Class<?> specClass = property.getValueClass();
 		ValueType type = ValueType.getType(specClass);
@@ -124,7 +110,7 @@ public class BetterConfigScreen extends Screen
 		}
 
 		return type.callBuilder(builder, property);
-	}
+	}*/
 	
 	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
@@ -223,11 +209,17 @@ public class BetterConfigScreen extends Screen
 	{
 		return (mc, prevScreen) ->
 		{
-			// TODO get from mod properties
-			IConfigUIBuilder<? extends IGuiComponent> uiBuilder = new BetterConfigBuilder();
+			// TODO get ui builder and style from mod properties
+			IConfigUIBuilder uiBuilder = BetterConfigBuilder::build;
 			BetterConfigScreen screen = new BetterConfigScreen(uiBuilder, mod, configs, 0);
 			screen.setPrevScreen(prevScreen);
 			return screen;
 		};
+	}
+	
+	@FunctionalInterface
+	public static interface IConfigUIBuilder
+	{
+		IGuiComponent build(BetterConfigScreen screen, ConfigTable config);
 	}
 }

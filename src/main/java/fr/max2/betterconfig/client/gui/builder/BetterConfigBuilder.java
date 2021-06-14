@@ -5,14 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.ConfigProperty;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.gui.component.Button;
@@ -24,6 +21,10 @@ import fr.max2.betterconfig.client.gui.component.ScrollPane;
 import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
+import fr.max2.betterconfig.config.ConfigProperty;
+import fr.max2.betterconfig.config.ConfigTable;
+import fr.max2.betterconfig.config.IConfigEntryVisitor;
+import fr.max2.betterconfig.config.IConfigPropertyVisitor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FocusableGui;
 import net.minecraft.client.gui.FontRenderer;
@@ -38,7 +39,7 @@ import net.minecraftforge.fml.client.gui.GuiUtils;
 import net.minecraftforge.fml.config.ModConfig;
 
 /** A builder for better configuration screen */
-public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder.IBetterElement>
+public class BetterConfigBuilder
 {
 	/** The translation key for displaying the default value */
 	public static final String DEFAULT_VALUE_KEY = BetterConfig.MODID + ".option.default_value";
@@ -62,121 +63,94 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 	private static final int DEFAULT_FIELD_TEXT_COLOR = 0xFF_E0_E0_E0;
 	/** The color of the text in a text field when the value is not valid */
 	private static final int ERROR_FIELD_TEXT_COLOR   = 0xFF_FF_00_00;
-
-	@Override
-	public ITableUIBuilder<IBetterElement> start(BetterConfigScreen screen)
+	
+	/**
+	 * Builds the user interface
+	 * @param screen the parent screen
+	 * @param config the edited configuration
+	 * @return the user interface
+	 */
+	public static IGuiComponent build(BetterConfigScreen screen, ConfigTable config)
 	{
-		return new Table(screen, content -> new UIContainer(screen, content), 0);
+		return new UIContainer(screen, new Builder(screen).buildTable(config, 0));
 	}
 	
-	private static class Table implements ITableUIBuilder<IBetterElement>
+	/** The visitor to build the gui components */
+	private static class Builder implements IConfigEntryVisitor<Integer, IBetterElement>, IConfigPropertyVisitor<Void, IBetterElement>
 	{
+		private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4;
+		
 		/** The parent screen */
 		private final BetterConfigScreen screen;
-		/** The function to call to finalize the creation of the table ui */
-		private final UnaryOperator<IBetterElement> finalize;
-		/** The x offset of the created elements */
-		private final int xOffset;
 
-		private Table(BetterConfigScreen screen, UnaryOperator<IBetterElement> finalize, int xOffset)
+		private Builder(BetterConfigScreen screen)
 		{
 			this.screen = screen;
-			this.finalize = finalize;
-			this.xOffset = xOffset;
 		}
-
-		@Override
-		public ITableUIBuilder<IBetterElement> subTableBuilder(String path, String comment)
-		{
-			return new Table(this.screen, content -> new UIFoldout(this.screen, content, path, linesToTextProperties(splitText(comment)), this.xOffset), this.xOffset + SECTION_TAB_SIZE);
-		}
-
-		@Override
-		public IValueUIBuilder<IBetterElement> tableEntryBuilder(String path, String comment)
-		{
-			return new Value(this, path, comment);
-		}
-
-		@Override
-		public IBetterElement buildTable(List<IBetterElement> tableContent)
-		{
-			return this.finalize.apply(new UITable(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - this.xOffset,tableContent));
-		}
-	}
-	
-	private static class Value implements IValueUIBuilder<IBetterElement>
-	{
-		/** The parent builder */
-		private final Table parent;
 		
-		private static final int OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4;
-
-		private Value(Table parent, String path, String comment)
+		private IBetterElement buildTable(ConfigTable table, Integer xOffset)
 		{
-			this.parent = parent;
+			List<IBetterElement> content = table.exploreEntries(this, xOffset).collect(Collectors.toList());
+			return new UITable(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
 		}
-
+		
+		// Table entry visitor
+		
 		@Override
-		public IBetterElement buildBoolean(ConfigProperty<Boolean> property)
+		public IBetterElement visitSubTable(String key, ConfigTable table, Integer xOffset)
 		{
-			return finalizeBuild(OptionButton.booleanOption(this.parent.screen.width - OFFSET, property), property);
+			return new UIFoldout(this.screen, this.buildTable(table, xOffset + SECTION_TAB_SIZE), key, table.getDisplayComment(), xOffset);
 		}
-
+		
 		@Override
-		public IBetterElement buildNumber(ConfigProperty<? extends Number> property)
+		public <T> IBetterElement visitValue(String key, ConfigProperty<T> property, Integer xOffset)
 		{
-			return finalizeBuild(NumberInputField.numberOption(this.parent.screen, this.parent.screen.width - OFFSET, property), property);
+			IBetterElement widget = property.explore(this);
+			return new ValueContainer(this.screen, widget, property, xOffset);
 		}
-
+		
+		// Property visitor
+		
 		@Override
-		public IBetterElement buildString(ConfigProperty<String> property)
+		public IBetterElement visitBoolean(ConfigProperty<Boolean> property, Void param)
 		{
-			return finalizeBuild(StringInputField.stringOption(this.parent.screen, this.parent.screen.width - OFFSET, property), property);
+			return OptionButton.booleanOption(this.screen.width - VALUE_OFFSET, property);
 		}
-
+		
 		@Override
-		public <E extends Enum<E>> IBetterElement buildEnum(ConfigProperty<E> property)
+		public IBetterElement visitNumber(ConfigProperty<? extends Number> property, Void param)
 		{
-			return finalizeBuild(OptionButton.enumOption(this.parent.screen.width - OFFSET, property), property);
+			return NumberInputField.numberOption(this.screen, this.screen.width - VALUE_OFFSET, property);
 		}
-
+		
 		@Override
-		public IBetterElement buildList(ConfigProperty<? extends List<?>> property)
+		public IBetterElement visitString(ConfigProperty<String> property, Void param)
+		{
+			return StringInputField.stringOption(this.screen, this.screen.width - VALUE_OFFSET, property);
+		}
+		
+		@Override
+		public <E extends Enum<E>> IBetterElement visitEnum(ConfigProperty<E> property, Void param)
+		{
+			return OptionButton.enumOption(this.screen.width - VALUE_OFFSET, property);
+		}
+		
+		@Override
+		public IBetterElement visitList(ConfigProperty<? extends List<?>> property, Void param)
 		{
 			// TODO Implement list config ui
-			return buildUnknown(property);
+			return visitUnknown(property, param);
 		}
-
+		
 		@Override
-		public IBetterElement buildUnknown(ConfigProperty<?> property)
+		public IBetterElement visitUnknown(ConfigProperty<?> property, Void param)
 		{
-			return finalizeBuild(new UnknownOptionWidget(this.parent.screen.width - OFFSET, property), property);
+			return new UnknownOptionWidget(this.screen.width - VALUE_OFFSET, property);
 		}
-		
-		/** Finalizes the creating of a property edit ui element */
-		private IBetterElement finalizeBuild(IBetterElement content, ConfigProperty<?> property)
-		{
-			return new ValueContainer(this.parent.screen, content, property, this.parent.xOffset);
-		}
-	}
-	
-	/** Splits the given text to the list of contained lines */
-	private static List<String> splitText(String text)
-	{
-		if (Strings.isNullOrEmpty(text))
-			return Collections.emptyList();
-		
-		return Arrays.asList(text.split("\n"));
-	}
-	
-	/** Convert the given text into a list of text properties to render */
-	private static List<? extends ITextProperties> linesToTextProperties(List<String> text)
-	{
-		return text.stream().map(ITextProperties::func_240652_a_).collect(Collectors.toList());
 	}
 	
 	/** An interface for ui elements with a simple layout system */
-	public static interface IBetterElement extends IGuiComponent
+	private static interface IBetterElement extends IGuiComponent
 	{
 		// TODO add filter parameter for search bar
 		/**
@@ -370,9 +344,9 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 			int x = this.baseX  + this.layout.getLayoutX();
 			int y = this.baseY  + this.layout.getLayoutY();
 			// Draw background
-			fill(matrixStack, x, y, this.screen.width - X_PADDING - RIGHT_PADDING, y + FOLDOUT_HEADER_HEIGHT, 0xC0_33_33_33);
+			fill(matrixStack, x, y + 1, this.screen.width - X_PADDING - RIGHT_PADDING, y + FOLDOUT_HEADER_HEIGHT - 2, 0xC0_33_33_33);
 			// Draw foreground
-			String arrow = this.folded ? ">" : "v";
+			String arrow = this.folded ? ">" : "v"; // TODO Use arrow texture
 			FontRenderer font = this.screen.getFont(); 
 			font.drawString(matrixStack, arrow, x + 1, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
 			font.func_238422_b_(matrixStack, this.sectionName, x + 11, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
@@ -600,7 +574,7 @@ public class BetterConfigBuilder implements IConfigUIBuilder<BetterConfigBuilder
 		}*/
 		
 	}
-	
+	//TODO Add reset button
 	/** The container for table entries */
 	private static class ValueContainer extends FocusableGui implements INestedGuiComponent, IBetterElement
 	{
