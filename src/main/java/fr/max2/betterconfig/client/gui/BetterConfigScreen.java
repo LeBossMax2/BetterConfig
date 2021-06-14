@@ -51,66 +51,8 @@ public class BetterConfigScreen extends Screen
 	{
 		// Builds the user interface
 		this.ui = this.uiBuilder.build(this, new ConfigTable(this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues(), this.mod.getModInfo().getDescription()));
-		//this.ui = this.buildTableUI(this.uiBuilder.start(this), this.currentConfig.getSpec().getSpec(), this.currentConfig.getSpec().getValues());
 		this.addListener(this.ui);
 	}
-	
-	/**
-	 * Builds the user interface for a config table
-	 * @param <P> the type of user interface primitives
-	 * @param builder the user interface builder
-	 * @param spec the specification of the table
-	 * @param values the values in the table
-	 * @return the user interface primitive to draw the table
-	 */
-	/*protected <P> P buildTableUI(ITableUIBuilder<P> builder, UnmodifiableConfig spec, UnmodifiableConfig values)
-	{
-        Map<String, Object> specMap = spec.valueMap();
-        Map<String, Object> configMap = values.valueMap();
-
-    	List<P> tableContent = new ArrayList<>();
-
-        for (Map.Entry<String, Object> specEntry : specMap.entrySet())
-        {
-            String key = specEntry.getKey();
-            Object specValue = specEntry.getValue();
-            Object configValue = configMap.get(key);
-
-            if (specValue instanceof UnmodifiableConfig)
-            {
-            	String comment = ""; //TODO find a way to replace 'values.getComment(key);'
-                tableContent.add(this.buildTableUI(builder.subTableBuilder(key, comment), (UnmodifiableConfig)specValue, (UnmodifiableConfig)configValue));
-            }
-            else
-            {
-                ValueSpec valueSpec = (ValueSpec)specValue;
-                tableContent.add(this.buildValueIU(builder.tableEntryBuilder(key, valueSpec.getComment()), new ConfigProperty<>(valueSpec, (ConfigValue<?>)configValue)));
-            }
-        }
-        
-        return builder.buildTable(tableContent);
-	}*/
-
-	/**
-	 * Builds the user interface for a config property
-	 * @param <P> the type of user interface primitives
-	 * @param builder the user interface builder
-	 * @param property the configuration property
-	 * @return the user interface primitive to draw the property
-	 */
-	/*protected <P> P buildValueIU(IValueUIBuilder<P> builder, ConfigProperty<?> property)
-	{
-		Class<?> specClass = property.getValueClass();
-		ValueType type = ValueType.getType(specClass);
-		
-		if (type == null)
-		{
-			LOGGER.info("Configuration value of unknown type: " + specClass);
-			return builder.buildUnknown(property);
-		}
-
-		return type.callBuilder(builder, property);
-	}*/
 	
 	@Override
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)

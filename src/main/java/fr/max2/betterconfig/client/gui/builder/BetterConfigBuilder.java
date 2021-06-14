@@ -366,7 +366,7 @@ public class BetterConfigBuilder
 	
 	//TODO add search bar
 	/** The container for the main section */
-	private static class UIContainer extends FocusableGui implements INestedGuiComponent, IBetterElement
+	private static class UIContainer extends FocusableGui implements INestedGuiComponent
 	{
 		/** The the height of the header */
 		private static final int CONTAINER_HEADER_HEIGHT = 30;
@@ -376,8 +376,6 @@ public class BetterConfigBuilder
 		private final IBetterElement content;
 		/** The tab buttons */
 		private final List<IGuiComponent> configTabs = new ArrayList<>();
-		/** The y coordinate of this widget */
-		private int y;
 
 		public UIContainer(BetterConfigScreen screen, IBetterElement content)
 		{
@@ -397,7 +395,7 @@ public class BetterConfigBuilder
 				i++;
 			}
 			this.configTabs.add(this.content);
-			this.setYgetHeight(Y_PADDING);
+			this.content.setYgetHeight(Y_PADDING + CONTAINER_HEADER_HEIGHT);
 		}
 		
 		// Layout
@@ -406,14 +404,6 @@ public class BetterConfigBuilder
 		public List<? extends IGuiComponent> getEventListeners()
 		{
 			return this.configTabs;
-		}
-
-		@Override
-		public int setYgetHeight(int y)
-		{
-			this.y = y;
-			this.content.setYgetHeight(y + CONTAINER_HEADER_HEIGHT);
-			return this.getHeight(); 
 		}
 		
 		@Override

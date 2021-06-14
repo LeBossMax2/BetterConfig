@@ -43,6 +43,7 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run/client')
+            taskName "$project.name-runClient"
 
             // Recommended logging data for a userdev environment
             // The markers can be changed as needed.
@@ -65,6 +66,7 @@ minecraft {
 
         server {
             workingDirectory project.file('run/server')
+            taskName "$project.name-runServer"
 
             // Recommended logging data for a userdev environment
             // The markers can be changed as needed.
@@ -87,6 +89,7 @@ minecraft {
 
         data {
             workingDirectory project.file('run/data')
+            taskName "$project.name-runData"
 
             // Recommended logging data for a userdev environment
             // The markers can be changed as needed.
