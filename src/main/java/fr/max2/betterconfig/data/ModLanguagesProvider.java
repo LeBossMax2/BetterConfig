@@ -38,6 +38,7 @@ public class ModLanguagesProvider implements IDataProvider
 		add(CycleOptionButton.TRUE_OPTION_KEY, "ON", "Oui");
 		add(CycleOptionButton.FALSE_OPTION_KEY, "OFF", "Non");
 		add(BetterConfigBuilder.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
+		add(BetterConfigBuilder.SEARCH_BAR_KEY, "Search", "Rechercher");
     }
 	
 	@Override

@@ -21,6 +21,7 @@ import fr.max2.betterconfig.client.gui.component.ScrollPane;
 import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
+import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.ConfigProperty;
 import fr.max2.betterconfig.config.ConfigTable;
 import fr.max2.betterconfig.config.IConfigEntryVisitor;
@@ -43,6 +44,8 @@ public class BetterConfigBuilder
 {
 	/** The translation key for displaying the default value */
 	public static final String DEFAULT_VALUE_KEY = BetterConfig.MODID + ".option.default_value";
+	/** The translation key for the text field of the search bar */
+	public static final String SEARCH_BAR_KEY = BetterConfig.MODID + ".option.search";
 	
 	/** The width of the indentation added for each nested section */
 	private static final int SECTION_TAB_SIZE = 20;
@@ -78,6 +81,7 @@ public class BetterConfigBuilder
 	/** The visitor to build the gui components */
 	private static class Builder implements IConfigEntryVisitor<Integer, IBetterElement>, IConfigPropertyVisitor<Void, IBetterElement>
 	{
+		/** The position of the value widgets relative to the right side */
 		private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4;
 		
 		/** The parent screen */
@@ -99,14 +103,14 @@ public class BetterConfigBuilder
 		@Override
 		public IBetterElement visitSubTable(String key, ConfigTable table, Integer xOffset)
 		{
-			return new UIFoldout(this.screen, this.buildTable(table, xOffset + SECTION_TAB_SIZE), key, table.getDisplayComment(), xOffset);
+			return new UIFoldout(this.screen, table, this.buildTable(table, xOffset + SECTION_TAB_SIZE), key, xOffset);
 		}
 		
 		@Override
 		public <T> IBetterElement visitValue(String key, ConfigProperty<T> property, Integer xOffset)
 		{
 			IBetterElement widget = property.explore(this);
-			return new ValueContainer(this.screen, widget, property, xOffset);
+			return new ValueContainer(this.screen, property, widget, xOffset);
 		}
 		
 		// Property visitor
@@ -152,13 +156,12 @@ public class BetterConfigBuilder
 	/** An interface for ui elements with a simple layout system */
 	private static interface IBetterElement extends IGuiComponent
 	{
-		// TODO add filter parameter for search bar
 		/**
 		 * Sets the y coordinate of this component to the given one and computes the height
 		 * @param y the new y coordinate
 		 * @return the computed height of this component
 		 */
-		int setYgetHeight(int y);
+		int setYgetHeight(int y, ConfigFilter filter);
 	}
 	
 	/** The ui for a config table */
@@ -182,12 +185,12 @@ public class BetterConfigBuilder
 		}
 		
 		@Override
-		public int setYgetHeight(int y)
+		public int setYgetHeight(int y, ConfigFilter filter)
 		{
 			int h = 0;
 			for (IBetterElement elem : this.content)
 			{
-				h += elem.setYgetHeight(y + h);
+				h += elem.setYgetHeight(y + h, filter);
 			}
 			this.height = h;
 			return h;
@@ -213,6 +216,9 @@ public class BetterConfigBuilder
 		private static final int FOLDOUT_HEADER_HEIGHT = 20;
 		/** The parent screen */
 		private final BetterConfigScreen screen;
+		
+		/** The edited table */
+		private final ConfigTable table;
 		/** The content that will be collapsed */
 		private final IBetterElement content;
 		/** The title on the header */
@@ -230,13 +236,16 @@ public class BetterConfigBuilder
 		
 		/** {@code true} when the content is collapsed, {@code false} otherwise */
 		private boolean folded = false;
+		/** Indicates if the section is hidden or not */
+		private boolean hidden = false;
 
-		public UIFoldout(BetterConfigScreen screen, IBetterElement content, String path, List<? extends ITextProperties> comment, int x)
+		public UIFoldout(BetterConfigScreen screen, ConfigTable table, IBetterElement content, String path, int x)
 		{
 			this.screen = screen;
+			this.table = table;
 			this.content = content;
 			this.sectionName = IReorderingProcessor.fromString(path, Style.EMPTY.mergeWithFormatting(TextFormatting.BOLD, TextFormatting.YELLOW));
-			this.extraInfo = comment;
+			this.extraInfo = table.getDisplayComment();
 			this.baseX = x;
 		}
 		
@@ -245,14 +254,25 @@ public class BetterConfigBuilder
 		@Override
 		public List<? extends IGuiComponent> getEventListeners()
 		{
-			return this.folded ? Collections.emptyList() : Arrays.asList(this.content);
+			return this.folded || this.hidden ? Collections.emptyList() : Arrays.asList(this.content);
 		}
 
 		@Override
-		public int setYgetHeight(int y)
+		public int setYgetHeight(int y, ConfigFilter filter)
 		{
+			boolean matchFilter = filter.matches(this.table);
 			this.baseY = y;
-			int contentHeight = this.content.setYgetHeight(y + FOLDOUT_HEADER_HEIGHT);
+			int contentHeight = this.content.setYgetHeight(y + FOLDOUT_HEADER_HEIGHT, matchFilter ? ConfigFilter.ALL : filter);
+			
+			if (contentHeight == 0)
+			{
+				// Disable this section
+				this.hidden = true;
+				this.height = 0;
+				return 0;
+			}
+			
+			this.hidden = false;
 
 			if (this.folded)
 			{
@@ -314,6 +334,9 @@ public class BetterConfigBuilder
 		@Override
 		public boolean isMouseOver(double mouseX, double mouseY)
 		{
+			if (this.hidden)
+				return false;
+			
 			int y = this.baseY  + this.layout.getLayoutY();
 			return mouseX >= this.baseX + this.layout.getLayoutX()
 			    && mouseY >= y
@@ -323,6 +346,9 @@ public class BetterConfigBuilder
 		
 		private boolean isOverHeader(double mouseX, double mouseY)
 		{
+			if (this.hidden)
+				return false;
+			
 			int y = this.baseY  + this.layout.getLayoutY();
 			return mouseX >= this.baseX + this.layout.getLayoutX()
 			    && mouseY >= y
@@ -335,6 +361,9 @@ public class BetterConfigBuilder
 		@Override
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
+			if (this.hidden)
+				return;
+			
 			INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
 			this.renderFoldoutHeader(matrixStack, mouseX, mouseY, partialTicks);
 		}
@@ -355,6 +384,9 @@ public class BetterConfigBuilder
 		@Override
 		public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
+			if (this.hidden)
+				return;
+			
 			INestedGuiComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 			if (this.isOverHeader(mouseX, mouseY))
 			{
@@ -364,24 +396,30 @@ public class BetterConfigBuilder
 		}
 	}
 	
-	//TODO add search bar
 	/** The container for the main section */
 	private static class UIContainer extends FocusableGui implements INestedGuiComponent
 	{
 		/** The the height of the header */
-		private static final int CONTAINER_HEADER_HEIGHT = 30;
+		private static final int CONTAINER_HEADER_HEIGHT = 60;
+		/** The x position of the input field of the search bar */
+		private static final int SEARCH_LABEL_WIDTH = 80;
 		/** The parent screen */
 		private final BetterConfigScreen screen;
-		/** The contained section */
-		private final IBetterElement content;
+		/** The text field of the search bar */
+		private final TextField searchField;
+		/** The scroll panel */
+		private final UIScrollPane scrollPane;
 		/** The tab buttons */
-		private final List<IGuiComponent> configTabs = new ArrayList<>();
+		private final List<IGuiComponent> components = new ArrayList<>();
+		/** The filter from the search bar */
+		private final ConfigFilter filter = new ConfigFilter();
 
 		public UIContainer(BetterConfigScreen screen, IBetterElement content)
 		{
 			this.screen = screen;
-			this.content = new UIScrollPane(screen.getMinecraft(), X_PADDING, Y_PADDING + CONTAINER_HEADER_HEIGHT, screen.width - 2 * X_PADDING, screen.height - 2 * Y_PADDING - CONTAINER_HEADER_HEIGHT, content);
 			int x = X_PADDING;
+			
+			// Tabs
 			int buttonWidth = (this.screen.width - 2 * X_PADDING) / ModConfig.Type.values().length;
 			int i = 0;
 			for (ModConfig config : screen.getModConfigs())
@@ -389,13 +427,21 @@ public class BetterConfigBuilder
 				final int index = i;
 				Button b = new Button(x, Y_PADDING, buttonWidth, 20, new StringTextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
 				b.active = index != screen.getCurrentConfigIndex();
-				this.configTabs.add(b);
+				this.components.add(b);
 				
 				x += buttonWidth;
 				i++;
 			}
-			this.configTabs.add(this.content);
-			this.content.setYgetHeight(Y_PADDING + CONTAINER_HEADER_HEIGHT);
+			
+			// Search bar
+			this.searchField = new TextField(screen.getFont(), X_PADDING + SEARCH_LABEL_WIDTH + 1, 20 + 2 * Y_PADDING + 1, this.screen.width - 2 * X_PADDING - SEARCH_LABEL_WIDTH - 2, 20 - 2, new TranslationTextComponent(SEARCH_BAR_KEY));
+			this.searchField.setResponder(this::updateFilter);
+			this.components.add(this.searchField);
+			
+			// Scroll
+			this.scrollPane = new UIScrollPane(screen.getMinecraft(), X_PADDING, Y_PADDING + CONTAINER_HEADER_HEIGHT, screen.width - 2 * X_PADDING, screen.height - 2 * Y_PADDING - CONTAINER_HEADER_HEIGHT, content);
+			this.components.add(this.scrollPane);
+			this.scrollPane.setYgetHeight(Y_PADDING + CONTAINER_HEADER_HEIGHT, this.filter);
 		}
 		
 		// Layout
@@ -403,7 +449,7 @@ public class BetterConfigBuilder
 		@Override
 		public List<? extends IGuiComponent> getEventListeners()
 		{
-			return this.configTabs;
+			return this.components;
 		}
 		
 		@Override
@@ -428,6 +474,14 @@ public class BetterConfigBuilder
 			return this.screen.height;
 		}
 		
+		/** Updates the content using the given filter string */
+		private void updateFilter(String filterStr)
+		{
+			this.filter.setFilter(filterStr);
+			this.scrollPane.marksLayoutDirty();
+			this.scrollPane.checkLayout();
+		}
+		
 		// Rendering
 		
 		@Override
@@ -435,6 +489,8 @@ public class BetterConfigBuilder
 		{
 			this.screen.renderBackground(matrixStack);
 			INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
+			FontRenderer font = this.screen.getFont();
+			font.drawText(matrixStack, this.searchField.getMessage(), X_PADDING, 20 + 2 * Y_PADDING + (20 - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
 			this.renderHeader(matrixStack, mouseX, mouseY, partialTicks);
 		}
 		
@@ -447,6 +503,8 @@ public class BetterConfigBuilder
 	{
 		/** Indicates whether the layout is dirty */
 		private boolean dirty = true;
+		/** The filter from the search bar */
+		private ConfigFilter filter = ConfigFilter.ALL;
 
 		public UIScrollPane(Minecraft minecraft, int x, int y, int w, int h, IBetterElement content)
 		{
@@ -456,9 +514,10 @@ public class BetterConfigBuilder
 		// Layout
 
 		@Override
-		public int setYgetHeight(int y)
+		public int setYgetHeight(int y, ConfigFilter filter)
 		{
 			this.baseY = y;
+			this.filter = filter;
 			this.checkLayout();
 			
 			return this.getHeight();
@@ -468,7 +527,7 @@ public class BetterConfigBuilder
 		{
 			if (this.isDirty())
 			{
-				((IBetterElement)this.content).setYgetHeight(0);
+				((IBetterElement)this.content).setYgetHeight(0, this.filter);
 				this.clean();
 			}
 		}
@@ -555,14 +614,6 @@ public class BetterConfigBuilder
 			this.checkLayout();
 			return res;
 		}
-		
-		/*@Override
-		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
-		{
-			checkLayout();
-			super.render(matrixStack, mouseX, mouseY, partialTicks);
-		}*/
-		
 	}
 	//TODO Add reset button
 	/** The container for table entries */
@@ -570,6 +621,8 @@ public class BetterConfigBuilder
 	{
 		/** The parent screen */
 		private final BetterConfigScreen screen;
+		/** The edited property */
+		private final ConfigProperty<?> property;
 		/** the value widget */
 		private final IBetterElement content;
 		/** The title of the property */
@@ -584,10 +637,13 @@ public class BetterConfigBuilder
 		private int baseY = 0;
 		/** The height of the component */
 		private int height = 0;
+		/** Indicates if the property is hidden or not */
+		private boolean hidden = false;
 
-		public ValueContainer(BetterConfigScreen screen, IBetterElement content, ConfigProperty<?> property, int x)
+		public ValueContainer(BetterConfigScreen screen, ConfigProperty<?> property, IBetterElement content, int x)
 		{
 			this.screen = screen;
+			this.property = property;
 			this.content = content;
 			FontRenderer font = this.screen.getFont();
 			this.nameLines = font.trimStringToWidth(property.getDisplayName(), screen.width - x - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - 4);
@@ -604,15 +660,23 @@ public class BetterConfigBuilder
 		@Override
 		public List<? extends IGuiComponent> getEventListeners()
 		{
-			return Arrays.asList(this.content);
+			return this.hidden ? Collections.emptyList() : Arrays.asList(this.content);
 		}
 
 		@Override
-		public int setYgetHeight(int y)
+		public int setYgetHeight(int y, ConfigFilter filter)
 		{
 			this.baseY = y;
+			this.hidden = !filter.matches(this.property);
+			
+			if (this.hidden)
+			{
+				this.height = 0;
+				return 0;
+			}
+			
 			this.height = Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().FONT_HEIGHT);
-			this.content.setYgetHeight(y + (this.height - VALUE_HEIGHT) / 2);
+			this.content.setYgetHeight(y + (this.height - VALUE_HEIGHT) / 2, ConfigFilter.ALL);
 			return this.height;
 		}
 
@@ -620,7 +684,7 @@ public class BetterConfigBuilder
 		public void setLayoutManager(ILayoutManager manager)
 		{
 			this.layout = manager;
-			INestedGuiComponent.super.setLayoutManager(manager);
+			this.content.setLayoutManager(manager);
 		}
 
 		@Override
@@ -638,6 +702,9 @@ public class BetterConfigBuilder
 		@Override
 		public boolean isMouseOver(double mouseX, double mouseY)
 		{
+			if (this.hidden)
+				return false;
+			
 			int y = this.baseY + this.layout.getLayoutY();
 			return mouseX >= this.baseX + this.layout.getLayoutX() && mouseY >= y && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING && mouseY < y + this.height;
 		}
@@ -647,6 +714,9 @@ public class BetterConfigBuilder
 		@Override
 		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
+			if (this.hidden)
+				return;
+			
 			INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
 			FontRenderer font = this.screen.getFont();
 			int y = this.baseY + this.layout.getLayoutY() + (this.height - this.nameLines.size() * this.screen.getFont().FONT_HEIGHT) / 2;
@@ -660,6 +730,9 @@ public class BetterConfigBuilder
 		@Override
 		public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
+			if (this.hidden)
+				return;
+			
 			INestedGuiComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 			if (this.isMouseOver(mouseX, mouseY))
 			{
@@ -687,7 +760,7 @@ public class BetterConfigBuilder
 		}
 
 		@Override
-		public int setYgetHeight(int y)
+		public int setYgetHeight(int y, ConfigFilter filter)
 		{
 			this.setY(y);
 			return this.height;
@@ -736,7 +809,7 @@ public class BetterConfigBuilder
 		}
 
 		@Override
-		public int setYgetHeight(int y)
+		public int setYgetHeight(int y, ConfigFilter filter)
 		{
 			this.setY(y + 1);
 			return this.height + 2;
@@ -778,7 +851,7 @@ public class BetterConfigBuilder
 		}
 
 		@Override
-		public int setYgetHeight(int y)
+		public int setYgetHeight(int y, ConfigFilter filter)
 		{
 			this.setY(y);
 			return VALUE_HEIGHT;
@@ -820,7 +893,7 @@ public class BetterConfigBuilder
 		}
 
 		@Override
-		public int setYgetHeight(int y)
+		public int setYgetHeight(int y, ConfigFilter filter)
 		{
 			this.y = y;
 			return VALUE_HEIGHT;
