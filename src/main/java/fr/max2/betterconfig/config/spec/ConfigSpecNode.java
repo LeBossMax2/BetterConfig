@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.config;
+package fr.max2.betterconfig.config.spec;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,39 +6,30 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
-/**
- * A node in the configuration tree
- */
-public abstract class ConfigNode
+public abstract class ConfigSpecNode
 {
-	/** The path of this node in the configuration spec */
-	private final List<String> path;
+	private final ConfigLocation loc;
 	/** The comments describing the property */
 	private List<? extends ITextComponent> commentLines = null;
 	
-	protected ConfigNode(Iterable<String> path)
+	public ConfigSpecNode(ConfigLocation loc)
 	{
-		this.path = ImmutableList.copyOf(path);
+		this.loc = loc;
+	}
+
+	public ConfigLocation getLoc()
+	{
+		return loc;
 	}
 	
 	/**
-	 * Gets the path of this property in the configuration spec
-	 * @return the path of the property is an immutable list
-	 */
-	public List<String> getPath()
-	{
-		return this.path;
-	}
-
-	/**
 	 * Gets the comment associated with the config node
 	 */
-	abstract String getCommentString();
+	public abstract String getCommentString();
 	
 	/**
 	 * Gets the comment associated with the config node for display
@@ -60,4 +51,11 @@ public abstract class ConfigNode
 		}
 		return this.commentLines;
 	}
+	
+	public <R> R exploreNode(IConfigSpecVisitor<Void, R> visitor)
+	{
+		return this.exploreNode(visitor, null);
+	}
+	
+	public abstract <P, R> R exploreNode(IConfigSpecVisitor<P, R> visitor, P param);
 }

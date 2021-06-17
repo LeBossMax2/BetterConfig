@@ -2,6 +2,13 @@ package fr.max2.betterconfig.config;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import fr.max2.betterconfig.BetterConfig;
+import fr.max2.betterconfig.config.value.ConfigProperty;
+import fr.max2.betterconfig.config.value.IConfigPropertyVisitor;
+
 /**
  * Represents the type of values inside a config
  */
@@ -56,7 +63,18 @@ public enum ValueType
 		{
 			return visitor.visitList((ConfigProperty<? extends List<?>>)property, param);
 		}
+	},
+	UNKNOWN(Object.class)
+	{
+		@Override
+		public <P, R> R exploreProperty(IConfigPropertyVisitor<P, R> visitor, ConfigProperty<?> property, P param)
+		{
+			LOGGER.info("Configuration value of unknown type: " + property.getSpec().getValueClass());
+			return visitor.visitUnknown(property, param);
+		}
 	};
+	
+	private static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
 	
 	/** The super class corresponding to the type */
 	private final Class<?> superClass;
@@ -99,6 +117,7 @@ public enum ValueType
 				return type;
 			}
 		}
-		return null;
+		
+		return UNKNOWN;
 	}
 }

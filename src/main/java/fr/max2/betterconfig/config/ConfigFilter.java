@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import fr.max2.betterconfig.config.value.ConfigProperty;
+import fr.max2.betterconfig.config.value.ConfigTable;
+
 public class ConfigFilter
 {
 	public static final ConfigFilter ALL = new ConfigFilter(Collections.emptyList());
@@ -61,16 +64,16 @@ public class ConfigFilter
 	
 	private static boolean propertyMatchesWord(ConfigProperty<?> property, String word)
 	{
-		String comment = property.getCommentString(); 
+		String comment = property.getSpec().getCommentString(); 
 		return comment != null && comment.toLowerCase().contains(word)
-		    || property.getDisplayName().getString().toLowerCase().contains(word)
-		    || property.getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
+		    || property.getSpec().getDisplayName().getString().toLowerCase().contains(word)
+		    || property.getSpec().getLoc().getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
 	}
 	
 	private static boolean tableMatchesWord(ConfigTable table, String word)
 	{
-		String comment = table.getCommentString(); 
+		String comment = table.getSpec().getCommentString(); 
 		return comment != null && comment.toLowerCase().contains(word)
-		    || table.getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
+		    || table.getSpec().getLoc().getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
 	}
 }

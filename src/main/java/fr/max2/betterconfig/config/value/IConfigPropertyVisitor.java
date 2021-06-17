@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.config;
+package fr.max2.betterconfig.config.value;
 
 import java.util.List;
 
@@ -15,7 +15,10 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	R visitBoolean(ConfigProperty<Boolean> property, P param);
+	default R visitBoolean(ConfigProperty<Boolean> property, P param)
+	{
+		return this.visitUnknown(property, param);
+	}
 
 	/**
 	 * Visits a number property
@@ -23,7 +26,10 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	R visitNumber(ConfigProperty<? extends Number> property, P param);
+	default R visitNumber(ConfigProperty<? extends Number> property, P param)
+	{
+		return this.visitUnknown(property, param);
+	}
 
 	/**
 	 * Visits a string property
@@ -31,7 +37,10 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	R visitString(ConfigProperty<String> property, P param);
+	default R visitString(ConfigProperty<String> property, P param)
+	{
+		return this.visitUnknown(property, param);
+	}
 
 	/**
 	 * Visits an enum property
@@ -39,7 +48,10 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	<E extends Enum<E>> R visitEnum(ConfigProperty<E> property, P param);
+	default <E extends Enum<E>> R visitEnum(ConfigProperty<E> property, P param)
+	{
+		return this.visitUnknown(property, param);
+	}
 
 	/**
 	 * Visits a list property
@@ -47,7 +59,10 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	R visitList(ConfigProperty<? extends List<?>> property, P param);
+	default R visitList(ConfigProperty<? extends List<?>> property, P param)
+	{
+		return this.visitUnknown(property, param);
+	}
 
 	/**
 	 * Visits a property of unknown type

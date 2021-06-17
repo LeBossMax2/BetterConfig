@@ -10,10 +10,10 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.config.ConfigProperty;
-import fr.max2.betterconfig.config.ConfigTable;
-import fr.max2.betterconfig.config.IConfigEntryVisitor;
-import fr.max2.betterconfig.config.IConfigPropertyVisitor;
+import fr.max2.betterconfig.config.value.ConfigProperty;
+import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.value.IConfigPropertyVisitor;
+import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import net.minecraft.client.gui.FontRenderer;
 
 /**
@@ -78,12 +78,12 @@ public class DebugConfigGui  implements IGuiComponent
 	public static DebugConfigGui build(BetterConfigScreen screen, ConfigTable config)
 	{
 		List<String> list = new ArrayList<>();
-		config.exploreEntries(new TableBuilder(list), "").forEach(v -> {});
+		config.exploreEntries((key, value) -> value.exploreNode(new TableBuilder(list), key)).forEach(v -> {});
 		return new DebugConfigGui(screen, list);
 	}
 	
 	/** The visitor to build config tables */
-	private static class TableBuilder implements IConfigEntryVisitor<String, Void>
+	private static class TableBuilder implements IConfigValueVisitor<String, Void>
 	{
 		private final List<String> content;
 
@@ -93,16 +93,16 @@ public class DebugConfigGui  implements IGuiComponent
 		}
 		
 		@Override
-		public Void visitSubTable(String key, ConfigTable table, String prefix)
+		public Void visitTable(ConfigTable table, String path)
 		{
-			table.exploreEntries(this, prefix + key + ".").forEach(v -> {});
+			table.exploreEntries((key, value) -> value.exploreNode(this, path + "." + key)).forEach(v -> {});
 			return null;
 		}
 		
 		@Override
-		public <T> Void visitValue(String key, ConfigProperty<T> property, String prefix)
+		public <T> Void visitProperty(ConfigProperty<T> property, String path)
 		{
-			this.content.add(property.explore(ValueBuilder.INSTANCE,  prefix + key));
+			this.content.add(property.exploreType(ValueBuilder.INSTANCE,  path));
 			return null;
 		}
 	}

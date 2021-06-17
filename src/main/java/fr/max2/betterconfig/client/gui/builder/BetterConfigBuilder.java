@@ -22,10 +22,10 @@ import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
 import fr.max2.betterconfig.config.ConfigFilter;
-import fr.max2.betterconfig.config.ConfigProperty;
-import fr.max2.betterconfig.config.ConfigTable;
-import fr.max2.betterconfig.config.IConfigEntryVisitor;
-import fr.max2.betterconfig.config.IConfigPropertyVisitor;
+import fr.max2.betterconfig.config.value.ConfigProperty;
+import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.value.IConfigPropertyVisitor;
+import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FocusableGui;
 import net.minecraft.client.gui.FontRenderer;
@@ -79,7 +79,7 @@ public class BetterConfigBuilder
 	}
 	
 	/** The visitor to build the gui components */
-	private static class Builder implements IConfigEntryVisitor<Integer, IBetterElement>, IConfigPropertyVisitor<Void, IBetterElement>
+	private static class Builder implements IConfigValueVisitor<Integer, IBetterElement>, IConfigPropertyVisitor<Void, IBetterElement>
 	{
 		/** The position of the value widgets relative to the right side */
 		private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4;
@@ -94,22 +94,22 @@ public class BetterConfigBuilder
 		
 		private IBetterElement buildTable(ConfigTable table, Integer xOffset)
 		{
-			List<IBetterElement> content = table.exploreEntries(this, xOffset).collect(Collectors.toList());
+			List<IBetterElement> content = table.exploreEntries((key, value) -> value.exploreNode(this, xOffset)).collect(Collectors.toList());
 			return new UITable(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
 		}
 		
 		// Table entry visitor
 		
 		@Override
-		public IBetterElement visitSubTable(String key, ConfigTable table, Integer xOffset)
+		public IBetterElement visitTable(ConfigTable table, Integer xOffset)
 		{
-			return new UIFoldout(this.screen, table, this.buildTable(table, xOffset + SECTION_TAB_SIZE), key, xOffset);
+			return new UIFoldout(this.screen, table, this.buildTable(table, xOffset + SECTION_TAB_SIZE), xOffset);
 		}
 		
 		@Override
-		public <T> IBetterElement visitValue(String key, ConfigProperty<T> property, Integer xOffset)
+		public <T> IBetterElement visitProperty(ConfigProperty<T> property, Integer xOffset)
 		{
-			IBetterElement widget = property.explore(this);
+			IBetterElement widget = property.exploreType(this);
 			return new ValueContainer(this.screen, property, widget, xOffset);
 		}
 		
@@ -239,13 +239,13 @@ public class BetterConfigBuilder
 		/** Indicates if the section is hidden or not */
 		private boolean hidden = false;
 
-		public UIFoldout(BetterConfigScreen screen, ConfigTable table, IBetterElement content, String path, int x)
+		public UIFoldout(BetterConfigScreen screen, ConfigTable table, IBetterElement content, int x)
 		{
 			this.screen = screen;
 			this.table = table;
 			this.content = content;
-			this.sectionName = IReorderingProcessor.fromString(path, Style.EMPTY.mergeWithFormatting(TextFormatting.BOLD, TextFormatting.YELLOW));
-			this.extraInfo = table.getDisplayComment();
+			this.sectionName = IReorderingProcessor.fromString(table.getSpec().getLoc().getName(), Style.EMPTY.mergeWithFormatting(TextFormatting.BOLD, TextFormatting.YELLOW));
+			this.extraInfo = table.getSpec().getDisplayComment();
 			this.baseX = x;
 		}
 		
@@ -646,12 +646,12 @@ public class BetterConfigBuilder
 			this.property = property;
 			this.content = content;
 			FontRenderer font = this.screen.getFont();
-			this.nameLines = font.trimStringToWidth(property.getDisplayName(), screen.width - x - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - 4);
-			List<String> path = property.getPath();
+			this.nameLines = font.trimStringToWidth(property.getSpec().getDisplayName(), screen.width - x - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - 4);
+			List<String> path = property.getSpec().getLoc().getPath();
 			if (!path.isEmpty())
 				this.extraInfo.add(ITextProperties.func_240653_a_(path.get(path.size() - 1), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
-			this.extraInfo.addAll(property.getDisplayComment());
-			this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(property.getDefaultValue().toString()))).mergeStyle(TextFormatting.GRAY));
+			this.extraInfo.addAll(property.getSpec().getDisplayComment());
+			this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(property.getSpec().getDefaultValue().toString()))).mergeStyle(TextFormatting.GRAY));
 			this.baseX = x;
 		}
 		
@@ -753,7 +753,7 @@ public class BetterConfigBuilder
 			Function<? super V, ITextComponent> valueToText, ConfigProperty<V> property)
 		{
 			super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT,
-				acceptedValues.stream().filter(property::isAllowed).collect(Collectors.toList()),
+				acceptedValues.stream().filter(property.getSpec()::isAllowed).collect(Collectors.toList()),
 				valueToText,
 				property.getValue(), thiz -> property.setValue(thiz.getCurrentValue()),
 				NO_TOOLTIP);
@@ -782,7 +782,7 @@ public class BetterConfigBuilder
 		{
 			return new OptionButton<>(
 				xPos,
-				Arrays.asList(((Class<E>)property.getValueClass()).getEnumConstants()),
+				Arrays.asList(((Class<E>)property.getSpec().getValueClass()).getEnumConstants()),
 				enuw -> new StringTextComponent(enuw.name()),
 				property);
 		}
@@ -796,7 +796,7 @@ public class BetterConfigBuilder
 		
 		private StringInputField(FontRenderer fontRenderer, int x, ConfigProperty<String> property)
 		{
-			super(fontRenderer, x + 1, 0, VALUE_WIDTH - 2, VALUE_HEIGHT - 2, property.getDisplayName());
+			super(fontRenderer, x + 1, 0, VALUE_WIDTH - 2, VALUE_HEIGHT - 2, property.getSpec().getDisplayName());
 			this.property = property;
 			this.setText(property.getValue());
 			this.setResponder(this::updateTextColor);
@@ -805,7 +805,7 @@ public class BetterConfigBuilder
 		/** Updates the color of the text to indicates an error */
 		private void updateTextColor(String text)
 		{
-			this.setTextColor(this.property.isAllowed(text) ? DEFAULT_FIELD_TEXT_COLOR : ERROR_FIELD_TEXT_COLOR);
+			this.setTextColor(this.property.getSpec().isAllowed(text) ? DEFAULT_FIELD_TEXT_COLOR : ERROR_FIELD_TEXT_COLOR);
 		}
 
 		@Override
@@ -818,7 +818,7 @@ public class BetterConfigBuilder
 		@Override
 		protected void onValidate(String text)
 		{
-			if (this.property.isAllowed(text))
+			if (this.property.getSpec().isAllowed(text))
 			{
 				this.property.setValue(text);
 			}
@@ -839,7 +839,7 @@ public class BetterConfigBuilder
 
 		public NumberInputField(FontRenderer fontRenderer, int x, INumberType<N> numberType, ConfigProperty<N> property)
 		{
-			super(fontRenderer, x, 0, VALUE_WIDTH, VALUE_HEIGHT, property.getDisplayName(), numberType, property.getValue());
+			super(fontRenderer, x, 0, VALUE_WIDTH, VALUE_HEIGHT, property.getSpec().getDisplayName(), numberType, property.getValue());
 			this.property = property;
 			this.inputField.setResponder(this::updateTextColor);
 		}
@@ -847,7 +847,7 @@ public class BetterConfigBuilder
 		/** Updates the color of the text to indicates an error */
 		private void updateTextColor(String text)
 		{
-			this.inputField.setTextColor(this.property.isAllowed(this.getValue()) ? DEFAULT_FIELD_TEXT_COLOR : ERROR_FIELD_TEXT_COLOR);
+			this.inputField.setTextColor(this.property.getSpec().isAllowed(this.getValue()) ? DEFAULT_FIELD_TEXT_COLOR : ERROR_FIELD_TEXT_COLOR);
 		}
 
 		@Override
@@ -860,16 +860,16 @@ public class BetterConfigBuilder
 		@Override
 		protected N correct(N value)
 		{
-			if (this.property.isAllowed(value))
+			if (this.property.getSpec().isAllowed(value))
 				return value;
 			
-			return this.property.correct(value);
+			return this.property.getSpec().correct(value);
 		}
 		
 		@Override
 		protected void onValidate(N value)
 		{
-			if (this.property.isAllowed(value))
+			if (this.property.getSpec().isAllowed(value))
 			{
 				this.property.setValue(value);
 			}
@@ -879,7 +879,7 @@ public class BetterConfigBuilder
 		@SuppressWarnings("unchecked")
 		private static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, int xPos, ConfigProperty<N> property)
 		{
-			return new NumberInputField<>(screen.getFont(), xPos, NumberTypes.getType((Class<N>)property.getValueClass()), property);
+			return new NumberInputField<>(screen.getFont(), xPos, NumberTypes.getType((Class<N>)property.getSpec().getValueClass()), property);
 		}
 	}
 

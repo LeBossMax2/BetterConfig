@@ -10,8 +10,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.config.ConfigProperty;
-import fr.max2.betterconfig.config.ConfigTable;
+import fr.max2.betterconfig.config.value.ConfigProperty;
+import fr.max2.betterconfig.config.value.ConfigTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
