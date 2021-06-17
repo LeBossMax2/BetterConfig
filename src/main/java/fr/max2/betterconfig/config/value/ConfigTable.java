@@ -3,7 +3,6 @@ package fr.max2.betterconfig.config.value;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
@@ -12,6 +11,7 @@ import fr.max2.betterconfig.config.spec.ConfigPropertySpec;
 import fr.max2.betterconfig.config.spec.ConfigSpecNode;
 import fr.max2.betterconfig.config.spec.ConfigTableSpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecVisitor;
+import fr.max2.betterconfig.util.MappedMapView;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
@@ -44,7 +44,7 @@ public class ConfigTable extends ConfigNode<ConfigTableSpec>
 	{
 		if (this.valueMap == null)
 		{
-			this.valueMap = this.getSpec().getSpecMap().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> childNode(entry.getKey(), entry.getValue())));
+			this.valueMap = new MappedMapView<>(this.getSpec().getSpecMap(), (key, value) -> childNode(key, value));
 		}
 		return this.valueMap;
 	}

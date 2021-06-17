@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
+import fr.max2.betterconfig.util.MappedMapView;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -56,7 +56,7 @@ public class ConfigTableSpec extends ConfigSpecNode
 	{
 		if (this.specMap == null)
 		{
-			this.specMap = this.spec.valueMap().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> childNode(entry.getKey(), entry.getValue())));
+			this.specMap = new MappedMapView<>(this.spec.valueMap(), (key, spec) -> childNode(key, spec));
 		}
 		return this.specMap;
 	}
