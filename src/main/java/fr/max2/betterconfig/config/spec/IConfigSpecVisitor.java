@@ -14,7 +14,7 @@ public interface IConfigSpecVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	<T> R visitProperty(ConfigPropertySpec<T> propertySpec, P param);
+	<T> R visitProperty(ConfigValueSpec<T> propertySpec, P param);
 
 	/**
 	 * Visits a table spec node

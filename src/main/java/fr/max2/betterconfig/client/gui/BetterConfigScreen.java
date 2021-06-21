@@ -10,6 +10,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
+import fr.max2.betterconfig.config.impl.ForgeConfigTable;
 import fr.max2.betterconfig.config.value.ConfigProperty;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import net.minecraft.client.Minecraft;
@@ -58,7 +59,7 @@ public class BetterConfigScreen extends Screen
 		this.modifiedProperties.clear();
 		ForgeConfigSpec spec = this.currentConfig.getSpec();
 		// Builds the user interface
-		this.ui = this.uiBuilder.build(this, new ConfigTable(spec, this::onPropertyChanged));
+		this.ui = this.uiBuilder.build(this, new ForgeConfigTable(spec, this::onPropertyChanged));
 		this.addListener(this.ui);
 	}
 

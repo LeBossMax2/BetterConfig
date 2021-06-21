@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import fr.max2.betterconfig.config.value.ConfigProperty;
-import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 
 public class ConfigFilter
 {
@@ -38,11 +37,11 @@ public class ConfigFilter
 		}
 	}
 	
-	public boolean matches(ConfigProperty<?> property)
+	public boolean matches(ConfigTableEntrySpec entry)
 	{
 		for (String word : this.words)
 		{
-			if (!propertyMatchesWord(property, word))
+			if (!entryMatchesWord(entry, word))
 			{
 				return false;
 			}
@@ -50,30 +49,11 @@ public class ConfigFilter
 		return true;
 	}
 	
-	public boolean matches(ConfigTable table)
+	private static boolean entryMatchesWord(ConfigTableEntrySpec entry, String word)
 	{
-		for (String word : this.words)
-		{
-			if (!tableMatchesWord(table, word))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	private static boolean propertyMatchesWord(ConfigProperty<?> property, String word)
-	{
-		String comment = property.getSpec().getCommentString(); 
+		String comment = entry.getCommentString(); 
 		return comment != null && comment.toLowerCase().contains(word)
-		    || property.getSpec().getDisplayName().getString().toLowerCase().contains(word)
-		    || property.getSpec().getLoc().getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
-	}
-	
-	private static boolean tableMatchesWord(ConfigTable table, String word)
-	{
-		String comment = table.getSpec().getCommentString(); 
-		return comment != null && comment.toLowerCase().contains(word)
-		    || table.getSpec().getLoc().getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
+		    || entry.getDisplayName().getString().toLowerCase().contains(word)
+		    || entry.getLoc().getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
 	}
 }

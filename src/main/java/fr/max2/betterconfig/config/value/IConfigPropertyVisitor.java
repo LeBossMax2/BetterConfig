@@ -15,7 +15,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitBoolean(ConfigProperty<Boolean> property, P param)
+	default R visitBoolean(ConfigValue<Boolean> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -26,7 +26,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitNumber(ConfigProperty<? extends Number> property, P param)
+	default R visitNumber(ConfigValue<? extends Number> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -37,7 +37,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitString(ConfigProperty<String> property, P param)
+	default R visitString(ConfigValue<String> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -48,7 +48,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default <E extends Enum<E>> R visitEnum(ConfigProperty<E> property, P param)
+	default <E extends Enum<E>> R visitEnum(ConfigValue<E> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -59,7 +59,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitList(ConfigProperty<? extends List<?>> property, P param)
+	default R visitList(ConfigValue<? extends List<?>> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -70,5 +70,5 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	R visitUnknown(ConfigProperty<?> property, P param);
+	R visitUnknown(ConfigValue<?> property, P param);
 }

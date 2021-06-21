@@ -14,7 +14,7 @@ public interface IConfigValueVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	<T> R visitProperty(ConfigProperty<T> property, P param);
+	<T> R visitProperty(ConfigValue<T> property, P param);
 
 	/**
 	 * Visits a table node

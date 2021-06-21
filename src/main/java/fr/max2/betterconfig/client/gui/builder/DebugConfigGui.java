@@ -10,8 +10,8 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.config.value.ConfigProperty;
 import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.value.ConfigValue;
 import fr.max2.betterconfig.config.value.IConfigPropertyVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import net.minecraft.client.gui.FontRenderer;
@@ -78,7 +78,7 @@ public class DebugConfigGui  implements IGuiComponent
 	public static DebugConfigGui build(BetterConfigScreen screen, ConfigTable config)
 	{
 		List<String> list = new ArrayList<>();
-		config.exploreEntries((key, value) -> value.exploreNode(new TableBuilder(list), key)).forEach(v -> {});
+		config.exploreEntries((key, value) -> value.exploreNode(new TableBuilder(list), key.getLoc().getName())).forEach(v -> {});
 		return new DebugConfigGui(screen, list);
 	}
 	
@@ -100,7 +100,7 @@ public class DebugConfigGui  implements IGuiComponent
 		}
 		
 		@Override
-		public <T> Void visitProperty(ConfigProperty<T> property, String path)
+		public <T> Void visitProperty(ConfigValue<T> property, String path)
 		{
 			this.content.add(property.exploreType(ValueBuilder.INSTANCE,  path));
 			return null;
@@ -113,31 +113,31 @@ public class DebugConfigGui  implements IGuiComponent
 		INSTANCE;
 		
 		@Override
-		public String visitBoolean(ConfigProperty<Boolean> property, String path)
+		public String visitBoolean(ConfigValue<Boolean> property, String path)
 		{
 			return path + " : " + "BOOL" + " = " + property.getValue();
 		}
 		
 		@Override
-		public String visitNumber(ConfigProperty<? extends Number> property, String path)
+		public String visitNumber(ConfigValue<? extends Number> property, String path)
 		{
 			return path + " : " + "NUMBER" + " = " + property.getValue();
 		}
 		
 		@Override
-		public String visitString(ConfigProperty<String> property, String path)
+		public String visitString(ConfigValue<String> property, String path)
 		{
 			return path + " : " + "STRING" + " = " + property.getValue();
 		}
 		
 		@Override
-		public <E extends Enum<E>> String visitEnum(ConfigProperty<E> property, String path)
+		public <E extends Enum<E>> String visitEnum(ConfigValue<E> property, String path)
 		{
 			return path + " : " + "ENUM" + " = " + property.getValue();
 		}
 		
 		@Override
-		public String visitList(ConfigProperty<? extends List<?>> property, String path)
+		public String visitList(ConfigValue<? extends List<?>> property, String path)
 		{
 			StringBuilder str = new StringBuilder();
 			List<?> value = property.getValue();
@@ -153,7 +153,7 @@ public class DebugConfigGui  implements IGuiComponent
 		}
 		
 		@Override
-		public String visitUnknown(ConfigProperty<?> property, String path)
+		public String visitUnknown(ConfigValue<?> property, String path)
 		{
 			return path + " : " + "UNKNOWN" + " = " + property.getValue();
 		}

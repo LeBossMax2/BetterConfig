@@ -1,35 +1,37 @@
 package fr.max2.betterconfig.config.spec;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import fr.max2.betterconfig.config.ValueType;
-import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
 
-public class ConfigListSpec<T> extends ConfigPropertySpec<List<T>>
+public abstract class ConfigListSpec<T> extends ConfigValueSpec<List<T>>
 {
-	/** The type of the elements of the list */
-	private final ValueType elementType;
-	private final ConfigPropertySpec<T> elementSpec;
+	private final ConfigValueSpec<T> elementSpec;
 	
-	public ConfigListSpec(ConfigLocation loc, ValueSpec spec)
+	public ConfigListSpec(ConfigValueSpec<T> elementSpec)
 	{
-		super(loc, spec);
-		this.elementType = ValueType.getType(this.getElementClass());
+		super(List.class);
+		this.elementSpec = elementSpec;
 	}
 	
-	/**
-	 * Gets the class of the configuration value
-	 */
+	@Override
+	public List<T> deepCopy(List<T> value)
+	{
+		return value.stream().map(this.elementSpec::deepCopy).collect(Collectors.toList());
+	}
+
+	public ValueType getElementType()
+	{
+		return this.elementSpec.getType();
+	}
+	
 	public Class<?> getElementClass()
 	{
-		List<T> value = this.getDefaultValue();
-		if (value != null)
-			return value.getClass();
-		
-		return Object.class;
+		return this.elementSpec.getValueClass();
 	}
 	
-	public ConfigPropertySpec<T> getElementSpec()
+	public ConfigValueSpec<T> getElementSpec()
 	{
 		return elementSpec;
 	}
