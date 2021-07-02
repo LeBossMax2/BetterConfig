@@ -1,5 +1,6 @@
 package fr.max2.betterconfig.client.util;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import net.minecraft.util.text.ITextComponent;
@@ -43,7 +44,7 @@ public interface INumberType<N>
 	 */
 	default String intoString(N value)
 	{
-		return value.toString();
+		return Objects.toString(value);
 	}
 	
 	/**

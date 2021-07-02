@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.config.impl;
+package fr.max2.betterconfig.config.impl.spec;
 
 import java.util.List;
 import java.util.Map;
@@ -9,16 +9,18 @@ import com.google.common.base.Strings;
 
 import fr.max2.betterconfig.config.spec.ConfigLocation;
 import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
-import fr.max2.betterconfig.config.spec.ConfigTableSpec;
+import fr.max2.betterconfig.config.spec.IConfigSpecNode;
+import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.util.MappedMapView;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.LanguageMap;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-public class ForgeConfigTableSpec extends ConfigTableSpec
+public class ForgeConfigTableSpec implements IConfigTableSpec
 {
 	private final ConfigLocation tableLoc;
 	/** The map containing the comment for each node */
@@ -62,21 +64,69 @@ public class ForgeConfigTableSpec extends ConfigTableSpec
 		ConfigLocation location = new ConfigLocation(this.tableLoc, key);
 		if (spec instanceof UnmodifiableConfig)
         {
-        	return new ConfigTableEntrySpec(location, new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments), new StringTextComponent(key), this.levelComments.apply(location));
+        	return new ConfigTableEntrySpec(location, new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments), this.levelComments.apply(location));
         }
         else
         {
-            ValueSpec valueSpec = (ValueSpec)spec;
+            ValueSpec forgeSpec = (ValueSpec)spec;
             
             ITextComponent name = null;
             // Try getting name from translation key 
-    		String translationKey = valueSpec.getTranslationKey();
-    		if (!Strings.isNullOrEmpty(translationKey))
+    		String translationKey = forgeSpec.getTranslationKey();
+    		if (!Strings.isNullOrEmpty(translationKey) && LanguageMap.getInstance().func_230506_b_(translationKey)) // func_230506_b_ is equivalent to "I18n.hasKey"
     			name = new TranslationTextComponent(translationKey);
     		else // Get name from path
     			name = new StringTextComponent(key);
+    		
+    		IConfigSpecNode valSpec;
+    		Class<?> valueClass = valueClass(forgeSpec);
+    		
+    		if (List.class.isAssignableFrom(valueClass))
+    		{
+    			valSpec = new ForgeConfigListSpec(getSpecForValues((List<?>)forgeSpec.getDefault()));
+    		}
+    		else
+    		{
+    			valSpec = new ForgeConfigPrimitiveSpec<>(forgeSpec, valueClass);
+    		}
             
-            return new ConfigTableEntrySpec(location, new ForgeConfigPropertySpec<>(valueSpec), name, valueSpec.getComment());
+            return new ConfigTableEntrySpec(location, valSpec, name, forgeSpec.getComment());
         }
+	}
+	
+	private static Class<?> valueClass(ValueSpec spec)
+	{
+		Class<?> specClass = spec.getClazz();
+		if (specClass != Object.class)
+			return specClass;
+		
+		Object value = spec.getDefault();
+		if (value != null)
+			return value.getClass();
+		
+		return Object.class;
+	}
+	
+	private static IConfigSpecNode getSpecForValues(List<?> exampleValues)
+	{
+		for (Object obj : exampleValues)
+		{
+			if (obj == null)
+				continue;
+			
+			Class<?> valClass = obj.getClass();
+			if (List.class.isAssignableFrom(valClass))
+			{
+				return new ForgeConfigListSpec(getSpecForValues((List<?>)obj));
+			}
+			if (UnmodifiableConfig.class.isAssignableFrom(valClass))
+			{
+				// TODO implements list of tables
+				// Don't know how to deal with tables in lists
+				return new ForgeListPrimitiveSpec<>(Object.class);
+			}
+			return new ForgeListPrimitiveSpec<>(valClass);
+		}
+		return new ForgeListPrimitiveSpec<>(Object.class);
 	}
 }

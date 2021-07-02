@@ -5,9 +5,9 @@ import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 public class ConfigTableEntry
 {
 	private final ConfigTableEntrySpec spec;
-	private final ConfigNode<?> node;
+	private final IConfigNode<?> node;
 
-	public ConfigTableEntry(ConfigTableEntrySpec spec, ConfigNode<?> node)
+	public ConfigTableEntry(ConfigTableEntrySpec spec, IConfigNode<?> node)
 	{
 		this.spec = spec;
 		this.node = node;
@@ -18,7 +18,7 @@ public class ConfigTableEntry
 		return this.spec;
 	}
 	
-	public ConfigNode<?> getNode()
+	public IConfigNode<?> getNode()
 	{
 		return this.node;
 	}

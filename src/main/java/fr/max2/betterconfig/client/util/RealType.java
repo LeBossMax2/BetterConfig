@@ -33,7 +33,7 @@ public final class RealType<N extends Number> implements INumberType<N>
 	@Override
 	public String intoString(N value)
 	{
-		return this.formater.format(value.doubleValue());
+		return value == null ? "null" : this.formater.format(value.doubleValue());
 	}
 
 	@Override

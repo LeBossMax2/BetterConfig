@@ -1,5 +1,8 @@
 package fr.max2.betterconfig;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 import fr.max2.betterconfig.config.ValueType;
@@ -55,6 +58,25 @@ public class TestConfig
 			
 			spec.comment("This is a double")
 				.defineInRange("myDouble", 5.0, 0.0, 100.0);
+
+			spec.comment("This is a list")
+				.defineList("myDoubles", Arrays.asList(0.0), val ->
+				{
+					if (!(val instanceof Double))
+						return false;
+					
+					return true;
+				});
+
+			spec.defineList("myListsOfStrings", Arrays.asList(Arrays.asList("Exemple")), val ->
+				{
+					if (!(val instanceof List))
+						return false;
+					
+					List<?> v = (List<?>)val;
+					
+					return v.stream().allMatch(elem -> elem instanceof String);
+				});
 		}
 	}
 	

@@ -13,18 +13,23 @@ import net.minecraft.util.text.StringTextComponent;
 public class ConfigTableEntrySpec
 {
 	private final ConfigLocation loc;
-	private final ConfigSpecNode node;
+	private final IConfigSpecNode node;
 	private final ITextComponent displayName;
 	private final String commentString;
 	/** The comments describing the property */
 	private List<? extends ITextComponent> commentLines = null;
 	
-	public ConfigTableEntrySpec(ConfigLocation loc, ConfigSpecNode node, ITextComponent displayName, String comment)
+	public ConfigTableEntrySpec(ConfigLocation loc, IConfigSpecNode node, ITextComponent displayName, String comment)
 	{
 		this.loc = loc;
 		this.node = node;
 		this.displayName = displayName;
 		this.commentString = comment;
+	}
+	
+	public ConfigTableEntrySpec(ConfigLocation loc, IConfigSpecNode node, String comment)
+	{
+		this(loc, node, new StringTextComponent(loc.getName()), comment);
 	}
 
 	public ConfigLocation getLoc()
@@ -32,7 +37,7 @@ public class ConfigTableEntrySpec
 		return loc;
 	}
 	
-	public ConfigSpecNode getNode()
+	public IConfigSpecNode getNode()
 	{
 		return node;
 	}

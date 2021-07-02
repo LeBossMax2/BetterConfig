@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Function;
 
-public class MappedSetView<U, V> extends AbstractSet<V> implements Set<V>
+public class MappedSetView<U, V> extends AbstractSet<V>
 {
 	private final Set<U> parent;
 	private final Function<U, V> mapper;

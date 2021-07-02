@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-public class MappedMapView<K, U, V> extends AbstractMap<K, V> implements Map<K, V>
+public class MappedMapView<K, U, V> extends AbstractMap<K, V>
 {
 	private final Map<K, U> parent;
 	private final BiFunction<K, U, V> mapper;

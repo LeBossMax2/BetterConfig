@@ -1,36 +1,39 @@
-package fr.max2.betterconfig.config.impl;
+package fr.max2.betterconfig.config.impl.value;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
-import fr.max2.betterconfig.config.spec.ConfigValueSpec;
+import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
+import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
 import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
-import fr.max2.betterconfig.config.spec.ConfigTableSpec;
+import fr.max2.betterconfig.config.spec.IConfigListSpec;
+import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecVisitor;
-import fr.max2.betterconfig.config.value.ConfigProperty;
-import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.ConfigTableEntry;
+import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.util.MappedMapView;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public class ForgeConfigTable extends ConfigTable
+public class ForgeConfigTable extends ForgeConfigNode<IConfigTableSpec> implements IConfigTable
 {
 	/** The table containing the value of each entry */
 	private final UnmodifiableConfig configValues;
 
 	private Map<String, ConfigTableEntry> valueMap;
 
-	private ForgeConfigTable(ConfigTableSpec spec, Consumer<ConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
+	private ForgeConfigTable(IConfigTableSpec spec, Consumer<ForgeConfigProperty<?, ?>> changeListener, UnmodifiableConfig configValues)
 	{
 		super(spec, changeListener);
 		
 		this.configValues = configValues;
 	}
 	
-	public ForgeConfigTable(ForgeConfigSpec spec, Consumer<ConfigProperty<?>> changeListener)
+	public ForgeConfigTable(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?, ?>> changeListener)
 	{
 		this(new ForgeConfigTableSpec(spec), changeListener, spec.getValues());
 	}
@@ -51,10 +54,10 @@ public class ForgeConfigTable extends ConfigTable
 	
 	private static class ConfigNodeCreator implements IConfigSpecVisitor<Object, ConfigTableEntry>
 	{
-		private final Consumer<ConfigProperty<?>> changeListener;
+		private final Consumer<ForgeConfigProperty<?, ?>> changeListener;
 		private final ConfigTableEntrySpec entrySpec;
 
-		public ConfigNodeCreator(Consumer<ConfigProperty<?>> changeListener, ConfigTableEntrySpec entrySpec)
+		public ConfigNodeCreator(Consumer<ForgeConfigProperty<?, ?>> changeListener, ConfigTableEntrySpec entrySpec)
 		{
 			this.changeListener = changeListener;
 			this.entrySpec = entrySpec;
@@ -62,15 +65,27 @@ public class ForgeConfigTable extends ConfigTable
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T> ConfigTableEntry visitProperty(ConfigValueSpec<T> propertySpec, Object param)
+		public <T> ConfigTableEntry visitProperty(IConfigPrimitiveSpec<T> propertySpec, Object param)
 		{
-			return new ConfigTableEntry(this.entrySpec, new ForgeConfigProperty<>(propertySpec, (ConfigValue<T>)param, this.changeListener));
+			return new ConfigTableEntry(this.entrySpec, new ForgeConfigPrimitive<>(propertySpec, this.changeListener, (ConfigValue<T>)param));
 		}
 
 		@Override
-		public ConfigTableEntry visitTable(ConfigTableSpec tableSpec, Object param)
+		public ConfigTableEntry visitTable(IConfigTableSpec tableSpec, Object param)
 		{
 			return new ConfigTableEntry(this.entrySpec, new ForgeConfigTable(tableSpec, this.changeListener, (UnmodifiableConfig)param));
+		}
+
+		@Override
+		public ConfigTableEntry visitList(IConfigListSpec listSpec, Object param)
+		{
+			return new ConfigTableEntry(this.entrySpec, buildList(listSpec, param));
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T> IConfigNode<?> buildList(IConfigListSpec listSpec, Object param)
+		{
+			return new ForgeConfigList<>(listSpec, this.changeListener, (ConfigValue<List<T>>)param);
 		}
 	}
 }

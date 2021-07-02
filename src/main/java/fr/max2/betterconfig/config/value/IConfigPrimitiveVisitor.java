@@ -1,13 +1,11 @@
 package fr.max2.betterconfig.config.value;
 
-import java.util.List;
-
 /**
- * An interface for visiting {@code ConfigProperty} according to the type of the value
+ * An interface for visiting {@code IConfigPrimitive} according to the type of the value
  * @param <P> the type of parameter value
  * @param <R> the type of returned value
  */
-public interface IConfigPropertyVisitor<P, R>
+public interface IConfigPrimitiveVisitor<P, R>
 {
 	/**
 	 * Visits a boolean property
@@ -15,7 +13,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitBoolean(ConfigValue<Boolean> property, P param)
+	default R visitBoolean(IConfigPrimitive<Boolean> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -26,7 +24,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitNumber(ConfigValue<? extends Number> property, P param)
+	default R visitNumber(IConfigPrimitive<? extends Number> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -37,7 +35,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitString(ConfigValue<String> property, P param)
+	default R visitString(IConfigPrimitive<String> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -48,18 +46,7 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default <E extends Enum<E>> R visitEnum(ConfigValue<E> property, P param)
-	{
-		return this.visitUnknown(property, param);
-	}
-
-	/**
-	 * Visits a list property
-	 * @param property
-	 * @param param the parameter of the visitor
-	 * @return the resulting value of the visitor
-	 */
-	default R visitList(ConfigValue<? extends List<?>> property, P param)
+	default <E extends Enum<E>> R visitEnum(IConfigPrimitive<E> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -70,5 +57,5 @@ public interface IConfigPropertyVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	R visitUnknown(ConfigValue<?> property, P param);
+	R visitUnknown(IConfigPrimitive<?> property, P param);
 }

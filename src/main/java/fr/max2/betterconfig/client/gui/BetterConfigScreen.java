@@ -10,9 +10,9 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 
 import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.config.impl.ForgeConfigTable;
-import fr.max2.betterconfig.config.value.ConfigProperty;
-import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
+import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;
+import fr.max2.betterconfig.config.value.IConfigTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -35,7 +35,7 @@ public class BetterConfigScreen extends Screen
 	/** The current edited configuration */
 	private final ModConfig currentConfig;
 	/** The set of properties that changed and need to be saved */
-	private final Set<ConfigProperty<?>> modifiedProperties = new HashSet<>();
+	private final Set<ForgeConfigProperty<?, ?>> modifiedProperties = new HashSet<>();
 	
 	/** The screen to open when this screen closes */
 	private Screen prevScreen = null;
@@ -84,7 +84,7 @@ public class BetterConfigScreen extends Screen
 		if (this.configChanged())
 		{
 			// Save changes to config
-			for (ConfigProperty<?> property : this.modifiedProperties)
+			for (ForgeConfigProperty<?, ?> property : this.modifiedProperties)
 			{
 				property.sendChanges();
 			}
@@ -106,7 +106,7 @@ public class BetterConfigScreen extends Screen
 	 * Called when a the value property changes to tracks which property should be saved
 	 * @param property the property that changed
 	 */
-	protected void onPropertyChanged(ConfigProperty<?> property)
+	protected void onPropertyChanged(ForgeConfigProperty<?, ?> property)
 	{
 		if (property.valueChanged())
 		{
@@ -189,6 +189,6 @@ public class BetterConfigScreen extends Screen
 	@FunctionalInterface
 	public static interface IConfigUIBuilder
 	{
-		IGuiComponent build(BetterConfigScreen screen, ConfigTable config);
+		IGuiComponent build(BetterConfigScreen screen, IConfigTable config);
 	}
 }

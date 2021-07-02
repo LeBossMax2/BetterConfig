@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -22,10 +23,13 @@ import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
 import fr.max2.betterconfig.config.ConfigFilter;
+import fr.max2.betterconfig.config.spec.ConfigLocation;
 import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
-import fr.max2.betterconfig.config.value.ConfigTable;
-import fr.max2.betterconfig.config.value.ConfigValue;
-import fr.max2.betterconfig.config.value.IConfigPropertyVisitor;
+import fr.max2.betterconfig.config.value.IConfigTable;
+import fr.max2.betterconfig.config.value.IConfigList;
+import fr.max2.betterconfig.config.value.IConfigNode;
+import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FocusableGui;
@@ -74,13 +78,13 @@ public class BetterConfigBuilder
 	 * @param config the edited configuration
 	 * @return the user interface
 	 */
-	public static IGuiComponent build(BetterConfigScreen screen, ConfigTable config)
+	public static IGuiComponent build(BetterConfigScreen screen, IConfigTable config)
 	{
 		return new UIContainer(screen, Builder.buildTable(screen, config, 0));
 	}
 	
 	/** The visitor to build the gui components */
-	private static class Builder implements IConfigValueVisitor<ConfigTableEntrySpec, IBetterElement>, IConfigPropertyVisitor<ConfigTableEntrySpec, IBetterElement>
+	private static class Builder implements IConfigValueVisitor<ConfigTableEntrySpec, IBetterElement>, IConfigPrimitiveVisitor<ConfigTableEntrySpec, IBetterElement>
 	{
 		/** The position of the value widgets relative to the right side */
 		private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4;
@@ -95,22 +99,43 @@ public class BetterConfigBuilder
 			this.xOffset = xOffset;
 		}
 		
-		private static IBetterElement buildTable(BetterConfigScreen screen, ConfigTable table, int xOffset)
+		private static IBetterElement buildTable(BetterConfigScreen screen, IConfigTable table, int xOffset)
 		{
 			List<IBetterElement> content = table.exploreEntries((e, value) -> value.exploreNode(new Builder(screen, xOffset), e)).collect(Collectors.toList());
 			return new UITable(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
 		}
 		
+		private static IBetterElement buildList(BetterConfigScreen screen, IConfigList list, int xOffset, ConfigTableEntrySpec entry)
+		{
+			List<IBetterElement> content = new ArrayList<>();
+			int i = 0;
+			for (IConfigNode<?> elem : list.getValueList())
+			{
+				content.add(elem.exploreNode(new Builder(screen, xOffset), new ConfigTableEntrySpec(new ConfigLocation(entry.getLoc(), entry.getLoc().getName() + "[" + i + "]"), elem.getSpec(), new StringTextComponent("[" + i + "]"), entry.getCommentString())));
+				i++;
+			}
+			
+			return new UITable(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
+		}
+		
+		
 		// Table entry visitor
 		
 		@Override
-		public IBetterElement visitTable(ConfigTable table, ConfigTableEntrySpec entry)
+		public IBetterElement visitTable(IConfigTable table, ConfigTableEntrySpec entry)
 		{
 			return new UIFoldout(this.screen, entry, buildTable(this.screen, table, this.xOffset + SECTION_TAB_SIZE), this.xOffset);
 		}
 		
 		@Override
-		public <T> IBetterElement visitProperty(ConfigValue<T> property, ConfigTableEntrySpec entry)
+		public IBetterElement visitList(IConfigList list, ConfigTableEntrySpec entry)
+		{
+			// TODO Implement list config ui
+			return new UIFoldout(this.screen, entry, buildList(this.screen, list, this.xOffset + SECTION_TAB_SIZE, entry), this.xOffset);
+		}
+		
+		@Override
+		public <T> IBetterElement visitProperty(IConfigPrimitive<T> property, ConfigTableEntrySpec entry)
 		{
 			IBetterElement widget = property.exploreType(this, entry);
 			return new ValueContainer(this.screen, entry, property, widget, this.xOffset);
@@ -119,38 +144,31 @@ public class BetterConfigBuilder
 		// Property visitor
 		
 		@Override
-		public IBetterElement visitBoolean(ConfigValue<Boolean> property, ConfigTableEntrySpec entry)
+		public IBetterElement visitBoolean(IConfigPrimitive<Boolean> property, ConfigTableEntrySpec entry)
 		{
 			return OptionButton.booleanOption(this.screen.width - VALUE_OFFSET, property);
 		}
 		
 		@Override
-		public IBetterElement visitNumber(ConfigValue<? extends Number> property, ConfigTableEntrySpec entry)
+		public IBetterElement visitNumber(IConfigPrimitive<? extends Number> property, ConfigTableEntrySpec entry)
 		{
 			return NumberInputField.numberOption(this.screen, this.screen.width - VALUE_OFFSET, entry, property);
 		}
 		
 		@Override
-		public IBetterElement visitString(ConfigValue<String> property, ConfigTableEntrySpec entry)
+		public IBetterElement visitString(IConfigPrimitive<String> property, ConfigTableEntrySpec entry)
 		{
 			return StringInputField.stringOption(this.screen, this.screen.width - VALUE_OFFSET, entry, property);
 		}
 		
 		@Override
-		public <E extends Enum<E>> IBetterElement visitEnum(ConfigValue<E> property, ConfigTableEntrySpec entry)
+		public <E extends Enum<E>> IBetterElement visitEnum(IConfigPrimitive<E> property, ConfigTableEntrySpec entry)
 		{
 			return OptionButton.enumOption(this.screen.width - VALUE_OFFSET, property);
 		}
 		
 		@Override
-		public IBetterElement visitList(ConfigValue<? extends List<?>> property, ConfigTableEntrySpec entry)
-		{
-			// TODO Implement list config ui
-			return visitUnknown(property, entry);
-		}
-		
-		@Override
-		public IBetterElement visitUnknown(ConfigValue<?> property, ConfigTableEntrySpec entry)
+		public IBetterElement visitUnknown(IConfigPrimitive<?> property, ConfigTableEntrySpec entry)
 		{
 			return new UnknownOptionWidget(this.screen.width - VALUE_OFFSET, property);
 		}
@@ -225,9 +243,9 @@ public class BetterConfigBuilder
 		/** The content that will be collapsed */
 		private final IBetterElement content;
 		/** The title on the header */
-		private final IReorderingProcessor sectionName;
+		private final ITextComponent sectionName;
 		/** The extra info to show on the tooltip */
-		private final List<? extends ITextProperties> extraInfo;
+		private final List<ITextProperties> extraInfo = new ArrayList<>();
 		/** The layout to notify for layout update */
 		private ILayoutManager layout;
 		/** The x coordinate of this component */
@@ -247,8 +265,9 @@ public class BetterConfigBuilder
 			this.screen = screen;
 			this.tableEntry = entry;
 			this.content = content;
-			this.sectionName = IReorderingProcessor.fromString(entry.getLoc().getName(), Style.EMPTY.mergeWithFormatting(TextFormatting.BOLD, TextFormatting.YELLOW));
-			this.extraInfo = entry.getDisplayComment();
+			this.sectionName = entry.getDisplayName().deepCopy().mergeStyle(TextFormatting.BOLD, TextFormatting.YELLOW);
+			this.extraInfo.add(ITextProperties.func_240653_a_(entry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+			this.extraInfo.addAll(entry.getDisplayComment());
 			this.baseX = x;
 		}
 		
@@ -381,7 +400,7 @@ public class BetterConfigBuilder
 			String arrow = this.folded ? ">" : "v"; // TODO Use arrow texture
 			FontRenderer font = this.screen.getFont(); 
 			font.drawString(matrixStack, arrow, x + 1, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
-			font.func_238422_b_(matrixStack, this.sectionName, x + 11, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+			font.drawText(matrixStack, this.sectionName, x + 11, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
 		}
 		
 		@Override
@@ -643,18 +662,16 @@ public class BetterConfigBuilder
 		/** Indicates if the property is hidden or not */
 		private boolean hidden = false;
 
-		public ValueContainer(BetterConfigScreen screen, ConfigTableEntrySpec entry, ConfigValue<?> property, IBetterElement content, int x)
+		public ValueContainer(BetterConfigScreen screen, ConfigTableEntrySpec entry, IConfigPrimitive<?> property, IBetterElement content, int x)
 		{
 			this.screen = screen;
 			this.entry = entry;
 			this.content = content;
 			FontRenderer font = this.screen.getFont();
 			this.nameLines = font.trimStringToWidth(entry.getDisplayName(), screen.width - x - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - 4);
-			List<String> path = entry.getLoc().getPath();
-			if (!path.isEmpty())
-				this.extraInfo.add(ITextProperties.func_240653_a_(path.get(path.size() - 1), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+			this.extraInfo.add(ITextProperties.func_240653_a_(entry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
 			this.extraInfo.addAll(entry.getDisplayComment());
-			this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(property.getSpec().getDefaultValue().toString()))).mergeStyle(TextFormatting.GRAY));
+			this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(Objects.toString(property.getSpec().getDefaultValue())))).mergeStyle(TextFormatting.GRAY));
 			this.baseX = x;
 		}
 		
@@ -753,7 +770,7 @@ public class BetterConfigBuilder
 	private static class OptionButton<V> extends CycleOptionButton<V> implements IBetterElement
 	{
 		private OptionButton(int xPos, List<? extends V> acceptedValues,
-			Function<? super V, ITextComponent> valueToText, ConfigValue<V> property)
+			Function<? super V, ITextComponent> valueToText, IConfigPrimitive<V> property)
 		{
 			super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT,
 				acceptedValues.stream().filter(property.getSpec()::isAllowed).collect(Collectors.toList()),
@@ -770,7 +787,7 @@ public class BetterConfigBuilder
 		}
 		
 		/** Creates a widget for boolean values */
-		private static OptionButton<Boolean> booleanOption(int xPos, ConfigValue<Boolean> property)
+		private static OptionButton<Boolean> booleanOption(int xPos, IConfigPrimitive<Boolean> property)
 		{
 			return new OptionButton<>(
 				xPos,
@@ -781,7 +798,7 @@ public class BetterConfigBuilder
 
 		/** Creates a widget for enum values */
 		@SuppressWarnings("unchecked")
-		private static <E extends Enum<E>> OptionButton<E> enumOption(int xPos, ConfigValue<E> property)
+		private static <E extends Enum<E>> OptionButton<E> enumOption(int xPos, IConfigPrimitive<E> property)
 		{
 			return new OptionButton<>(
 				xPos,
@@ -795,9 +812,9 @@ public class BetterConfigBuilder
 	private static class StringInputField extends TextField implements IBetterElement
 	{
 		/** The property to edit */
-		private final ConfigValue<String> property;
+		private final IConfigPrimitive<String> property;
 		
-		private StringInputField(FontRenderer fontRenderer, int x, ConfigValue<String> property, ITextComponent title)
+		private StringInputField(FontRenderer fontRenderer, int x, IConfigPrimitive<String> property, ITextComponent title)
 		{
 			super(fontRenderer, x + 1, 0, VALUE_WIDTH - 2, VALUE_HEIGHT - 2, title);
 			this.property = property;
@@ -828,7 +845,7 @@ public class BetterConfigBuilder
 		}
 
 		/** Creates a widget for string values */
-		private static StringInputField stringOption(BetterConfigScreen screen, int xPos, ConfigTableEntrySpec entry, ConfigValue<String> property)
+		private static StringInputField stringOption(BetterConfigScreen screen, int xPos, ConfigTableEntrySpec entry, IConfigPrimitive<String> property)
 		{
 			return new StringInputField(screen.getFont(), xPos, property, entry.getDisplayName());
 		}
@@ -838,9 +855,9 @@ public class BetterConfigBuilder
 	private static class NumberInputField<N extends Number> extends NumberField<N> implements IBetterElement
 	{
 		/** The property to edit */
-		private final ConfigValue<N> property;
+		private final IConfigPrimitive<N> property;
 
-		public NumberInputField(FontRenderer fontRenderer, int x, INumberType<N> numberType, ConfigValue<N> property, ITextComponent title)
+		public NumberInputField(FontRenderer fontRenderer, int x, INumberType<N> numberType, IConfigPrimitive<N> property, ITextComponent title)
 		{
 			super(fontRenderer, x, 0, VALUE_WIDTH, VALUE_HEIGHT, title, numberType, property.getValue());
 			this.property = property;
@@ -880,7 +897,7 @@ public class BetterConfigBuilder
 
 		/** Creates a widget for number values */
 		@SuppressWarnings("unchecked")
-		private static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, int xPos, ConfigTableEntrySpec entry, ConfigValue<N> property)
+		private static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, int xPos, ConfigTableEntrySpec entry, IConfigPrimitive<N> property)
 		{
 			return new NumberInputField<>(screen.getFont(), xPos, NumberTypes.getType((Class<N>)property.getSpec().getValueClass()), property, entry.getDisplayName());
 		}
@@ -889,7 +906,7 @@ public class BetterConfigBuilder
 	/** The widget for properties of unknown type */
 	private static class UnknownOptionWidget extends Button implements IBetterElement
 	{
-		private UnknownOptionWidget(int xPos, ConfigValue<?> property)
+		private UnknownOptionWidget(int xPos, IConfigPrimitive<?> property)
 		{
 			super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT, new StringTextComponent(property.getValue().toString()), thiz -> {}, NO_TOOLTIP);
 			this.active = false;
