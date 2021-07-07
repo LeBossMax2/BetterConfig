@@ -51,6 +51,12 @@ public class BetterConfigBuilder
 	public static final String DEFAULT_VALUE_KEY = BetterConfig.MODID + ".option.default_value";
 	/** The translation key for the text field of the search bar */
 	public static final String SEARCH_BAR_KEY = BetterConfig.MODID + ".option.search";
+	/** The translation key for the text on the add element button in lists */
+	public static final String ADD_ELEMENT_KEY = BetterConfig.MODID + ".list.add";
+	/** The translation key for the tooltip on the add element button at the start of lists */
+	public static final String ADD_FIRST_TOOLTIP_KEY = BetterConfig.MODID + ".list.add.first.tooltip";
+	/** The translation key for the tooltip on the add element button at the end of lists */
+	public static final String ADD_LAST_TOOLTIP_KEY = BetterConfig.MODID + ".list.add.last.tooltip";
 	
 	/** The width of the indentation added for each nested section */
 	private static final int SECTION_TAB_SIZE = 20;
@@ -102,22 +108,35 @@ public class BetterConfigBuilder
 		private static IBetterElement buildTable(BetterConfigScreen screen, IConfigTable table, int xOffset)
 		{
 			List<IBetterElement> content = table.exploreEntries((e, value) -> value.exploreNode(new Builder(screen, xOffset), e)).collect(Collectors.toList());
-			return new UITable(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
+			return new UIGroup(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
 		}
 		
-		private static IBetterElement buildList(BetterConfigScreen screen, IConfigList list, int xOffset, ConfigTableEntrySpec entry)
+		private void buildList(BetterConfigScreen screen, IConfigList list, UIGroup uiGroup, int xOffset, ConfigTableEntrySpec entry)
 		{
-			List<IBetterElement> content = new ArrayList<>();
 			int i = 0;
-			for (IConfigNode<?> elem : list.getValueList())
+
+			List<IBetterElement> content = new ArrayList<>();
+			List<? extends IConfigNode<?>> values = list.getValueList();
+			if (!values.isEmpty())
+				content.add(new BetterButton(screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+				{
+					list.addValue(0);
+					this.buildList(screen, list, uiGroup, xOffset, entry);
+				}, new TranslationTextComponent(ADD_FIRST_TOOLTIP_KEY)));
+			
+			for (IConfigNode<?> elem : values)
 			{
 				content.add(elem.exploreNode(new Builder(screen, xOffset), new ConfigTableEntrySpec(new ConfigLocation(entry.getLoc(), entry.getLoc().getName() + "[" + i + "]"), elem.getSpec(), new StringTextComponent("[" + i + "]"), entry.getCommentString())));
 				i++;
 			}
+			content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+			{
+				list.addValue(values.size());
+				this.buildList(screen, list, uiGroup, xOffset, entry);
+			}, new TranslationTextComponent(ADD_LAST_TOOLTIP_KEY)));
 			
-			return new UITable(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
+			uiGroup.setContent(content);
 		}
-		
 		
 		// Table entry visitor
 		
@@ -130,8 +149,10 @@ public class BetterConfigBuilder
 		@Override
 		public IBetterElement visitList(IConfigList list, ConfigTableEntrySpec entry)
 		{
-			// TODO Implement list config ui
-			return new UIFoldout(this.screen, entry, buildList(this.screen, list, this.xOffset + SECTION_TAB_SIZE, entry), this.xOffset);
+			int offset = this.xOffset + SECTION_TAB_SIZE;
+			UIGroup uiGroup = new UIGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, new ArrayList<>());
+			this.buildList(this.screen, list, uiGroup, offset, entry);
+			return new UIFoldout(this.screen, entry, uiGroup, this.xOffset);
 		}
 		
 		@Override
@@ -185,24 +206,43 @@ public class BetterConfigBuilder
 		int setYgetHeight(int y, ConfigFilter filter);
 	}
 	
-	/** The ui for a config table */
-	private static class UITable extends FocusableGui implements INestedGuiComponent, IBetterElement
+	/** The ui for a group of components */
+	private static class UIGroup extends FocusableGui implements INestedGuiComponent, IBetterElement
 	{
-		/** The list of entries of the table */
+		/** The list of entries of the group */
 		private final List<IBetterElement> content;
 		private final int width;
 		private int height = 0;
+		private ILayoutManager layout;
 
-		public UITable(int width, List<IBetterElement> content)
+		public UIGroup(int width, List<IBetterElement> content)
 		{
 			this.content = content;
 			this.width = width;
+		}
+
+		public void setContent(List<IBetterElement> content)
+		{
+			this.content.clear();
+			this.content.addAll(content);
+			if (this.layout != null)
+			{
+				INestedGuiComponent.super.setLayoutManager(this.layout);
+				this.layout.marksLayoutDirty();
+			}
 		}
 
 		@Override
 		public List<? extends IGuiComponent> getEventListeners()
 		{
 			return this.content;
+		}
+		
+		@Override
+		public void setLayoutManager(ILayoutManager manager)
+		{
+			this.layout = manager;
+			INestedGuiComponent.super.setLayoutManager(manager);
 		}
 		
 		@Override
@@ -637,6 +677,39 @@ public class BetterConfigBuilder
 			return res;
 		}
 	}
+	
+	private static class BetterButton extends Button implements IBetterElement
+	{
+		/** The parent screen */
+		private final BetterConfigScreen screen;
+		
+		private final List<? extends ITextProperties> tooltipInfo;
+		
+		public BetterButton(BetterConfigScreen screen, int xPos, int width, ITextComponent displayString, IPressable pressedHandler, ITextComponent overlay)
+		{
+			super(xPos, 0, width, VALUE_HEIGHT, displayString, pressedHandler, null);
+			this.screen = screen;
+			this.tooltipInfo = Arrays.asList(overlay);
+		}
+
+		@Override
+		public int setYgetHeight(int y, ConfigFilter filter)
+		{
+			this.setY(y + (VALUE_CONTAINER_HEIGHT - VALUE_HEIGHT) / 2);
+			return VALUE_CONTAINER_HEIGHT;
+		}
+		
+		@Override
+		public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+		{
+			if (this.isMouseOver(mouseX, mouseY))
+			{
+				FontRenderer font = Minecraft.getInstance().fontRenderer;
+				GuiUtils.drawHoveringText(matrixStack, this.tooltipInfo, mouseX, mouseY, this.screen.width, this.screen.height, 200, font);
+			}
+		}
+	}
+	
 	//TODO Add reset button
 	/** The container for table entries */
 	private static class ValueContainer extends FocusableGui implements INestedGuiComponent, IBetterElement
@@ -908,7 +981,7 @@ public class BetterConfigBuilder
 	{
 		private UnknownOptionWidget(int xPos, IConfigPrimitive<?> property)
 		{
-			super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT, new StringTextComponent(property.getValue().toString()), thiz -> {}, NO_TOOLTIP);
+			super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT, new StringTextComponent(Objects.toString(property.getValue())), thiz -> {}, NO_TOOLTIP);
 			this.active = false;
 		}
 

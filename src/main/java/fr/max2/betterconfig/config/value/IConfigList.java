@@ -10,7 +10,9 @@ public interface IConfigList extends IConfigNode<IConfigListSpec>
 {
 	List<? extends IConfigNode<?>> getValueList();
 	
-	IConfigNode<?> addValue();
+	void removeValueAt(int index);
+	
+	IConfigNode<?> addValue(int index);
 	
 	default <R> Stream<R> exploreElements(Function<IConfigNode<?>, R> visitor)
 	{

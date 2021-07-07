@@ -22,8 +22,15 @@ public class TextField extends TextFieldWidget implements IGuiComponent
 	public TextField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent title)
 	{
 		super(fontRenderer, x, y, width, height, title);
+		this.setMaxStringLength(Integer.MAX_VALUE);
 		this.baseX = x;
 		this.baseY = y;
+	}
+	
+	@Override
+	public void setText(String text)
+	{
+		super.setText(text == null ? "" : text);
 	}
 	
 	// Layout

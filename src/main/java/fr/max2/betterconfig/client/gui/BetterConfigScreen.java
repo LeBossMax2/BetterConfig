@@ -17,7 +17,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -34,6 +33,8 @@ public class BetterConfigScreen extends Screen
 	private final int configIndex;
 	/** The current edited configuration */
 	private final ModConfig currentConfig;
+	/** The current edited configuration table */
+	private final IConfigTable currentTable;
 	/** The set of properties that changed and need to be saved */
 	private final Set<ForgeConfigProperty<?, ?>> modifiedProperties = new HashSet<>();
 	
@@ -51,15 +52,15 @@ public class BetterConfigScreen extends Screen
 		this.modConfigs = configs;
 		this.configIndex = index;
 		this.currentConfig = this.modConfigs.get(this.configIndex);
+		this.currentTable = new ForgeConfigTable(this.currentConfig.getSpec(), this::onPropertyChanged);
 	}
 	
 	@Override
 	protected void init()
 	{
 		this.modifiedProperties.clear();
-		ForgeConfigSpec spec = this.currentConfig.getSpec();
 		// Builds the user interface
-		this.ui = this.uiBuilder.build(this, new ForgeConfigTable(spec, this::onPropertyChanged));
+		this.ui = this.uiBuilder.build(this, this.currentTable);
 		this.addListener(this.ui);
 	}
 

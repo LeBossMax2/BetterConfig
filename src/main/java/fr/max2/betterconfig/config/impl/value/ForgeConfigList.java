@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
+import com.google.common.base.Preconditions;
+
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
@@ -24,7 +26,8 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	public ForgeConfigList(IConfigListSpec spec, Consumer<ForgeConfigProperty<?, ?>> changeListener, ConfigValue<List<T>> configValue)
 	{
 		super(spec, changeListener, configValue);
-		this.list = new ListImpl<>(ind -> this.onValueChanged(), spec, configValue.get());
+		this.list = new ListImpl<>(ind -> this.onValueChanged(), spec);
+		this.list.setCurrentValue(configValue.get());
 	}
 
 	@Override
@@ -38,16 +41,22 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	{
 		return this.list.getValueList();
 	}
+	
+	@Override
+	public void removeValueAt(int index)
+	{
+		this.list.removeValueAt(index);
+	}
 
 	@Override
-	public IConfigNode<?> addValue()
+	public IConfigNode<?> addValue(int index)
 	{
-		return this.list.addValue();
+		return this.list.addValue(index);
 	}
 	
 	public static interface IElementBuilder<T>
 	{
-		ElementNode<?, T> build(int index, T initialValue);
+		ElementNode<?, T> build(int index);
 	}
 	
 	public static abstract class ElementNode<Spec extends IConfigSpecNode, T> implements IConfigNode<Spec>
@@ -70,16 +79,18 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		}
 		
 		protected abstract T getCurrentValue();
+		
+		protected abstract void setCurrentValue(T value);
 	}
 	
 	public static class ElementPrimitive<T> extends ElementNode<IConfigPrimitiveSpec<T>, T> implements IConfigPrimitive<T>
 	{
 		private T currentValue;
 		
-		public ElementPrimitive(IConfigPrimitiveSpec<T> spec, ListImpl<T> parent, int index, T initialValue)
+		public ElementPrimitive(IConfigPrimitiveSpec<T> spec, ListImpl<T> parent, int index)
 		{
 			super(spec, parent, index);
-			this.currentValue = initialValue;
+			this.currentValue = spec.getDefaultValue();
 		}
 
 		@Override
@@ -92,6 +103,12 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		protected T getCurrentValue()
 		{
 			return this.getValue();
+		}
+		
+		@Override
+		protected void setCurrentValue(T value)
+		{
+			this.currentValue = value;
 		}
 
 		@Override
@@ -106,10 +123,10 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	{
 		private final ListImpl<T> list;
 		
-		public ElementList(IConfigListSpec spec, ListImpl<List<T>> parent, int index, List<T> initialValue)
+		public ElementList(IConfigListSpec spec, ListImpl<List<T>> parent, int index)
 		{
 			super(spec, parent, index);
-			this.list = new ListImpl<>(ind -> parent.onValueChanged(this.index), spec, initialValue);
+			this.list = new ListImpl<>(ind -> parent.onValueChanged(this.index), spec);
 		}
 
 		@Override
@@ -117,11 +134,23 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		{
 			return this.list.getValueList();
 		}
+		
+		@Override
+		public void removeValueAt(int index)
+		{
+			this.list.removeValueAt(index);
+		}
 
 		@Override
-		public IConfigNode<?> addValue()
+		public IConfigNode<?> addValue(int index)
 		{
-			return this.list.addValue();
+			return this.list.addValue(index);
+		}
+		
+		@Override
+		protected void setCurrentValue(List<T> value)
+		{
+			this.list.setCurrentValue(value);
 		}
 
 		@Override
@@ -139,18 +168,29 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		private final List<IConfigNode<?>> valueListView;
 		private final List<T> currentValue;
 
-		public ListImpl(IntConsumer changeListener, IConfigListSpec specs, List<T> initialValue)
+		public ListImpl(IntConsumer changeListener, IConfigListSpec specs)
 		{
 			this.changeListener = changeListener;
 			this.elementBuilder = specs.getElementSpec().exploreNode(new ElementBuilderChooser<>(), this);
 
 			this.valueList = new ArrayList<>();
-			for (int i = 0; i < initialValue.size(); i++)
-			{
-				this.valueList.add(this.elementBuilder.build(i, initialValue.get(i)));
-			}
 			this.valueListView = Collections.unmodifiableList(this.valueList);
 			this.currentValue = new MappedListView<>(this.valueList, elem -> elem.getCurrentValue());
+		}
+		
+		protected void setCurrentValue(List<T> value)
+		{
+			this.valueList.clear();
+			
+			if (value != null)
+			{
+				for (int i = 0; i < value.size(); i++)
+				{
+					ElementNode<?, T> elem = this.elementBuilder.build(i);
+					elem.setCurrentValue(value.get(i));
+					this.valueList.add(elem);
+				}
+			}
 		}
 
 		protected List<T> getCurrentValue()
@@ -163,10 +203,16 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 			return this.valueListView;
 		}
 
-		public IConfigNode<?> addValue()
+		public void removeValueAt(int index)
 		{
-			int index = this.valueList.size();
-			ElementNode<?, T> newNode = this.elementBuilder.build(index, null);
+			this.valueList.remove(index);
+		}
+
+		public IConfigNode<?> addValue(int index)
+		{
+			Preconditions.checkPositionIndex(index, this.valueList.size());
+			ElementNode<?, T> newNode = this.elementBuilder.build(index);
+			this.valueList.add(index, newNode);
 			this.onValueChanged(index);
 			this.changeListener.accept(index);
 			return newNode;
@@ -186,7 +232,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		public <S> IElementBuilder<T> visitProperty(IConfigPrimitiveSpec<S> propertySpec, ListImpl<T> list)
 		{
 			// Here S is the same as T
-			return (index, val) -> new ElementPrimitive<>((IConfigPrimitiveSpec<T>)propertySpec, list, index, val);
+			return index -> new ElementPrimitive<>((IConfigPrimitiveSpec<T>)propertySpec, list, index);
 		}
 
 		@Override
@@ -200,7 +246,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		public IElementBuilder<T> visitList(IConfigListSpec listSpec, ListImpl<T> list)
 		{
 			// Here T is a List<?> so it is ok to cast to List<?> and cast back to T
-			return (index, val) -> (ElementNode<?, T>)new ElementList(listSpec, (ListImpl<List<?>>)list, index, (List<?>)val);
+			return index -> (ElementNode<?, T>)new ElementList(listSpec, (ListImpl<List<?>>)list, index);
 		}
 		
 	}
