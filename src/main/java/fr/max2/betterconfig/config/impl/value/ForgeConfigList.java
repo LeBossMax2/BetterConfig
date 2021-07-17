@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
 import com.google.common.base.Preconditions;
 
@@ -26,7 +25,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	public ForgeConfigList(IConfigListSpec spec, Consumer<ForgeConfigProperty<?, ?>> changeListener, ConfigValue<List<T>> configValue)
 	{
 		super(spec, changeListener, configValue);
-		this.list = new ListImpl<>(ind -> this.onValueChanged(), spec);
+		this.list = new ListImpl<>(this::onValueChanged, spec);
 		this.list.setCurrentValue(configValue.get());
 	}
 
@@ -56,20 +55,18 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	
 	public static interface IElementBuilder<T>
 	{
-		ElementNode<?, T> build(int index);
+		ElementNode<?, T> build();
 	}
 	
 	public static abstract class ElementNode<Spec extends IConfigSpecNode, T> implements IConfigNode<Spec>
 	{
 		private final Spec spec;
 		protected ListImpl<T> parent;
-		protected int index;
 		
-		public ElementNode(Spec spec, ListImpl<T> parent, int index)
+		public ElementNode(Spec spec, ListImpl<T> parent)
 		{
 			this.spec = spec;
 			this.parent = parent;
-			this.index = index;
 		}
 		
 		@Override
@@ -87,9 +84,9 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	{
 		private T currentValue;
 		
-		public ElementPrimitive(IConfigPrimitiveSpec<T> spec, ListImpl<T> parent, int index)
+		public ElementPrimitive(IConfigPrimitiveSpec<T> spec, ListImpl<T> parent)
 		{
-			super(spec, parent, index);
+			super(spec, parent);
 			this.currentValue = spec.getDefaultValue();
 		}
 
@@ -115,7 +112,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		public void setValue(T value)
 		{
 			this.currentValue = value;
-			this.parent.onValueChanged(this.index);
+			this.parent.onValueChanged();
 		}
 	}
 	
@@ -123,10 +120,10 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	{
 		private final ListImpl<T> list;
 		
-		public ElementList(IConfigListSpec spec, ListImpl<List<T>> parent, int index)
+		public ElementList(IConfigListSpec spec, ListImpl<List<T>> parent)
 		{
-			super(spec, parent, index);
-			this.list = new ListImpl<>(ind -> parent.onValueChanged(this.index), spec);
+			super(spec, parent);
+			this.list = new ListImpl<>(parent::onValueChanged, spec);
 		}
 
 		@Override
@@ -162,13 +159,13 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	
 	private static final class ListImpl<T>
 	{
-		private final IntConsumer changeListener;
+		private final Runnable changeListener;
 		private final IElementBuilder<T> elementBuilder;
 		private final List<ElementNode<?, T>> valueList;
 		private final List<IConfigNode<?>> valueListView;
 		private final List<T> currentValue;
 
-		public ListImpl(IntConsumer changeListener, IConfigListSpec specs)
+		public ListImpl(Runnable changeListener, IConfigListSpec specs)
 		{
 			this.changeListener = changeListener;
 			this.elementBuilder = specs.getElementSpec().exploreNode(new ElementBuilderChooser<>(), this);
@@ -186,7 +183,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 			{
 				for (int i = 0; i < value.size(); i++)
 				{
-					ElementNode<?, T> elem = this.elementBuilder.build(i);
+					ElementNode<?, T> elem = this.elementBuilder.build();
 					elem.setCurrentValue(value.get(i));
 					this.valueList.add(elem);
 				}
@@ -206,21 +203,21 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		public void removeValueAt(int index)
 		{
 			this.valueList.remove(index);
+			this.onValueChanged();
 		}
 
 		public IConfigNode<?> addValue(int index)
 		{
 			Preconditions.checkPositionIndex(index, this.valueList.size());
-			ElementNode<?, T> newNode = this.elementBuilder.build(index);
+			ElementNode<?, T> newNode = this.elementBuilder.build();
 			this.valueList.add(index, newNode);
-			this.onValueChanged(index);
-			this.changeListener.accept(index);
+			this.onValueChanged();
 			return newNode;
 		}
 		
-		public void onValueChanged(int index)
+		public void onValueChanged()
 		{
-			this.changeListener.accept(index);
+			this.changeListener.run();
 		}
 	}
 	
@@ -232,7 +229,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		public <S> IElementBuilder<T> visitProperty(IConfigPrimitiveSpec<S> propertySpec, ListImpl<T> list)
 		{
 			// Here S is the same as T
-			return index -> new ElementPrimitive<>((IConfigPrimitiveSpec<T>)propertySpec, list, index);
+			return () -> new ElementPrimitive<>((IConfigPrimitiveSpec<T>)propertySpec, list);
 		}
 
 		@Override
@@ -246,7 +243,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		public IElementBuilder<T> visitList(IConfigListSpec listSpec, ListImpl<T> list)
 		{
 			// Here T is a List<?> so it is ok to cast to List<?> and cast back to T
-			return index -> (ElementNode<?, T>)new ElementList(listSpec, (ListImpl<List<?>>)list, index);
+			return () -> (ElementNode<?, T>)new ElementList(listSpec, (ListImpl<List<?>>)list);
 		}
 		
 	}

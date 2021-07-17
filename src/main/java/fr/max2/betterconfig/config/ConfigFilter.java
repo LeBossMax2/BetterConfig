@@ -9,6 +9,14 @@ import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 public class ConfigFilter
 {
 	public static final ConfigFilter ALL = new ConfigFilter(Collections.emptyList());
+	public static final ConfigFilter NONE = new ConfigFilter(Collections.emptyList())
+	{
+		@Override
+		public boolean matches(ConfigTableEntrySpec entry)
+		{
+			return false;
+		}
+	};
 	
 	private final List<String> words;
 	

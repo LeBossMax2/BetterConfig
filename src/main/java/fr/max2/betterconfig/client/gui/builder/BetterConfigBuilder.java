@@ -34,6 +34,7 @@ import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FocusableGui;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextProperties;
@@ -57,9 +58,11 @@ public class BetterConfigBuilder
 	public static final String ADD_FIRST_TOOLTIP_KEY = BetterConfig.MODID + ".list.add.first.tooltip";
 	/** The translation key for the tooltip on the add element button at the end of lists */
 	public static final String ADD_LAST_TOOLTIP_KEY = BetterConfig.MODID + ".list.add.last.tooltip";
+	/** The translation key for the tooltop of the button to remove elements from the list */
+	public static final String REMOVE_TOOLTIP_KEY = BetterConfig.MODID + ".list.remove.tooltip";
 	
 	/** The width of the indentation added for each nested section */
-	private static final int SECTION_TAB_SIZE = 20;
+	private static final int SECTION_TAB_SIZE = 22;
 	/** The left and right padding around the screen */
 	private static final int X_PADDING = 10;
 	/** The top and bottom padding around the screen */
@@ -111,28 +114,34 @@ public class BetterConfigBuilder
 			return new UIGroup(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
 		}
 		
-		private void buildList(BetterConfigScreen screen, IConfigList list, UIGroup uiGroup, int xOffset, ConfigTableEntrySpec entry)
+		private void buildList(IConfigList list, UIGroup uiGroup, int xOffset, ConfigTableEntrySpec entry)
 		{
 			int i = 0;
 
 			List<IBetterElement> content = new ArrayList<>();
 			List<? extends IConfigNode<?>> values = list.getValueList();
 			if (!values.isEmpty())
-				content.add(new BetterButton(screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+				content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
 				{
 					list.addValue(0);
-					this.buildList(screen, list, uiGroup, xOffset, entry);
+					this.buildList(list, uiGroup, xOffset, entry); //TODO clean this, we should only create new elements, not rebuilding the ui list
 				}, new TranslationTextComponent(ADD_FIRST_TOOLTIP_KEY)));
 			
 			for (IConfigNode<?> elem : values)
 			{
-				content.add(elem.exploreNode(new Builder(screen, xOffset), new ConfigTableEntrySpec(new ConfigLocation(entry.getLoc(), entry.getLoc().getName() + "[" + i + "]"), elem.getSpec(), new StringTextComponent("[" + i + "]"), entry.getCommentString())));
+				final int index = i;
+				IBetterElement child = elem.exploreNode(new Builder(this.screen, xOffset), new ConfigTableEntrySpec(new ConfigLocation(entry.getLoc(), entry.getLoc().getName() + "[" + i + "]"), elem.getSpec(), new StringTextComponent("[" + i + "]"), entry.getCommentString()));
+				content.add(new ListElementEntry(this.screen, child, xOffset - SECTION_TAB_SIZE, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE, deleteButton ->
+				{
+					list.removeValueAt(index);
+					this.buildList(list, uiGroup, xOffset, entry);
+				}));
 				i++;
 			}
 			content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
 			{
 				list.addValue(values.size());
-				this.buildList(screen, list, uiGroup, xOffset, entry);
+				this.buildList(list, uiGroup, xOffset, entry);
 			}, new TranslationTextComponent(ADD_LAST_TOOLTIP_KEY)));
 			
 			uiGroup.setContent(content);
@@ -151,7 +160,7 @@ public class BetterConfigBuilder
 		{
 			int offset = this.xOffset + SECTION_TAB_SIZE;
 			UIGroup uiGroup = new UIGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, new ArrayList<>());
-			this.buildList(this.screen, list, uiGroup, offset, entry);
+			this.buildList(list, uiGroup, offset, entry);
 			return new UIFoldout(this.screen, entry, uiGroup, this.xOffset);
 		}
 		
@@ -270,11 +279,96 @@ public class BetterConfigBuilder
 		}
 	}
 	
+	private static class ListElementEntry extends FocusableGui implements INestedGuiComponent, IBetterElement
+	{
+		private final BetterConfigScreen screen;
+		private final IBetterElement content;
+		private final IBetterElement button;
+		private final List<IBetterElement> children;
+		private final int width;
+		private int height = 0;
+		private final int baseX;
+		private int baseY;
+		private boolean hidden;
+		private ILayoutManager layout;
+		
+		public ListElementEntry(BetterConfigScreen screen, IBetterElement content, int x, int width, IPressable deleteAction)
+		{
+			this.screen = screen;
+			this.content = content;
+			this.button = new BetterButton(screen, x, VALUE_HEIGHT, new StringTextComponent("X"), deleteAction, new TranslationTextComponent(REMOVE_TOOLTIP_KEY)); // TODO use X icon
+			this.children = Arrays.asList(content, this.button);
+			this.baseX = x;
+			this.width = width;
+		}
+
+		@Override
+		public int getWidth()
+		{
+			return this.width;
+		}
+
+		@Override
+		public int getHeight()
+		{
+			return this.height;
+		}
+		
+		@Override
+		public void setLayoutManager(ILayoutManager manager)
+		{
+			this.layout = manager;
+			INestedGuiComponent.super.setLayoutManager(manager);
+		}
+
+		@Override
+		public int setYgetHeight(int y, ConfigFilter filter)
+		{
+			this.baseY = y;
+			this.height = this.content.setYgetHeight(y, filter);
+			this.hidden = this.height == 0;
+			this.button.setYgetHeight(y, this.hidden ? ConfigFilter.NONE : filter);
+			return this.height;
+		}
+
+		@Override
+		public List<? extends IGuiComponent> getEventListeners()
+		{
+			return this.children;
+		}
+		
+		@Override
+		public boolean isMouseOver(double mouseX, double mouseY)
+		{
+			if (this.hidden)
+				return false;
+			
+			int y = this.baseY  + this.layout.getLayoutY();
+			return mouseX >= this.baseX + this.layout.getLayoutX()
+			    && mouseY >= y
+			    && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING
+			    && mouseY < y + this.height;
+		}
+		
+		@Override
+		public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+		{
+			if (this.hidden)
+				return;
+			
+			if (this.isMouseOver(mouseX, mouseY))
+			{
+				this.button.render(matrixStack, mouseX, mouseY, partialTicks);
+			}
+			this.content.render(matrixStack, mouseX, mouseY, partialTicks);
+		}
+	}
+	
 	/** The ui for a expand/collapse subsection */
 	private static class UIFoldout extends FocusableGui implements INestedGuiComponent, IBetterElement
 	{
 		/** The height of the fouldout header */
-		private static final int FOLDOUT_HEADER_HEIGHT = 20;
+		private static final int FOLDOUT_HEADER_HEIGHT = 24;
 		/** The parent screen */
 		private final BetterConfigScreen screen;
 		
@@ -435,12 +529,12 @@ public class BetterConfigBuilder
 			int x = this.baseX  + this.layout.getLayoutX();
 			int y = this.baseY  + this.layout.getLayoutY();
 			// Draw background
-			fill(matrixStack, x, y + 1, this.screen.width - X_PADDING - RIGHT_PADDING, y + FOLDOUT_HEADER_HEIGHT - 2, 0xC0_33_33_33);
+			fill(matrixStack, x, y + 2, this.screen.width - X_PADDING - RIGHT_PADDING, y + FOLDOUT_HEADER_HEIGHT - 2, 0xC0_33_33_33);
 			// Draw foreground
 			String arrow = this.folded ? ">" : "v"; // TODO Use arrow texture
 			FontRenderer font = this.screen.getFont(); 
-			font.drawString(matrixStack, arrow, x + 1, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
-			font.drawText(matrixStack, this.sectionName, x + 11, y + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+			font.drawString(matrixStack, arrow, x + 1, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+			font.drawText(matrixStack, this.sectionName, x + 11, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
 		}
 		
 		@Override
@@ -812,7 +906,7 @@ public class BetterConfigBuilder
 			
 			INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
 			FontRenderer font = this.screen.getFont();
-			int y = this.baseY + this.layout.getLayoutY() + (this.height - this.nameLines.size() * this.screen.getFont().FONT_HEIGHT) / 2;
+			int y = this.baseY + this.layout.getLayoutY() + (this.height - this.nameLines.size() * this.screen.getFont().FONT_HEIGHT) / 2 + 1;
 			for(IReorderingProcessor line : this.nameLines)
 			{
 				font.func_238422_b_(matrixStack, line, this.baseX + this.layout.getLayoutX() + 1, y, 0xFF_FF_FF_FF);
