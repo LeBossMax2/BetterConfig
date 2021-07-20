@@ -179,7 +179,7 @@ public class BetterConfigScreen extends Screen
 	{
 		return (mc, prevScreen) ->
 		{
-			// TODO get ui builder and style from mod properties
+			// TODO [1.1] Get ui builder and style from mod properties
 			IConfigUIBuilder uiBuilder = BetterConfigBuilder::build;
 			BetterConfigScreen screen = new BetterConfigScreen(uiBuilder, mod, configs, 0);
 			screen.setPrevScreen(prevScreen);

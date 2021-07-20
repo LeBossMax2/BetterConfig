@@ -32,10 +32,13 @@ import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.FocusableGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.button.Button.IPressable;
 import net.minecraft.util.IReorderingProcessor;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.StringTextComponent;
@@ -60,6 +63,8 @@ public class BetterConfigBuilder
 	public static final String ADD_LAST_TOOLTIP_KEY = BetterConfig.MODID + ".list.add.last.tooltip";
 	/** The translation key for the tooltop of the button to remove elements from the list */
 	public static final String REMOVE_TOOLTIP_KEY = BetterConfig.MODID + ".list.remove.tooltip";
+	
+	public static final ResourceLocation BETTER_ICONS = new ResourceLocation(BetterConfig.MODID, "textures/gui/better_icons.png");
 	
 	/** The width of the indentation added for each nested section */
 	private static final int SECTION_TAB_SIZE = 22;
@@ -124,7 +129,7 @@ public class BetterConfigBuilder
 				content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
 				{
 					list.addValue(0);
-					this.buildList(list, uiGroup, xOffset, entry); //TODO clean this, we should only create new elements, not rebuilding the ui list
+					this.buildList(list, uiGroup, xOffset, entry); //TODO [1.0] Clean this, we should only create new elements, not rebuilding the ui list
 				}, new TranslationTextComponent(ADD_FIRST_TOOLTIP_KEY)));
 			
 			for (IConfigNode<?> elem : values)
@@ -296,7 +301,7 @@ public class BetterConfigBuilder
 		{
 			this.screen = screen;
 			this.content = content;
-			this.button = new BetterButton(screen, x, VALUE_HEIGHT, new StringTextComponent("X"), deleteAction, new TranslationTextComponent(REMOVE_TOOLTIP_KEY)); // TODO use X icon
+			this.button = new IconButton(screen, x, 0, 0, new StringTextComponent("X"), deleteAction, new TranslationTextComponent(REMOVE_TOOLTIP_KEY)); // TODO [1.0] Use X icon
 			this.children = Arrays.asList(content, this.button);
 			this.baseX = x;
 			this.width = width;
@@ -477,6 +482,7 @@ public class BetterConfigBuilder
 		{
 			if (this.isOverHeader(mouseX, mouseY))
 			{
+				this.screen.getMinecraft().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 				this.toggleFolding();
 				return true;
 			}
@@ -530,11 +536,16 @@ public class BetterConfigBuilder
 			int y = this.baseY  + this.layout.getLayoutY();
 			// Draw background
 			fill(matrixStack, x, y + 2, this.screen.width - X_PADDING - RIGHT_PADDING, y + FOLDOUT_HEADER_HEIGHT - 2, 0xC0_33_33_33);
-			// Draw foreground
-			String arrow = this.folded ? ">" : "v"; // TODO Use arrow texture
+
+			// Draw foreground arrow icon
+			int arrowU = this.folded ? 16 : 32;
+			int arrowV = this.isOverHeader(mouseX, mouseY) ? 16 : 0;
+			this.screen.getMinecraft().getTextureManager().bindTexture(BETTER_ICONS);
+			blit(matrixStack, x, y + 4, arrowU, arrowV, 16, 16, 256, 256);
+			
+			// Draw foreground text
 			FontRenderer font = this.screen.getFont(); 
-			font.drawString(matrixStack, arrow, x + 1, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
-			font.drawText(matrixStack, this.sectionName, x + 11, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+			font.drawText(matrixStack, this.sectionName, x + 16, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
 		}
 		
 		@Override
@@ -770,12 +781,19 @@ public class BetterConfigBuilder
 			this.checkLayout();
 			return res;
 		}
+		
+		@Override
+		public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+		{
+			if (this.isMouseOver(mouseX, mouseY))
+				super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		}
 	}
 	
 	private static class BetterButton extends Button implements IBetterElement
 	{
 		/** The parent screen */
-		private final BetterConfigScreen screen;
+		protected final BetterConfigScreen screen;
 		
 		private final List<? extends ITextProperties> tooltipInfo;
 		
@@ -804,7 +822,30 @@ public class BetterConfigBuilder
 		}
 	}
 	
-	//TODO Add reset button
+	private static class IconButton extends BetterButton
+	{
+		private final int iconU;
+		private final int iconV;
+
+		public IconButton(BetterConfigScreen screen, int xPos, int iconU, int iconV, ITextComponent displayString, IPressable pressedHandler, ITextComponent overlay)
+		{
+			super(screen, xPos, VALUE_HEIGHT, displayString, pressedHandler, overlay);
+			this.iconU = iconU;
+			this.iconV = iconV;
+		}
+		
+		@Override
+		public void renderWidget(MatrixStack mStack, int mouseX, int mouseY, float partial)
+		{
+			// Draw foreground icon
+			int v = this.iconV + (this.isHovered ? 16 : 0);
+			this.screen.getMinecraft().getTextureManager().bindTexture(BETTER_ICONS);
+			blit(mStack, x + (VALUE_HEIGHT - 16) / 2, y + (VALUE_HEIGHT - 16) / 2, this.iconU, v, 16, 16, 256, 256);
+		}
+		
+	}
+	
+	//TODO [1.0] Add reset button
 	/** The container for table entries */
 	private static class ValueContainer extends FocusableGui implements INestedGuiComponent, IBetterElement
 	{

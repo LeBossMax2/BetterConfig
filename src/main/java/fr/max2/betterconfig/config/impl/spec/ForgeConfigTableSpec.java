@@ -121,7 +121,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 			}
 			if (UnmodifiableConfig.class.isAssignableFrom(valClass))
 			{
-				// TODO implements list of tables
+				// TODO [2.0] Implements list of tables
 				// Don't know how to deal with tables in lists
 				return new ForgeListPrimitiveSpec<>(Object.class);
 			}
