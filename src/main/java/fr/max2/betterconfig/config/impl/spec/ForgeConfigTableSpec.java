@@ -12,9 +12,10 @@ import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.util.MappedMapView;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.LanguageMap;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
@@ -64,13 +65,14 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 		ConfigLocation location = new ConfigLocation(this.tableLoc, key);
 		if (spec instanceof UnmodifiableConfig)
         {
-        	return new ConfigTableEntrySpec(location, new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments), this.levelComments.apply(location));
+            IFormattableTextComponent name = new StringTextComponent(location.getName()).mergeStyle(TextFormatting.BOLD, TextFormatting.YELLOW);
+        	return new ConfigTableEntrySpec(location, new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments), name, this.levelComments.apply(location));
         }
         else
         {
             ValueSpec forgeSpec = (ValueSpec)spec;
             
-            ITextComponent name = null;
+            IFormattableTextComponent name = null;
             // Try getting name from translation key 
     		String translationKey = forgeSpec.getTranslationKey();
     		if (!Strings.isNullOrEmpty(translationKey) && LanguageMap.getInstance().func_230506_b_(translationKey)) // func_230506_b_ is equivalent to "I18n.hasKey"
@@ -83,6 +85,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
     		
     		if (List.class.isAssignableFrom(valueClass))
     		{
+        		name.mergeStyle(TextFormatting.BOLD, TextFormatting.YELLOW);
     			valSpec = new ForgeConfigListSpec(getSpecForValues((List<?>)forgeSpec.getDefault()));
     		}
     		else

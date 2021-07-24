@@ -119,37 +119,67 @@ public class BetterConfigBuilder
 			return new UIGroup(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
 		}
 		
-		private void buildList(IConfigList list, UIGroup uiGroup, int xOffset, ConfigTableEntrySpec entry)
+		private void buildList(IConfigList list, int xOffset, ConfigTableEntrySpec entry, List<IBetterElement> content, List<ListElemInfo> entries, Runnable layoutUpdater)
 		{
 			int i = 0;
 
-			List<IBetterElement> content = new ArrayList<>();
 			List<? extends IConfigNode<?>> values = list.getValueList();
-			if (!values.isEmpty())
-				content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
-				{
-					list.addValue(0);
-					this.buildList(list, uiGroup, xOffset, entry); //TODO [1.0] Clean this, we should only create new elements, not rebuilding the ui list
-				}, new TranslationTextComponent(ADD_FIRST_TOOLTIP_KEY)));
+			content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+			{
+				IConfigNode<?> elem = list.addValue(0);
+				putListElement(list, elem, xOffset, entry, content, entries, layoutUpdater, 0);
+				layoutUpdater.run();
+			}, new TranslationTextComponent(ADD_FIRST_TOOLTIP_KEY)));
 			
 			for (IConfigNode<?> elem : values)
 			{
-				final int index = i;
-				IBetterElement child = elem.exploreNode(new Builder(this.screen, xOffset), new ConfigTableEntrySpec(new ConfigLocation(entry.getLoc(), entry.getLoc().getName() + "[" + i + "]"), elem.getSpec(), new StringTextComponent("[" + i + "]"), entry.getCommentString()));
-				content.add(new ListElementEntry(this.screen, child, xOffset - SECTION_TAB_SIZE, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE, deleteButton ->
-				{
-					list.removeValueAt(index);
-					this.buildList(list, uiGroup, xOffset, entry);
-				}));
+				putListElement(list, elem, xOffset, entry, content, entries, layoutUpdater, i);
 				i++;
 			}
-			content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
-			{
-				list.addValue(values.size());
-				this.buildList(list, uiGroup, xOffset, entry);
-			}, new TranslationTextComponent(ADD_LAST_TOOLTIP_KEY)));
 			
-			uiGroup.setContent(content);
+			layoutUpdater.run();
+		}
+		
+		private void putListElement(IConfigList list, IConfigNode<?> elem, int xOffset, ConfigTableEntrySpec entry, List<IBetterElement> content, List<ListElemInfo> entries, Runnable layoutUpdater, int index)
+		{
+			ConfigTableEntrySpec elemEntry = new ConfigTableEntrySpec(new ConfigLocation(entry.getLoc(), entry.getLoc().getName() + "[" + index + "]"), elem.getSpec(), new StringTextComponent("[" + index + "]"), entry.getCommentString());
+			ListElemInfo info = new ListElemInfo(index, entry, elemEntry);
+			boolean isFirst = content.size() <= 1;
+			entries.add(index, info);
+			IBetterElement child = elem.exploreNode(new Builder(this.screen, xOffset), elemEntry);
+			content.add(index + 1, new ListElementEntry(this.screen, child, xOffset - SECTION_TAB_SIZE, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE, deleteButton ->
+			{
+				int myIndex = info.getIndex();
+				list.removeValueAt(myIndex);
+				content.remove(myIndex + 1);
+				entries.remove(myIndex);
+				for (int i = myIndex; i < entries.size(); i++)
+				{
+					entries.get(i).updateIndex(i);
+				}
+				layoutUpdater.run();
+				if (content.size() == 2)
+				{
+					// Remove "add last" button
+					content.remove(1);
+				}
+			}));
+			for (int i = index + 1; i < entries.size(); i++)
+			{
+				entries.get(i).updateIndex(i);
+			}
+			
+			if (isFirst)
+			{
+				// Add "add last" button
+				content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+				{
+					int lastIndex = list.getValueList().size();
+					IConfigNode<?> newElem = list.addValue(lastIndex);
+					putListElement(list, newElem, xOffset, entry, content, entries, layoutUpdater, lastIndex);
+					layoutUpdater.run();
+				}, new TranslationTextComponent(ADD_LAST_TOOLTIP_KEY)));
+			}
 		}
 		
 		// Table entry visitor
@@ -164,8 +194,9 @@ public class BetterConfigBuilder
 		public IBetterElement visitList(IConfigList list, ConfigTableEntrySpec entry)
 		{
 			int offset = this.xOffset + SECTION_TAB_SIZE;
-			UIGroup uiGroup = new UIGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, new ArrayList<>());
-			this.buildList(list, uiGroup, offset, entry);
+			List<IBetterElement> content = new ArrayList<>();
+			UIGroup uiGroup = new UIGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, content);
+			this.buildList(list, offset, entry, content, new ArrayList<>(), uiGroup::updateLayout);
 			return new UIFoldout(this.screen, entry, uiGroup, this.xOffset);
 		}
 		
@@ -209,6 +240,32 @@ public class BetterConfigBuilder
 		}
 	}
 	
+	private static class ListElemInfo
+	{
+		private int index;
+		private final ConfigTableEntrySpec parent;
+		private final ConfigTableEntrySpec entry;
+		
+		public ListElemInfo(int index, ConfigTableEntrySpec parent, ConfigTableEntrySpec entry)
+		{
+			this.index = index;
+			this.parent = parent;
+			this.entry = entry;
+		}
+		
+		public void updateIndex(int index)
+		{
+			this.index = index;
+			this.entry.setLoc(new ConfigLocation(this.parent.getLoc(), this.parent.getLoc().getName() + "[" + index + "]"));
+			this.entry.setDisplayName(new StringTextComponent("[" + index + "]"));
+		}
+		
+		public int getIndex()
+		{
+			return this.index;
+		}
+	}
+	
 	/** An interface for ui elements with a simple layout system */
 	private static interface IBetterElement extends IGuiComponent
 	{
@@ -235,10 +292,8 @@ public class BetterConfigBuilder
 			this.width = width;
 		}
 
-		public void setContent(List<IBetterElement> content)
+		public void updateLayout()
 		{
-			this.content.clear();
-			this.content.addAll(content);
 			if (this.layout != null)
 			{
 				INestedGuiComponent.super.setLayoutManager(this.layout);
@@ -301,7 +356,7 @@ public class BetterConfigBuilder
 		{
 			this.screen = screen;
 			this.content = content;
-			this.button = new IconButton(screen, x, 0, 0, new StringTextComponent("X"), deleteAction, new TranslationTextComponent(REMOVE_TOOLTIP_KEY)); // TODO [1.0] Use X icon
+			this.button = new IconButton(screen, x, 0, 0, new StringTextComponent("X"), deleteAction, new TranslationTextComponent(REMOVE_TOOLTIP_KEY));
 			this.children = Arrays.asList(content, this.button);
 			this.baseX = x;
 			this.width = width;
@@ -381,8 +436,6 @@ public class BetterConfigBuilder
 		private final ConfigTableEntrySpec tableEntry;
 		/** The content that will be collapsed */
 		private final IBetterElement content;
-		/** The title on the header */
-		private final ITextComponent sectionName;
 		/** The extra info to show on the tooltip */
 		private final List<ITextProperties> extraInfo = new ArrayList<>();
 		/** The layout to notify for layout update */
@@ -404,7 +457,6 @@ public class BetterConfigBuilder
 			this.screen = screen;
 			this.tableEntry = entry;
 			this.content = content;
-			this.sectionName = entry.getDisplayName().deepCopy().mergeStyle(TextFormatting.BOLD, TextFormatting.YELLOW);
 			this.extraInfo.add(ITextProperties.func_240653_a_(entry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
 			this.extraInfo.addAll(entry.getDisplayComment());
 			this.baseX = x;
@@ -430,6 +482,7 @@ public class BetterConfigBuilder
 				// Disable this section
 				this.hidden = true;
 				this.height = 0;
+				updateTexts();
 				return 0;
 			}
 			
@@ -441,7 +494,15 @@ public class BetterConfigBuilder
 			}
 			
 			this.height = contentHeight + FOLDOUT_HEADER_HEIGHT;
+			updateTexts();
 			return this.height;
+		}
+		
+		private void updateTexts()
+		{
+			this.extraInfo.clear();
+			this.extraInfo.add(ITextProperties.func_240653_a_(this.tableEntry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+			this.extraInfo.addAll(this.tableEntry.getDisplayComment());
 		}
 		
 		@Override
@@ -545,7 +606,7 @@ public class BetterConfigBuilder
 			
 			// Draw foreground text
 			FontRenderer font = this.screen.getFont(); 
-			font.drawText(matrixStack, this.sectionName, x + 16, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+			font.drawText(matrixStack, this.tableEntry.getDisplayName(), x + 16, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
 		}
 		
 		@Override
@@ -853,10 +914,11 @@ public class BetterConfigBuilder
 		private final BetterConfigScreen screen;
 		/** The edited property */
 		private final ConfigTableEntrySpec entry;
+		private final IConfigPrimitive<?> property;
 		/** the value widget */
 		private final IBetterElement content;
 		/** The title of the property */
-		private final List<IReorderingProcessor> nameLines;
+		private List<IReorderingProcessor> nameLines;
 		/** The extra info to show on the tooltip */
 		private final List<ITextProperties> extraInfo = new ArrayList<>();
 		/** The parent layout */
@@ -874,13 +936,10 @@ public class BetterConfigBuilder
 		{
 			this.screen = screen;
 			this.entry = entry;
+			this.property = property;
 			this.content = content;
-			FontRenderer font = this.screen.getFont();
-			this.nameLines = font.trimStringToWidth(entry.getDisplayName(), screen.width - x - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - 4);
-			this.extraInfo.add(ITextProperties.func_240653_a_(entry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
-			this.extraInfo.addAll(entry.getDisplayComment());
-			this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(Objects.toString(property.getSpec().getDefaultValue())))).mergeStyle(TextFormatting.GRAY));
 			this.baseX = x;
+			this.updateTexts();
 		}
 		
 		// Layout
@@ -905,7 +964,18 @@ public class BetterConfigBuilder
 			
 			this.height = Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().FONT_HEIGHT);
 			this.content.setYgetHeight(y + (this.height - VALUE_HEIGHT) / 2, ConfigFilter.ALL);
+			updateTexts();
 			return this.height;
+		}
+		
+		private void updateTexts()
+		{
+			FontRenderer font = this.screen.getFont();
+			this.nameLines = font.trimStringToWidth(this.entry.getDisplayName(), this.screen.width - this.baseX - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - 4);
+			this.extraInfo.clear();
+			this.extraInfo.add(ITextProperties.func_240653_a_(this.entry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+			this.extraInfo.addAll(this.entry.getDisplayComment());
+			this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(Objects.toString(this.property.getSpec().getDefaultValue())))).mergeStyle(TextFormatting.GRAY));
 		}
 
 		@Override
