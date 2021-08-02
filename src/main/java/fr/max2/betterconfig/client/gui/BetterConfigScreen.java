@@ -8,7 +8,7 @@ import java.util.function.BiFunction;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.matrix.MatrixStack;
 
-import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
+import fr.max2.betterconfig.client.gui.better.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;

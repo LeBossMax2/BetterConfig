@@ -7,7 +7,7 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.client.gui.builder.BetterConfigBuilder;
+import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.CycleOptionButton;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
@@ -37,12 +37,14 @@ public class ModLanguagesProvider implements IDataProvider
 		add(CycleOptionButton.NO_OPTION_KEY, "NONE", "AUCUN");
 		add(CycleOptionButton.TRUE_OPTION_KEY, "ON", "Oui");
 		add(CycleOptionButton.FALSE_OPTION_KEY, "OFF", "Non");
-		add(BetterConfigBuilder.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
-		add(BetterConfigBuilder.SEARCH_BAR_KEY, "Search", "Rechercher");
-		add(BetterConfigBuilder.ADD_ELEMENT_KEY, "Add", "Ajouter");
-		add(BetterConfigBuilder.ADD_FIRST_TOOLTIP_KEY, "Add a new element at the start of the list", "Ajouter un nouvel élément au début de la liste");
-		add(BetterConfigBuilder.ADD_LAST_TOOLTIP_KEY, "Add a new element at the end of the list", "Ajouter un nouvel élément à la fin de la liste");
-		add(BetterConfigBuilder.REMOVE_TOOLTIP_KEY, "Remove this element from the list", "Retirer cet élément de la liste");
+		add(Constants.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
+		add(Constants.SEARCH_BAR_KEY, "Search", "Rechercher");
+		add(Constants.ADD_ELEMENT_KEY, "Add", "Ajouter");
+		add(Constants.ADD_FIRST_TOOLTIP_KEY, "Add a new element at the start of the list", "Ajouter un nouvel élément au début de la liste");
+		add(Constants.ADD_LAST_TOOLTIP_KEY, "Add a new element at the end of the list", "Ajouter un nouvel élément à la fin de la liste");
+		add(Constants.REMOVE_TOOLTIP_KEY, "Remove this element from the list", "Retirer cet élément de la liste");
+		add(Constants.UNDO_TOOLTIP_KEY, "Undo", "Annuler le changement");
+		add(Constants.RESET_TOOLTIP_KEY, "Reset to default", "Réinitialiserà la valeur par défaut");
     }
 	
 	@Override

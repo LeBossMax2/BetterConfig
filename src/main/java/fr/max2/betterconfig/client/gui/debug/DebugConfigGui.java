@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.client.gui.builder;
+package fr.max2.betterconfig.client.gui.debug;
 
 import java.util.ArrayList;
 import java.util.List;
