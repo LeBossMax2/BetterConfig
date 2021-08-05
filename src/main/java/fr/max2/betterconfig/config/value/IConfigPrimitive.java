@@ -2,7 +2,7 @@ package fr.max2.betterconfig.config.value;
 
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 
-public interface IConfigPrimitive<T> extends IConfigNode<IConfigPrimitiveSpec<T>>
+public interface IConfigPrimitive<T> extends IConfigNode<T>
 {
 	/**
 	 * Gets the current configuration value
@@ -15,6 +15,9 @@ public interface IConfigPrimitive<T> extends IConfigNode<IConfigPrimitiveSpec<T>
 	 * @param value the new value
 	 */
 	void setValue(T value);
+	
+	@Override
+	IConfigPrimitiveSpec<T> getSpec();
 	
 	/**
 	 * Explores this property using the given visitor

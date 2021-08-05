@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.value.IConfigNode;
 
-public abstract class ForgeConfigNode<Spec extends IConfigSpecNode> implements IConfigNode<Spec>
+public abstract class ForgeConfigNode<T, Spec extends IConfigSpecNode<T>> implements IConfigNode<T>
 {
 	private final Spec spec;
 	/** The function to call then the value is changed */

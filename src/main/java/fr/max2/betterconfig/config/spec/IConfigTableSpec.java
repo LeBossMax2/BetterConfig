@@ -4,8 +4,16 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-public interface IConfigTableSpec extends IConfigSpecNode
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
+
+public interface IConfigTableSpec extends IConfigSpecNode<UnmodifiableConfig>
 {
+	@Override
+	default Class<? super UnmodifiableConfig> getValueClass()
+	{
+		return UnmodifiableConfig.class;
+	}
+	
 	Map<String, ConfigTableEntrySpec> getSpecMap();
 	
 	default <R> Stream<R> exploreEntries(BiFunction<String, ConfigTableEntrySpec, R> visitor)

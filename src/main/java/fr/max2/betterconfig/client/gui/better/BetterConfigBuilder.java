@@ -56,7 +56,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<ConfigTableEntry
 		return new GuiGroup(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
 	}
 	
-	private void buildList(IConfigList list, int xOffset, ConfigTableEntrySpec entry, List<IBetterElement> content, List<ListElemInfo> entries, Runnable layoutUpdater)
+	private void buildList(IConfigList<?> list, int xOffset, ConfigTableEntrySpec entry, List<IBetterElement> content, List<ListElemInfo> entries, Runnable layoutUpdater)
 	{
 		int i = 0;
 
@@ -77,12 +77,12 @@ public class BetterConfigBuilder implements IConfigValueVisitor<ConfigTableEntry
 		layoutUpdater.run();
 	}
 	
-	private void putListElement(IConfigList list, IConfigNode<?> elem, int xOffset, ConfigTableEntrySpec entry, List<IBetterElement> content, List<ListElemInfo> entries, Runnable layoutUpdater, int index)
+	private void putListElement(IConfigList<?> list, IConfigNode<?> elem, int xOffset, ConfigTableEntrySpec entry, List<IBetterElement> content, List<ListElemInfo> entries, Runnable layoutUpdater, int index)
 	{
 		ConfigTableEntrySpec elemEntry = new ConfigTableEntrySpec(new ConfigLocation(entry.getLoc(), entry.getLoc().getName() + "[" + index + "]"), elem.getSpec(), new StringTextComponent("[" + index + "]"), entry.getCommentString());
 		ListElemInfo info = new ListElemInfo(index, entry, elemEntry);
-		boolean isFirst = content.size() <= 1;
 		entries.add(index, info);
+		boolean isFirst = content.size() <= 1;
 		IBetterElement child = elem.exploreNode(new BetterConfigBuilder(this.screen, xOffset), elemEntry);
 		content.add(index + 1, new ListElementEntry(this.screen, child, xOffset - SECTION_TAB_SIZE, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE, deleteButton ->
 		{
@@ -128,7 +128,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<ConfigTableEntry
 	}
 	
 	@Override
-	public IBetterElement visitList(IConfigList list, ConfigTableEntrySpec entry)
+	public <T> IBetterElement visitList(IConfigList<T> list, ConfigTableEntrySpec entry)
 	{
 		int offset = this.xOffset + SECTION_TAB_SIZE;
 		List<IBetterElement> content = new ArrayList<>();

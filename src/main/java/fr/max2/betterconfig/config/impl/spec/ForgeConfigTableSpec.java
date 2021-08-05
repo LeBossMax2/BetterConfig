@@ -80,13 +80,13 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
     		else // Get name from path
     			name = new StringTextComponent(key);
     		
-    		IConfigSpecNode valSpec;
+    		IConfigSpecNode<?> valSpec;
     		Class<?> valueClass = valueClass(forgeSpec);
     		
     		if (List.class.isAssignableFrom(valueClass))
     		{
         		name.mergeStyle(TextFormatting.BOLD, TextFormatting.YELLOW);
-    			valSpec = new ForgeConfigListSpec(getSpecForValues((List<?>)forgeSpec.getDefault()));
+    			valSpec = new ForgeConfigListSpec<>(getSpecForValues((List<?>)forgeSpec.getDefault()));
     		}
     		else
     		{
@@ -110,7 +110,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 		return Object.class;
 	}
 	
-	private static IConfigSpecNode getSpecForValues(List<?> exampleValues)
+	private static IConfigSpecNode<?> getSpecForValues(List<?> exampleValues)
 	{
 		for (Object obj : exampleValues)
 		{
@@ -120,7 +120,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 			Class<?> valClass = obj.getClass();
 			if (List.class.isAssignableFrom(valClass))
 			{
-				return new ForgeConfigListSpec(getSpecForValues((List<?>)obj));
+				return new ForgeConfigListSpec<>(getSpecForValues((List<?>)obj));
 			}
 			if (UnmodifiableConfig.class.isAssignableFrom(valClass))
 			{

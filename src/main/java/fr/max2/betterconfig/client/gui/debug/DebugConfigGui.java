@@ -100,7 +100,7 @@ public class DebugConfigGui  implements IGuiComponent
 		}
 		
 		@Override
-		public Void visitList(IConfigList list, String path)
+		public <T> Void visitList(IConfigList<T> list, String path)
 		{
 			this.content.add(path + " : " + "LIST" + " = {");
 			for (int i = 0; i < list.getValueList().size(); i++)

@@ -30,5 +30,5 @@ public interface IConfigSpecVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	R visitList(IConfigListSpec listSpec, P param);
+	<T> R visitList(IConfigListSpec<T> listSpec, P param);
 }

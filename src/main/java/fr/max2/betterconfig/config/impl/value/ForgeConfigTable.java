@@ -19,7 +19,7 @@ import fr.max2.betterconfig.util.MappedMapView;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public class ForgeConfigTable extends ForgeConfigNode<IConfigTableSpec> implements IConfigTable
+public class ForgeConfigTable extends ForgeConfigNode<UnmodifiableConfig, IConfigTableSpec> implements IConfigTable
 {
 	/** The table containing the value of each entry */
 	private final UnmodifiableConfig configValues;
@@ -77,13 +77,13 @@ public class ForgeConfigTable extends ForgeConfigNode<IConfigTableSpec> implemen
 		}
 
 		@Override
-		public ConfigTableEntry visitList(IConfigListSpec listSpec, Object param)
+		public <T> ConfigTableEntry visitList(IConfigListSpec<T> listSpec, Object param)
 		{
 			return new ConfigTableEntry(this.entrySpec, buildList(listSpec, param));
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T> IConfigNode<?> buildList(IConfigListSpec listSpec, Object param)
+		private <T> IConfigNode<?> buildList(IConfigListSpec<T> listSpec, Object param)
 		{
 			return new ForgeConfigList<>(listSpec, this.changeListener, (ConfigValue<List<T>>)param);
 		}

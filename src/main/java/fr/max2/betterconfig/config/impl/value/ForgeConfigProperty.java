@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public abstract class ForgeConfigProperty<Spec extends IConfigSpecNode, T> extends ForgeConfigNode<Spec>
+public abstract class ForgeConfigProperty<Spec extends IConfigSpecNode<T>, T> extends ForgeConfigNode<T, Spec>
 {
 	/** The configuration value currently saved */
 	private final ConfigValue<T> configValue;

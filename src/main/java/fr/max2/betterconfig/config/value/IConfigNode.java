@@ -2,9 +2,9 @@ package fr.max2.betterconfig.config.value;
 
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 
-public interface IConfigNode<Spec extends IConfigSpecNode>
+public interface IConfigNode<T>
 {
-	Spec getSpec();
+	IConfigSpecNode<T> getSpec();
 	
 	default <R> R exploreNode(IConfigValueVisitor<Void, R> visitor)
 	{

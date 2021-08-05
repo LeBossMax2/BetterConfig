@@ -18,11 +18,11 @@ import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.MappedListView;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, List<T>> implements IConfigList
+public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec<T>, List<T>> implements IConfigList<T>
 {
 	private final ListImpl<T> list;
 
-	public ForgeConfigList(IConfigListSpec spec, Consumer<ForgeConfigProperty<?, ?>> changeListener, ConfigValue<List<T>> configValue)
+	public ForgeConfigList(IConfigListSpec<T> spec, Consumer<ForgeConfigProperty<?, ?>> changeListener, ConfigValue<List<T>> configValue)
 	{
 		super(spec, changeListener, configValue);
 		this.list = new ListImpl<>(this::onValueChanged, spec);
@@ -36,7 +36,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	}
 
 	@Override
-	public List<? extends IConfigNode<?>> getValueList()
+	public List<? extends IConfigNode<T>> getValueList()
 	{
 		return this.list.getValueList();
 	}
@@ -48,7 +48,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 	}
 
 	@Override
-	public IConfigNode<?> addValue(int index)
+	public IConfigNode<T> addValue(int index)
 	{
 		return this.list.addValue(index);
 	}
@@ -58,7 +58,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		ElementNode<?, T> build();
 	}
 	
-	public static abstract class ElementNode<Spec extends IConfigSpecNode, T> implements IConfigNode<Spec>
+	public static abstract class ElementNode<Spec extends IConfigSpecNode<T>, T> implements IConfigNode<T>
 	{
 		private final Spec spec;
 		protected ListImpl<T> parent;
@@ -116,18 +116,18 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		}
 	}
 	
-	public static class ElementList<T> extends ElementNode<IConfigListSpec, List<T>> implements IConfigList
+	public static class ElementList<T> extends ElementNode<IConfigListSpec<T>, List<T>> implements IConfigList<T>
 	{
 		private final ListImpl<T> list;
 		
-		public ElementList(IConfigListSpec spec, ListImpl<List<T>> parent)
+		public ElementList(IConfigListSpec<T> spec, ListImpl<List<T>> parent)
 		{
 			super(spec, parent);
 			this.list = new ListImpl<>(parent::onValueChanged, spec);
 		}
 
 		@Override
-		public List<? extends IConfigNode<?>> getValueList()
+		public List<? extends IConfigNode<T>> getValueList()
 		{
 			return this.list.getValueList();
 		}
@@ -139,7 +139,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		}
 
 		@Override
-		public IConfigNode<?> addValue(int index)
+		public IConfigNode<T> addValue(int index)
 		{
 			return this.list.addValue(index);
 		}
@@ -162,10 +162,10 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 		private final Runnable changeListener;
 		private final IElementBuilder<T> elementBuilder;
 		private final List<ElementNode<?, T>> valueList;
-		private final List<IConfigNode<?>> valueListView;
+		private final List<IConfigNode<T>> valueListView;
 		private final List<T> currentValue;
 
-		public ListImpl(Runnable changeListener, IConfigListSpec specs)
+		public ListImpl(Runnable changeListener, IConfigListSpec<T> specs)
 		{
 			this.changeListener = changeListener;
 			this.elementBuilder = specs.getElementSpec().exploreNode(new ElementBuilderChooser<>(), this);
@@ -195,7 +195,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 			return this.currentValue;
 		}
 
-		public List<? extends IConfigNode<?>> getValueList()
+		public List<? extends IConfigNode<T>> getValueList()
 		{
 			return this.valueListView;
 		}
@@ -206,7 +206,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 			this.onValueChanged();
 		}
 
-		public IConfigNode<?> addValue(int index)
+		public IConfigNode<T> addValue(int index)
 		{
 			Preconditions.checkPositionIndex(index, this.valueList.size());
 			ElementNode<?, T> newNode = this.elementBuilder.build();
@@ -240,7 +240,7 @@ public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec, Lis
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
-		public IElementBuilder<T> visitList(IConfigListSpec listSpec, ListImpl<T> list)
+		public <U> IElementBuilder<T> visitList(IConfigListSpec<U> listSpec, ListImpl<T> list)
 		{
 			// Here T is a List<?> so it is ok to cast to List<?> and cast back to T
 			return () -> (ElementNode<?, T>)new ElementList(listSpec, (ListImpl<List<?>>)list);

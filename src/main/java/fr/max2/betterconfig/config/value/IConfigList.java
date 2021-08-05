@@ -6,15 +6,18 @@ import java.util.stream.Stream;
 
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 
-public interface IConfigList extends IConfigNode<IConfigListSpec>
+public interface IConfigList<T> extends IConfigNode<List<T>>
 {
-	List<? extends IConfigNode<?>> getValueList();
+	List<? extends IConfigNode<T>> getValueList();
 	
 	void removeValueAt(int index);
 	
-	IConfigNode<?> addValue(int index);
+	IConfigNode<T> addValue(int index);
 	
-	default <R> Stream<R> exploreElements(Function<IConfigNode<?>, R> visitor)
+	@Override
+	IConfigListSpec<T> getSpec();
+	
+	default <R> Stream<R> exploreElements(Function<IConfigNode<T>, R> visitor)
 	{
 		return this.getValueList().stream().map(elem -> visitor.apply(elem));
 	}
