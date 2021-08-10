@@ -23,14 +23,9 @@ public interface IConfigPrimitiveSpec<T> extends IConfigSpecNode<T>
 	 */
 	T correct(T value);
 	
-	/**
-	 * Gets the default configuration value
-	 */
-	T getDefaultValue();
-	
 	@Override
 	default <P, R> R exploreNode(IConfigSpecVisitor<P, R> visitor, P param)
 	{
-		return visitor.visitProperty(this, param);
+		return visitor.visitPrimitive(this, param);
 	}
 }

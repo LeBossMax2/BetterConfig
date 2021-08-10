@@ -2,19 +2,23 @@ package fr.max2.betterconfig.config.impl.value;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public abstract class ForgeConfigProperty<Spec extends IConfigSpecNode<T>, T> extends ForgeConfigNode<T, Spec>
+public class ForgeConfigProperty<T>
 {
 	/** The configuration value currently saved */
 	private final ConfigValue<T> configValue;
+	private final Supplier<T> valueProvider;
+	/** The function to call then the value is changed */
+	private final Consumer<ForgeConfigProperty<?>> changeListener;
 	
-	public ForgeConfigProperty(Spec spec, Consumer<ForgeConfigProperty<?, ?>> changeListener, ConfigValue<T> configValue)
+	public ForgeConfigProperty(ConfigValue<T> configValue, Consumer<ForgeConfigProperty<?>> changeListener, Supplier<T> valueProvider)
 	{
-		super(spec, changeListener);
 		this.configValue = configValue;
+		this.changeListener = changeListener;
+		this.valueProvider = valueProvider;
 	}
 	
 	protected void onValueChanged()
@@ -49,5 +53,8 @@ public abstract class ForgeConfigProperty<Spec extends IConfigSpecNode<T>, T> ex
 		return this.configValue.get();
 	}
 	
-	protected abstract T getCurrentValue();
+	private T getCurrentValue()
+	{
+		return this.valueProvider.get();
+	}
 }

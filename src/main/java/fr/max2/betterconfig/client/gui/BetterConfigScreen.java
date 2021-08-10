@@ -36,7 +36,7 @@ public class BetterConfigScreen extends Screen
 	/** The current edited configuration table */
 	private final IConfigTable currentTable;
 	/** The set of properties that changed and need to be saved */
-	private final Set<ForgeConfigProperty<?, ?>> modifiedProperties = new HashSet<>();
+	private final Set<ForgeConfigProperty<?>> modifiedProperties = new HashSet<>();
 	
 	/** The screen to open when this screen closes */
 	private Screen prevScreen = null;
@@ -52,7 +52,7 @@ public class BetterConfigScreen extends Screen
 		this.modConfigs = configs;
 		this.configIndex = index;
 		this.currentConfig = this.modConfigs.get(this.configIndex);
-		this.currentTable = new ForgeConfigTable(this.currentConfig.getSpec(), this::onPropertyChanged);
+		this.currentTable = ForgeConfigTable.create(this.currentConfig.getSpec(), this::onPropertyChanged);
 	}
 	
 	@Override
@@ -85,7 +85,7 @@ public class BetterConfigScreen extends Screen
 		if (this.configChanged())
 		{
 			// Save changes to config
-			for (ForgeConfigProperty<?, ?> property : this.modifiedProperties)
+			for (ForgeConfigProperty<?> property : this.modifiedProperties)
 			{
 				property.sendChanges();
 			}
@@ -107,7 +107,7 @@ public class BetterConfigScreen extends Screen
 	 * Called when a the value property changes to tracks which property should be saved
 	 * @param property the property that changed
 	 */
-	protected void onPropertyChanged(ForgeConfigProperty<?, ?> property)
+	protected void onPropertyChanged(ForgeConfigProperty<?> property)
 	{
 		if (property.valueChanged())
 		{

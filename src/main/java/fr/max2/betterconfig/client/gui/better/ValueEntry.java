@@ -13,7 +13,6 @@ import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
 import fr.max2.betterconfig.config.ConfigFilter;
-import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import net.minecraft.client.gui.FocusableGui;
 import net.minecraft.client.gui.FontRenderer;
@@ -33,7 +32,6 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	/** The edited property */
-	private final ConfigTableEntrySpec entry;
 	private final IConfigPrimitive<?> property;
 	private final IBetterElement content;
 	private final IBetterElement button;
@@ -53,12 +51,12 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 	/** Indicates if the property is hidden or not */
 	private boolean hidden = false;
 
-	public ValueEntry(BetterConfigScreen screen, ConfigTableEntrySpec entry, IConfigPrimitive<?> property, IBetterElement content, int x)
+	public ValueEntry(BetterConfigScreen screen, IConfigPrimitive<?> property, IBetterElement content, int x)
 	{
 		this.screen = screen;
-		this.entry = entry;
 		this.property = property;
 		this.content = content;
+		// TODO [1.0] Actually make the undo button undo the change
 		// TODO [2.0] Gray out the button when value is unchanged
 		// TODO [2.0] Add reset to default button
 		this.button = new BetterButton.Icon(screen, this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4, 48, 0, new TranslationTextComponent(UNDO_TOOLTIP_KEY), thiz -> {}, new TranslationTextComponent(UNDO_TOOLTIP_KEY));
@@ -79,7 +77,7 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 	public int setYgetHeight(int y, ConfigFilter filter)
 	{
 		this.baseY = y;
-		this.hidden = !filter.matches(this.entry);
+		this.hidden = !filter.matches(this.property);
 		
 		if (this.hidden)
 		{
@@ -99,10 +97,10 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 	private void updateTexts()
 	{
 		FontRenderer font = this.screen.getFont();
-		this.nameLines = font.trimStringToWidth(this.entry.getDisplayName(), this.screen.width - this.baseX - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4);
+		this.nameLines = font.trimStringToWidth(this.property.getDisplayName(), this.screen.width - this.baseX - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4);
 		this.extraInfo.clear();
-		this.extraInfo.add(ITextProperties.func_240653_a_(this.entry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
-		this.extraInfo.addAll(this.entry.getDisplayComment());
+		this.extraInfo.add(ITextProperties.func_240653_a_(this.property.getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+		this.extraInfo.addAll(this.property.getDisplayComment());
 		this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(Objects.toString(this.property.getSpec().getDefaultValue())))).mergeStyle(TextFormatting.GRAY));
 	}
 

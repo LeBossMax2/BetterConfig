@@ -12,7 +12,7 @@ import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
 import fr.max2.betterconfig.config.ConfigFilter;
-import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
+import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.FocusableGui;
 import net.minecraft.client.gui.FontRenderer;
@@ -33,7 +33,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	private final BetterConfigScreen screen;
 	
 	/** The edited table */
-	private final ConfigTableEntrySpec tableEntry;
+	private final IConfigNode<?> node;
 	/** The content that will be collapsed */
 	private final IBetterElement content;
 	/** The extra info to show on the tooltip */
@@ -52,13 +52,13 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	/** Indicates if the section is hidden or not */
 	private boolean hidden = false;
 
-	public Foldout(BetterConfigScreen screen, ConfigTableEntrySpec entry, IBetterElement content, int x)
+	public Foldout(BetterConfigScreen screen, IConfigNode<?> node, IBetterElement content, int x)
 	{
 		this.screen = screen;
-		this.tableEntry = entry;
+		this.node = node;
 		this.content = content;
-		this.extraInfo.add(ITextProperties.func_240653_a_(entry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
-		this.extraInfo.addAll(entry.getDisplayComment());
+		this.extraInfo.add(ITextProperties.func_240653_a_(node.getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+		this.extraInfo.addAll(node.getDisplayComment());
 		this.baseX = x;
 	}
 	
@@ -73,7 +73,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	@Override
 	public int setYgetHeight(int y, ConfigFilter filter)
 	{
-		boolean matchFilter = filter.matches(this.tableEntry);
+		boolean matchFilter = filter.matches(this.node);
 		this.baseY = y;
 		int contentHeight = this.content.setYgetHeight(y + FOLDOUT_HEADER_HEIGHT, matchFilter ? ConfigFilter.ALL : filter);
 		
@@ -101,8 +101,8 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	private void updateTexts()
 	{
 		this.extraInfo.clear();
-		this.extraInfo.add(ITextProperties.func_240653_a_(this.tableEntry.getLoc().getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
-		this.extraInfo.addAll(this.tableEntry.getDisplayComment());
+		this.extraInfo.add(ITextProperties.func_240653_a_(this.node.getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+		this.extraInfo.addAll(this.node.getDisplayComment());
 	}
 	
 	@Override
@@ -206,7 +206,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 		
 		// Draw foreground text
 		FontRenderer font = this.screen.getFont(); 
-		font.drawText(matrixStack, this.tableEntry.getDisplayName(), x + 16, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+		font.drawText(matrixStack, this.node.getDisplayName(), x + 16, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
 	}
 	
 	@Override

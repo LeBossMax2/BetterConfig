@@ -44,6 +44,6 @@ public interface IConfigPrimitive<T> extends IConfigNode<T>
 	@Override
 	default <P, R> R exploreNode(IConfigValueVisitor<P, R> visitor, P param)
 	{
-		return visitor.visitProperty(this, param);
+		return visitor.visitPrimitive(this, param);
 	}
 }

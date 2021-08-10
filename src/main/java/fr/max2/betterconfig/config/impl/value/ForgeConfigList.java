@@ -3,248 +3,173 @@ package fr.max2.betterconfig.config.impl.value;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
+import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
-import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigSpecVisitor;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
-import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.MappedListView;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
-public class ForgeConfigList<T> extends ForgeConfigProperty<IConfigListSpec<T>, List<T>> implements IConfigList<T>
+public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<List<T>, IConfigListSpec<T>, Info> implements IConfigList<T>
 {
-	private final ListImpl<T> list;
+	private final List<Runnable> elemChangeListeners = new ArrayList<>();
+	private final IElementBuilder<T> elementBuilder;
+	private final List<ForgeConfigNode<T, ?, ListChildInfo>> valueList;
+	private final List<IConfigNode<T>> valueListView;
+	private final List<T> currentValue;
 
-	public ForgeConfigList(IConfigListSpec<T> spec, Consumer<ForgeConfigProperty<?, ?>> changeListener, ConfigValue<List<T>> configValue)
+	public ForgeConfigList(IConfigListSpec<T> spec, Info info, List<T> initialValue)
 	{
-		super(spec, changeListener, configValue);
-		this.list = new ListImpl<>(this::onValueChanged, spec);
-		this.list.setCurrentValue(configValue.get());
+		super(spec, info);
+		this.elementBuilder = spec.getElementSpec().exploreNode(new ElementBuilderChooser<>(), this);
+
+		this.valueList = new ArrayList<>();
+		this.valueListView = Collections.unmodifiableList(this.valueList);
+		this.currentValue = new MappedListView<>(this.valueList, elem -> elem.getCurrentValue());
+		if (initialValue != null)
+		{
+			for (int i = 0; i < initialValue.size(); i++)
+			{
+				T val = initialValue.get(i);
+				ForgeConfigNode<T, ?, ListChildInfo> elem = this.elementBuilder.build(val);
+				elem.info.setIndex(i);
+				this.valueList.add(elem);
+			}
+		}
+	}
+	
+	public ForgeConfigList<T, Info> addChangeListener(Runnable listener)
+	{
+		this.elemChangeListeners.add(listener);
+		return this;
 	}
 
 	@Override
 	protected List<T> getCurrentValue()
 	{
-		return this.list.getCurrentValue();
+		return this.currentValue;
 	}
 
 	@Override
 	public List<? extends IConfigNode<T>> getValueList()
 	{
-		return this.list.getValueList();
+		return this.valueListView;
 	}
-	
+
 	@Override
 	public void removeValueAt(int index)
 	{
-		this.list.removeValueAt(index);
+		this.valueList.remove(index);
+		this.updateElementIndicesFrom(index);
+		this.onValueChanged();
 	}
 
 	@Override
 	public IConfigNode<T> addValue(int index)
 	{
-		return this.list.addValue(index);
+		Preconditions.checkPositionIndex(index, this.valueList.size());
+		ForgeConfigNode<T, ?, ListChildInfo> newNode = this.elementBuilder.build(this.getSpec().getElementSpec().getDefaultValue());
+		this.valueList.add(index, newNode);
+		this.updateElementIndicesFrom(index);
+		this.onValueChanged();
+		return newNode;
 	}
 	
-	public static interface IElementBuilder<T>
+	private void updateElementIndicesFrom(int index)
 	{
-		ElementNode<?, T> build();
-	}
-	
-	public static abstract class ElementNode<Spec extends IConfigSpecNode<T>, T> implements IConfigNode<T>
-	{
-		private final Spec spec;
-		protected ListImpl<T> parent;
-		
-		public ElementNode(Spec spec, ListImpl<T> parent)
+		for (int i = index; i < this.valueList.size(); i++)
 		{
-			this.spec = spec;
+			this.valueList.get(i).info.setIndex(i);
+		}
+	}
+	
+	private void onValueChanged()
+	{
+		this.elemChangeListeners.forEach(Runnable::run);
+	}
+	
+	private static interface IElementBuilder<T>
+	{
+		ForgeConfigNode<T, ?, ListChildInfo> build(T initialValue);
+	}
+	
+	private static class ListChildInfo implements IForgeNodeInfo
+	{
+		private final ForgeConfigList<?, ?> parent;
+		private int index;
+
+		private ListChildInfo(ForgeConfigList<?, ?> parent)
+		{
 			this.parent = parent;
+			this.index = -1;
 		}
 		
-		@Override
-		public Spec getSpec()
+		private void setIndex(int index)
 		{
-			return this.spec;
-		}
-		
-		protected abstract T getCurrentValue();
-		
-		protected abstract void setCurrentValue(T value);
-	}
-	
-	public static class ElementPrimitive<T> extends ElementNode<IConfigPrimitiveSpec<T>, T> implements IConfigPrimitive<T>
-	{
-		private T currentValue;
-		
-		public ElementPrimitive(IConfigPrimitiveSpec<T> spec, ListImpl<T> parent)
-		{
-			super(spec, parent);
-			this.currentValue = spec.getDefaultValue();
+			this.index = index;
 		}
 
 		@Override
-		public T getValue()
+		public String getName()
 		{
-			return this.currentValue;
+			return this.parent.getName() + "[" + this.index + "]";
 		}
 
 		@Override
-		protected T getCurrentValue()
+		public ITextComponent getDisplayName()
 		{
-			return this.getValue();
+			return new StringTextComponent(this.getName()); //TODO [1.0] use parentName[index]
 		}
 		
 		@Override
-		protected void setCurrentValue(T value)
+		public Stream<String> getPath()
 		{
-			this.currentValue = value;
+			return Stream.concat(this.parent.info.getPath(), Stream.of(Integer.toString(this.index)));
 		}
 
 		@Override
-		public void setValue(T value)
+		public String getCommentString()
 		{
-			this.currentValue = value;
-			this.parent.onValueChanged();
+			return this.parent.getCommentString();
+		}
+
+		@Override
+		public List<? extends ITextComponent> getDisplayComment()
+		{
+			return this.parent.getDisplayComment();
 		}
 	}
 	
-	public static class ElementList<T> extends ElementNode<IConfigListSpec<T>, List<T>> implements IConfigList<T>
+	private static class ElementBuilderChooser<T> implements IConfigSpecVisitor<ForgeConfigList<T, ?>, IElementBuilder<T>>
 	{
-		private final ListImpl<T> list;
-		
-		public ElementList(IConfigListSpec<T> spec, ListImpl<List<T>> parent)
-		{
-			super(spec, parent);
-			this.list = new ListImpl<>(parent::onValueChanged, spec);
-		}
-
 		@Override
-		public List<? extends IConfigNode<T>> getValueList()
-		{
-			return this.list.getValueList();
-		}
-		
-		@Override
-		public void removeValueAt(int index)
-		{
-			this.list.removeValueAt(index);
-		}
-
-		@Override
-		public IConfigNode<T> addValue(int index)
-		{
-			return this.list.addValue(index);
-		}
-		
-		@Override
-		protected void setCurrentValue(List<T> value)
-		{
-			this.list.setCurrentValue(value);
-		}
-
-		@Override
-		protected List<T> getCurrentValue()
-		{
-			return this.list.getCurrentValue();
-		}
-	}
-	
-	private static final class ListImpl<T>
-	{
-		private final Runnable changeListener;
-		private final IElementBuilder<T> elementBuilder;
-		private final List<ElementNode<?, T>> valueList;
-		private final List<IConfigNode<T>> valueListView;
-		private final List<T> currentValue;
-
-		public ListImpl(Runnable changeListener, IConfigListSpec<T> specs)
-		{
-			this.changeListener = changeListener;
-			this.elementBuilder = specs.getElementSpec().exploreNode(new ElementBuilderChooser<>(), this);
-
-			this.valueList = new ArrayList<>();
-			this.valueListView = Collections.unmodifiableList(this.valueList);
-			this.currentValue = new MappedListView<>(this.valueList, elem -> elem.getCurrentValue());
-		}
-		
-		protected void setCurrentValue(List<T> value)
-		{
-			this.valueList.clear();
-			
-			if (value != null)
-			{
-				for (int i = 0; i < value.size(); i++)
-				{
-					ElementNode<?, T> elem = this.elementBuilder.build();
-					elem.setCurrentValue(value.get(i));
-					this.valueList.add(elem);
-				}
-			}
-		}
-
-		protected List<T> getCurrentValue()
-		{
-			return this.currentValue;
-		}
-
-		public List<? extends IConfigNode<T>> getValueList()
-		{
-			return this.valueListView;
-		}
-
-		public void removeValueAt(int index)
-		{
-			this.valueList.remove(index);
-			this.onValueChanged();
-		}
-
-		public IConfigNode<T> addValue(int index)
-		{
-			Preconditions.checkPositionIndex(index, this.valueList.size());
-			ElementNode<?, T> newNode = this.elementBuilder.build();
-			this.valueList.add(index, newNode);
-			this.onValueChanged();
-			return newNode;
-		}
-		
-		public void onValueChanged()
-		{
-			this.changeListener.run();
-		}
-	}
-	
-	private static class ElementBuilderChooser<T> implements IConfigSpecVisitor<ListImpl<T>, IElementBuilder<T>>
-	{
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public <S> IElementBuilder<T> visitProperty(IConfigPrimitiveSpec<S> propertySpec, ListImpl<T> list)
-		{
-			// Here S is the same as T
-			return () -> new ElementPrimitive<>((IConfigPrimitiveSpec<T>)propertySpec, list);
-		}
-
-		@Override
-		public IElementBuilder<T> visitTable(IConfigTableSpec tableSpec, ListImpl<T> list)
+		public IElementBuilder<T> visitTable(IConfigTableSpec tableSpec, ForgeConfigList<T, ?> list)
 		{
 			throw new UnsupportedOperationException();
 		}
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings({ "unchecked" })
 		@Override
-		public <U> IElementBuilder<T> visitList(IConfigListSpec<U> listSpec, ListImpl<T> list)
+		public <U> IElementBuilder<T> visitList(IConfigListSpec<U> listSpec, ForgeConfigList<T, ?> parentList)
 		{
-			// Here T is a List<?> so it is ok to cast to List<?> and cast back to T
-			return () -> (ElementNode<?, T>)new ElementList(listSpec, (ListImpl<List<?>>)list);
+			// Here T is a List<U> so it is ok to cast to List<?> and cast back to T
+			return (val) -> (ForgeConfigNode<T, ?, ListChildInfo>)new ForgeConfigList<>(listSpec, new ListChildInfo(parentList), (List<U>)val).addChangeListener(parentList::onValueChanged);
 		}
-		
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <S> IElementBuilder<T> visitPrimitive(IConfigPrimitiveSpec<S> primitiveSpec, ForgeConfigList<T, ?> parentList)
+		{
+			// Here S is the same as T
+			return (val) -> new ForgeConfigPrimitive<>((IConfigPrimitiveSpec<T>)primitiveSpec, new ListChildInfo(parentList), val).addChangeListener(parentList::onValueChanged);
+		}
 	}
 }

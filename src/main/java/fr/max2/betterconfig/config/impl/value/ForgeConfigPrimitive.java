@@ -1,41 +1,45 @@
 package fr.max2.betterconfig.config.impl.value;
 
-import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
 
+import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public class ForgeConfigPrimitive<T> extends ForgeConfigProperty<IConfigPrimitiveSpec<T>, T> implements IConfigPrimitive<T>
+public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<T, IConfigPrimitiveSpec<T>, Info> implements IConfigPrimitive<T>
 {
-	/** The current temporary value of the property */
-	protected T currentValue;
-
-	public ForgeConfigPrimitive(IConfigPrimitiveSpec<T> spec, Consumer<ForgeConfigProperty<?, ?>> changeListener, ConfigValue<T> configValue)
+	private final List<Runnable> elemChangeListeners = new ArrayList<>();
+	private T currentValue;
+	
+	public ForgeConfigPrimitive(IConfigPrimitiveSpec<T> spec, Info info, T initialValue)
 	{
-		super(spec, changeListener, configValue);
-		this.currentValue = configValue.get();
+		super(spec, info);
+		this.currentValue = initialValue;
 	}
 	
+	public ForgeConfigPrimitive<T, Info> addChangeListener(Runnable listener)
+	{
+		this.elemChangeListeners.add(listener);
+		return this;
+	}
+	
+	@Override
+	protected T getCurrentValue()
+	{
+		return this.getValue();
+	}
+
 	@Override
 	public T getValue()
 	{
 		return this.currentValue;
 	}
-	
-	public void setValue(T value)
-	{
-		if (!Objects.equals(this.getValue(), value))
-		{
-			this.currentValue = value;
-			this.onValueChanged();
-		}
-	}
 
 	@Override
-	protected T getCurrentValue()
+	public void setValue(T value)
 	{
-		return this.getValue();
+		this.currentValue = value;
+		this.elemChangeListeners.forEach(Runnable::run);
 	}
 }

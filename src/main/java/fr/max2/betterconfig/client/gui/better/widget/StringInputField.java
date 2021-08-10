@@ -4,7 +4,6 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.config.ConfigFilter;
-import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.ITextComponent;
@@ -48,8 +47,8 @@ public class StringInputField extends TextField implements IBetterElement
 	}
 
 	/** Creates a widget for string values */
-	public static StringInputField stringOption(BetterConfigScreen screen, int xPos, ConfigTableEntrySpec entry, IConfigPrimitive<String> property)
+	public static StringInputField stringOption(BetterConfigScreen screen, int xPos, IConfigPrimitive<String> property)
 	{
-		return new StringInputField(screen.getFont(), xPos, property, entry.getDisplayName());
+		return new StringInputField(screen.getFont(), xPos, property, property.getDisplayName());
 	}
 }

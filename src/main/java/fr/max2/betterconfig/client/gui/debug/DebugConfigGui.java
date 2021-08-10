@@ -78,7 +78,7 @@ public class DebugConfigGui  implements IGuiComponent
 	public static DebugConfigGui build(BetterConfigScreen screen, IConfigTable config)
 	{
 		List<String> list = new ArrayList<>();
-		config.exploreEntries((key, value) -> value.exploreNode(new TableBuilder(list), key.getLoc().getName())).forEach(v -> {});
+		config.exploreEntries(value -> value.exploreNode(new TableBuilder(list), value.getName())).forEach(v -> {});
 		return new DebugConfigGui(screen, list);
 	}
 	
@@ -95,7 +95,7 @@ public class DebugConfigGui  implements IGuiComponent
 		@Override
 		public Void visitTable(IConfigTable table, String path)
 		{
-			table.exploreEntries((key, value) -> value.exploreNode(this, path + "." + key)).forEach(v -> {});
+			table.exploreEntries(value -> value.exploreNode(this, path + "." + value.getName())).forEach(v -> {});
 			return null;
 		}
 		
@@ -112,9 +112,9 @@ public class DebugConfigGui  implements IGuiComponent
 		}
 		
 		@Override
-		public <T> Void visitProperty(IConfigPrimitive<T> property, String path)
+		public <T> Void visitPrimitive(IConfigPrimitive<T> primitive, String path)
 		{
-			this.content.add(path + " : " + property.exploreType(ValueBuilder.INSTANCE));
+			this.content.add(path + " : " + primitive.exploreType(ValueBuilder.INSTANCE));
 			return null;
 		}
 	}

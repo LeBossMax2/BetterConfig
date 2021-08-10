@@ -26,9 +26,9 @@ public interface IConfigValueVisitor<P, R>
 	/**
 	 * Visits a property node
 	 * @param <T> the type of the property
-	 * @param property the visited config property
+	 * @param primitive the visited config property
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	<T> R visitProperty(IConfigPrimitive<T> property, P param);
+	<T> R visitPrimitive(IConfigPrimitive<T> primitive, P param);
 }

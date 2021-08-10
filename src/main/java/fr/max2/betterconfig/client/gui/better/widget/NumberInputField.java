@@ -6,7 +6,6 @@ import fr.max2.betterconfig.client.gui.component.NumberField;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
 import fr.max2.betterconfig.config.ConfigFilter;
-import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.ITextComponent;
@@ -59,8 +58,8 @@ public class NumberInputField<N extends Number> extends NumberField<N> implement
 
 	/** Creates a widget for number values */
 	@SuppressWarnings("unchecked")
-	public static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, int xPos, ConfigTableEntrySpec entry, IConfigPrimitive<N> property)
+	public static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, int xPos, IConfigPrimitive<N> property)
 	{
-		return new NumberInputField<>(screen.getFont(), xPos, NumberTypes.getType((Class<N>)property.getSpec().getValueClass()), property, entry.getDisplayName());
+		return new NumberInputField<>(screen.getFont(), xPos, NumberTypes.getType((Class<N>)property.getSpec().getValueClass()), property, property.getDisplayName());
 	}
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
+import fr.max2.betterconfig.config.value.IConfigNode;
 
 public class ConfigFilter
 {
@@ -12,7 +12,7 @@ public class ConfigFilter
 	public static final ConfigFilter NONE = new ConfigFilter(Collections.emptyList())
 	{
 		@Override
-		public boolean matches(ConfigTableEntrySpec entry)
+		public boolean matches(IConfigNode<?> node)
 		{
 			return false;
 		}
@@ -36,7 +36,7 @@ public class ConfigFilter
 		if (filter == null)
 			return;
 		
-		for (String word : filter.split("[ .,]"))
+		for (String word : filter.split("[ .,/]"))
 		{
 			if (!word.isEmpty())
 			{
@@ -45,23 +45,21 @@ public class ConfigFilter
 		}
 	}
 	
-	public boolean matches(ConfigTableEntrySpec entry)
+	public boolean matches(IConfigNode<?> node)
 	{
 		for (String word : this.words)
 		{
-			if (!entryMatchesWord(entry, word))
-			{
+			if (!entryMatchesWord(node, word))
 				return false;
-			}
 		}
 		return true;
 	}
 	
-	private static boolean entryMatchesWord(ConfigTableEntrySpec entry, String word)
+	private static boolean entryMatchesWord(IConfigNode<?> node, String word)
 	{
-		String comment = entry.getCommentString(); 
+		String comment = node.getCommentString(); 
 		return comment != null && comment.toLowerCase().contains(word)
-		    || entry.getDisplayName().getString().toLowerCase().contains(word)
-		    || entry.getLoc().getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
+		    || node.getDisplayName().getString().toLowerCase().contains(word)
+		    || node.getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
 	}
 }

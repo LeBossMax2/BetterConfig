@@ -7,6 +7,11 @@ public interface IConfigSpecNode<T>
 	 */
 	Class<? super T> getValueClass();
 	
+	/**
+	 * Gets the default configuration value
+	 */
+	T getDefaultValue();
+	
 	default <R> R exploreNode(IConfigSpecVisitor<Void, R> visitor)
 	{
 		return this.exploreNode(visitor, null);

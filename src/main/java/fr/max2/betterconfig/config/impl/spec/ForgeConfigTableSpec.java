@@ -43,6 +43,12 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 		this(ConfigLocation.ROOT, spec.getSpec(), getSpecComments(spec));
 	}
 	
+	@Override
+	public UnmodifiableConfig getDefaultValue()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
 	/** Gets the comments from the spec */
 	private static Function<ConfigLocation, String> getSpecComments(ForgeConfigSpec spec)
 	{
