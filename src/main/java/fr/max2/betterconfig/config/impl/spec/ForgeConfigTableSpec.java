@@ -46,7 +46,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	@Override
 	public UnmodifiableConfig getDefaultValue()
 	{
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException(); // TODO [2.0] Implement default value for tables
 	}
 	
 	/** Gets the comments from the spec */
@@ -130,8 +130,8 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 			}
 			if (UnmodifiableConfig.class.isAssignableFrom(valClass))
 			{
-				// TODO [2.0] Implements list of tables
-				// Don't know how to deal with tables in lists
+				// TODO [2.0] Implement list of tables
+				// Don't know how to deal with list of tables
 				return new ForgeListPrimitiveSpec<>(Object.class);
 			}
 			return new ForgeListPrimitiveSpec<>(valClass);

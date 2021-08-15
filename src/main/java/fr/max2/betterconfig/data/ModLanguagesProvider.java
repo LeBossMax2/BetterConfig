@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.CycleOptionButton;
+import fr.max2.betterconfig.config.impl.value.ForgeConfigList;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;
@@ -45,6 +46,7 @@ public class ModLanguagesProvider implements IDataProvider
 		add(Constants.REMOVE_TOOLTIP_KEY, "Remove this element from the list", "Retirer cet élément de la liste");
 		add(Constants.UNDO_TOOLTIP_KEY, "Undo", "Annuler le changement");
 		add(Constants.RESET_TOOLTIP_KEY, "Reset to default", "Réinitialiserà la valeur par défaut");
+		add(ForgeConfigList.LIST_ELEMENT_LABEL_KEY, "%s[%d]", "%s[%d]");
     }
 	
 	@Override

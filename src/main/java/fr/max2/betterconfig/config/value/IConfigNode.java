@@ -9,8 +9,6 @@ public interface IConfigNode<T>
 {
 	IConfigSpecNode<T> getSpec();
 	
-	//IConfigNode<?> getParent();
-	
 	String getName();
 	
 	ITextComponent getDisplayName();
@@ -20,6 +18,8 @@ public interface IConfigNode<T>
 	String getCommentString();
 	
 	List<? extends ITextComponent> getDisplayComment();
+	
+	void undoChanges();
 	
 	default <R> R exploreNode(IConfigValueVisitor<Void, R> visitor)
 	{

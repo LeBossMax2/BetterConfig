@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
+import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
@@ -16,11 +17,13 @@ import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.util.MappedListView;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<List<T>, IConfigListSpec<T>, Info> implements IConfigList<T>
 {
-	private final List<Runnable> elemChangeListeners = new ArrayList<>();
+	/** The translation key for the label of elements of a list */
+	public static final String LIST_ELEMENT_LABEL_KEY = BetterConfig.MODID + ".list.child";
+	
 	private final IElementBuilder<T> elementBuilder;
 	private final List<ForgeConfigNode<T, ?, ListChildInfo>> valueList;
 	private final List<IConfigNode<T>> valueListView;
@@ -126,7 +129,7 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 		@Override
 		public ITextComponent getDisplayName()
 		{
-			return new StringTextComponent(this.getName()); //TODO [1.0] use parentName[index]
+			return new TranslationTextComponent(LIST_ELEMENT_LABEL_KEY, this.parent.getName(), this.index);
 		}
 		
 		@Override

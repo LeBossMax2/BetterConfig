@@ -58,6 +58,12 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		return this.valueMap;
 	}
 	
+	@Override
+	public void undoChanges()
+	{
+		throw new UnsupportedOperationException(); // TODO [2.0] Implement undo for tables
+	}
+	
 	private IConfigNode<?> childNode(String key, ConfigTableEntrySpec spec)
 	{
 		return spec.getNode().exploreNode(new ConfigNodeCreator(this.changeListener, new TableChildInfo(this, spec)), this.configValues.get(key));
