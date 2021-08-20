@@ -5,10 +5,11 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
+import fr.max2.betterconfig.util.property.list.IReadableList;
 
 public interface IConfigList<T> extends IConfigNode<List<T>>
 {
-	List<? extends IConfigNode<T>> getValueList();
+	IReadableList<IConfigNode<T>> getValueList();
 	
 	void removeValueAt(int index);
 	

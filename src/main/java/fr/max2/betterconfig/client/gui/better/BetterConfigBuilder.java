@@ -16,6 +16,8 @@ import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
+import fr.max2.betterconfig.util.property.list.IListListener;
+import fr.max2.betterconfig.util.property.list.IReadableList;
 import net.minecraft.util.text.TranslationTextComponent;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
@@ -39,9 +41,9 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
-	private final Integer xOffset;
+	private final int xOffset;
 
-	private BetterConfigBuilder(BetterConfigScreen screen, Integer xOffset)
+	private BetterConfigBuilder(BetterConfigScreen screen, int xOffset)
 	{
 		this.screen = screen;
 		this.xOffset = xOffset;
@@ -51,68 +53,6 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	{
 		List<IBetterElement> content = table.exploreEntries(value -> value.exploreNode(new BetterConfigBuilder(screen, xOffset))).collect(Collectors.toList());
 		return new GuiGroup(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
-	}
-	
-	private void buildList(IConfigList<?> list, int xOffset, List<IBetterElement> content, List<ListElemInfo> entries, Runnable layoutUpdater)
-	{
-		int i = 0;
-
-		List<? extends IConfigNode<?>> values = list.getValueList();
-		content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
-		{
-			IConfigNode<?> elem = list.addValue(0);
-			putListElement(list, elem, xOffset, content, entries, layoutUpdater, 0);
-			layoutUpdater.run();
-		}, new TranslationTextComponent(ADD_FIRST_TOOLTIP_KEY)));
-		
-		for (IConfigNode<?> elem : values)
-		{
-			putListElement(list, elem, xOffset, content, entries, layoutUpdater, i);
-			i++;
-		}
-		
-		layoutUpdater.run();
-	}
-	
-	private void putListElement(IConfigList<?> list, IConfigNode<?> elem, int xOffset, List<IBetterElement> content, List<ListElemInfo> entries, Runnable layoutUpdater, int index)
-	{
-		ListElemInfo info = new ListElemInfo(index);
-		entries.add(index, info);
-		boolean isFirst = content.size() <= 1;
-		IBetterElement child = elem.exploreNode(new BetterConfigBuilder(this.screen, xOffset));
-		content.add(index + 1, new ListElementEntry(this.screen, child, xOffset - SECTION_TAB_SIZE, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE, deleteButton ->
-		{
-			int myIndex = info.getIndex();
-			list.removeValueAt(myIndex);
-			content.remove(myIndex + 1);
-			entries.remove(myIndex);
-			for (int i = myIndex; i < entries.size(); i++)
-			{
-				entries.get(i).updateIndex(i);
-			}
-			layoutUpdater.run();
-			if (content.size() == 2)
-			{
-				// Remove "add last" button
-				content.remove(1);
-			}
-		}));
-		for (int i = index + 1; i < entries.size(); i++)
-		{
-			entries.get(i).updateIndex(i);
-		}
-		
-		if (isFirst)
-		{
-			// Add "add last" button
-			content.add(new BetterButton(this.screen, xOffset, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
-			{
-				int lastIndex = list.getValueList().size();
-				IConfigNode<?> newElem = list.addValue(lastIndex);
-				putListElement(list, newElem, xOffset, content, entries, layoutUpdater, lastIndex);
-				layoutUpdater.run();
-			}, new TranslationTextComponent(ADD_LAST_TOOLTIP_KEY)));
-		}
 	}
 	
 	// Table entry visitor
@@ -127,10 +67,79 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	public <T> IBetterElement visitList(IConfigList<T> list, Void entry)
 	{
 		int offset = this.xOffset + SECTION_TAB_SIZE;
-		List<IBetterElement> content = new ArrayList<>();
-		GuiGroup uiGroup = new GuiGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, content);
-		this.buildList(list, offset, content, new ArrayList<>(), uiGroup::updateLayout);
-		return new Foldout(this.screen, list, uiGroup, this.xOffset);
+		List<IBetterElement> mainElements = new ArrayList<>();
+		GuiGroup mainGroup = new GuiGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, mainElements);
+		
+		IReadableList<IConfigNode<T>> values = list.getValueList();
+		mainElements.add(new BetterButton(this.screen, offset, this.screen.width - offset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+		{
+			list.addValue(0);
+		}, new TranslationTextComponent(ADD_FIRST_TOOLTIP_KEY)));
+		
+		List<ListElemInfo> entries = new ArrayList<>();
+		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, offset, mainElements, entries, index));
+		mainElements.add(1, new GuiGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, content));
+		
+		content.onChanged(new IListListener<IBetterElement>()
+		{
+			@Override
+			public void onElementAdded(int index, IBetterElement newValue)
+			{
+				for (int i = index + 1; i < entries.size(); i++)
+				{
+					entries.get(i).updateIndex(i);
+				}
+				
+				if (entries.size() == 1)
+					mainElements.add(buildAddLastButton(list, offset));
+				
+				mainGroup.updateLayout();
+			}
+
+			@Override
+			public void onElementRemoved(int index)
+			{
+				for (int i = index; i < entries.size(); i++)
+				{
+					entries.get(i).updateIndex(i);
+				}
+				
+				if (entries.size() == 0)
+					mainElements.remove(2); // Remove "add last" button
+				
+				mainGroup.updateLayout();
+			}
+		});
+
+		
+		if (entries.size() >= 1)
+			mainElements.add(buildAddLastButton(list, offset));
+		
+		mainGroup.updateLayout();
+		
+		return new Foldout(this.screen, list, mainGroup, this.xOffset);
+	}
+
+	private <T> BetterButton buildAddLastButton(IConfigList<T> list, int offset)
+	{
+		return new BetterButton(screen, offset, screen.width - offset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+		{
+			list.addValue(list.getValueList().size());
+		}, new TranslationTextComponent(ADD_LAST_TOOLTIP_KEY));
+	}
+	
+	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, int xOffset, List<IBetterElement> content, List<ListElemInfo> entries, int index)
+	{
+		ListElemInfo info = new ListElemInfo(index);
+		entries.add(index, info);
+		IBetterElement child = elem.exploreNode(new BetterConfigBuilder(this.screen, xOffset));
+		
+		return new ListElementEntry(this.screen, child, xOffset - SECTION_TAB_SIZE, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE, deleteButton ->
+		{
+			int myIndex = info.getIndex();
+			entries.remove(myIndex);
+			list.removeValueAt(myIndex);
+		});
 	}
 	
 	@Override

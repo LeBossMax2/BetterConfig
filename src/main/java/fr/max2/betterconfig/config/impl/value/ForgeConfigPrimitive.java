@@ -10,11 +10,13 @@ import fr.max2.betterconfig.config.value.IConfigPrimitive;
 public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<T, IConfigPrimitiveSpec<T>, Info> implements IConfigPrimitive<T>
 {
 	private final List<Runnable> elemChangeListeners = new ArrayList<>();
+	private final T initialValue;
 	private T currentValue;
 	
 	public ForgeConfigPrimitive(IConfigPrimitiveSpec<T> spec, Info info, T initialValue)
 	{
 		super(spec, info);
+		this.initialValue = initialValue;
 		this.currentValue = initialValue;
 	}
 	
@@ -41,5 +43,11 @@ public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeC
 	{
 		this.currentValue = value;
 		this.elemChangeListeners.forEach(Runnable::run);
+	}
+	
+	@Override
+	public void undoChanges()
+	{
+		this.currentValue = this.initialValue;
 	}
 }

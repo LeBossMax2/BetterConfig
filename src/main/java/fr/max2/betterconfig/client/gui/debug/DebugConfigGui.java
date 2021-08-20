@@ -11,9 +11,11 @@ import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
+import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
+import fr.max2.betterconfig.util.property.list.IReadableList;
 import net.minecraft.client.gui.FontRenderer;
 
 /**
@@ -103,9 +105,10 @@ public class DebugConfigGui  implements IGuiComponent
 		public <T> Void visitList(IConfigList<T> list, String path)
 		{
 			this.content.add(path + " : " + "LIST" + " = {");
-			for (int i = 0; i < list.getValueList().size(); i++)
+			IReadableList<IConfigNode<T>> values = list.getValueList();
+			for (int i = 0; i < values.size(); i++)
 			{
-				list.getValueList().get(i).exploreNode(this, "[" + i + "]");
+				values.get(i).exploreNode(this, "[" + i + "]");
 			}
 			this.content.add("}");
 			return null;

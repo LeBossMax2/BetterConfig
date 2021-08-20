@@ -61,7 +61,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 	@Override
 	public void undoChanges()
 	{
-		throw new UnsupportedOperationException(); // TODO [2.0] Implement undo for tables
+		this.valueMap.values().forEach(IConfigNode::undoChanges);
 	}
 	
 	private IConfigNode<?> childNode(String key, ConfigTableEntrySpec spec)

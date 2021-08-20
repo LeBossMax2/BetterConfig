@@ -1,7 +1,6 @@
 package fr.max2.betterconfig.config.impl.value;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,6 +15,9 @@ import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.util.MappedListView;
+import fr.max2.betterconfig.util.property.list.IReadableList;
+import fr.max2.betterconfig.util.property.list.ObservableList;
+import fr.max2.betterconfig.util.property.list.ReadableLists;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -24,18 +26,21 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 	/** The translation key for the label of elements of a list */
 	public static final String LIST_ELEMENT_LABEL_KEY = BetterConfig.MODID + ".list.child";
 	
+	private final List<Runnable> elemChangeListeners = new ArrayList<>();
 	private final IElementBuilder<T> elementBuilder;
-	private final List<ForgeConfigNode<T, ?, ListChildInfo>> valueList;
-	private final List<IConfigNode<T>> valueListView;
+	private final List<T> initialValue;
+	private final IReadableList<ForgeConfigNode<T, ?, ListChildInfo>> valueList;
+	private final IReadableList<IConfigNode<T>> valueListView;
 	private final List<T> currentValue;
 
 	public ForgeConfigList(IConfigListSpec<T> spec, Info info, List<T> initialValue)
 	{
 		super(spec, info);
 		this.elementBuilder = spec.getElementSpec().exploreNode(new ElementBuilderChooser<>(), this);
+		this.initialValue = initialValue;
 
-		this.valueList = new ArrayList<>();
-		this.valueListView = Collections.unmodifiableList(this.valueList);
+		this.valueList = new ObservableList<>();
+		this.valueListView = ReadableLists.unmodifiableList(this.valueList);
 		this.currentValue = new MappedListView<>(this.valueList, elem -> elem.getCurrentValue());
 		if (initialValue != null)
 		{
@@ -62,7 +67,7 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 	}
 
 	@Override
-	public List<? extends IConfigNode<T>> getValueList()
+	public IReadableList<IConfigNode<T>> getValueList()
 	{
 		return this.valueListView;
 	}
@@ -84,6 +89,21 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 		this.updateElementIndicesFrom(index);
 		this.onValueChanged();
 		return newNode;
+	}
+	
+	@Override
+	public void undoChanges()
+	{
+		for (int i = 0; i < this.initialValue.size(); i++)
+		{
+			this.valueListView.get(i).undoChanges();
+		}
+		
+		for (int i = this.initialValue.size() - 1; i >= this.initialValue.size(); i--)
+		{
+			this.valueListView.remove(i);
+		}
+		this.onValueChanged();
 	}
 	
 	private void updateElementIndicesFrom(int index)
