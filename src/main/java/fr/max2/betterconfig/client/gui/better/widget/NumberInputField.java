@@ -23,6 +23,8 @@ public class NumberInputField<N extends Number> extends NumberField<N> implement
 		super(fontRenderer, x, 0, VALUE_WIDTH, VALUE_HEIGHT, title, numberType, property.getValue());
 		this.property = property;
 		this.inputField.setResponder(this::updateTextColor);
+		
+		property.onChanged(this::setValue);
 	}
 
 	/** Updates the color of the text to indicates an error */

@@ -17,6 +17,8 @@ public class UnknownOptionWidget extends Button implements IBetterElement
 	{
 		super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT, new StringTextComponent(Objects.toString(property.getValue())), thiz -> {}, NO_TOOLTIP);
 		this.active = false;
+		
+		property.onChanged(newVal -> this.setMessage(new StringTextComponent(Objects.toString(newVal))));
 	}
 
 	@Override

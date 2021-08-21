@@ -171,7 +171,7 @@ public abstract class NumberField<N> extends FocusableGui implements INestedGuiC
 	}
 	
 	/** Sets the number in the field */
-	public void setValue(N value)
+	protected void setValue(N value)
 	{
 		this.inputField.setText(this.numberType.intoString(value));
 	}

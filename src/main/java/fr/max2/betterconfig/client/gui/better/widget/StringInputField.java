@@ -22,6 +22,8 @@ public class StringInputField extends TextField implements IBetterElement
 		this.property = property;
 		this.setText(property.getValue());
 		this.setResponder(this::updateTextColor);
+		
+		property.onChanged(this::setText);
 	}
 	
 	/** Updates the color of the text to indicates an error */

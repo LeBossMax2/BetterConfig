@@ -26,6 +26,8 @@ public class OptionButton<V> extends CycleOptionButton<V> implements IBetterElem
 			valueToText,
 			property.getValue(), thiz -> property.setValue(thiz.getCurrentValue()),
 			NO_TOOLTIP);
+		
+		property.onChanged(this::setCurrentValue);
 	}
 
 	@Override

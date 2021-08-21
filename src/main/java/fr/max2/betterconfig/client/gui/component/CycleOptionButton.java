@@ -47,6 +47,12 @@ public class CycleOptionButton<V> extends Button
 		return this.acceptedValues.size() == 0 ? null : this.acceptedValues.get(this.index % this.acceptedValues.size());
 	}
 	
+	protected void setCurrentValue(V newValue)
+	{
+		this.index = this.acceptedValues.indexOf(newValue);
+		this.setMessage(getValueText(this.valueToText, newValue));
+	}
+	
 	/** Selects the next available option */
 	public void cycleOption()
 	{
