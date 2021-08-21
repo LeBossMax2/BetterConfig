@@ -5,6 +5,9 @@ import net.minecraft.util.ResourceLocation;
 
 public class Constants
 {
+	public static final String CANCEL_CONFIG_KEY = BetterConfig.MODID + ".config.cancel";
+	public static final String SAVE_CONFIG_KEY = "gui.done";
+	
 	/** The translation key for displaying the default value */
 	public static final String DEFAULT_VALUE_KEY = BetterConfig.MODID + ".option.default_value";
 	/** The translation key for the text field of the search bar */

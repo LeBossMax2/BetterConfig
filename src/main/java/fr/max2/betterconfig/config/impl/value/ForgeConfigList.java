@@ -184,7 +184,7 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 		public <U> IElementBuilder<T> visitList(IConfigListSpec<U> listSpec, ForgeConfigList<T, ?> parentList)
 		{
 			// Here T is a List<U> so it is ok to cast to List<?> and cast back to T
-			return (val) -> (ForgeConfigNode<T, ?, ListChildInfo>)new ForgeConfigList<>(listSpec, new ListChildInfo(parentList), (List<U>)val).addChangeListener(parentList::onValueChanged);
+			return val -> (ForgeConfigNode<T, ?, ListChildInfo>)new ForgeConfigList<>(listSpec, new ListChildInfo(parentList), (List<U>)val).addChangeListener(parentList::onValueChanged);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -192,7 +192,12 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 		public <S> IElementBuilder<T> visitPrimitive(IConfigPrimitiveSpec<S> primitiveSpec, ForgeConfigList<T, ?> parentList)
 		{
 			// Here S is the same as T
-			return (val) -> new ForgeConfigPrimitive<>((IConfigPrimitiveSpec<T>)primitiveSpec, new ListChildInfo(parentList), val).addChangeListener(parentList::onValueChanged);
+			return val ->
+			{
+				ForgeConfigPrimitive<T, ListChildInfo> node = new ForgeConfigPrimitive<>((IConfigPrimitiveSpec<T>)primitiveSpec, new ListChildInfo(parentList), val);
+				node.onChanged(newVal -> parentList.onValueChanged());
+				return node;
+			};
 		}
 	}
 }

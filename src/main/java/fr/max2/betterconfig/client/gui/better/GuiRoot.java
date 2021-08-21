@@ -25,6 +25,8 @@ public class GuiRoot extends FocusableGui implements INestedGuiComponent
 {
 	/** The the height of the header */
 	private static final int CONTAINER_HEADER_HEIGHT = 60;
+	/** The the height of the header */
+	private static final int CONTAINER_FOOTER_HEIGHT = 30;
 	/** The x position of the input field of the search bar */
 	private static final int SEARCH_LABEL_WIDTH = 80;
 	/** The parent screen */
@@ -44,16 +46,17 @@ public class GuiRoot extends FocusableGui implements INestedGuiComponent
 		int x = X_PADDING;
 		
 		// Tabs
-		int buttonWidth = (this.screen.width - 2 * X_PADDING) / ModConfig.Type.values().length;
+		int tabButtonWidth = (this.screen.width - 2 * X_PADDING) / ModConfig.Type.values().length;
 		int i = 0;
 		for (ModConfig config : screen.getModConfigs())
 		{
+			//TODO [#1] Don't save on switching config type
 			final int index = i;
-			Button b = new Button(x, Y_PADDING, buttonWidth, 20, new StringTextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
+			Button b = new Button(x, Y_PADDING, tabButtonWidth, 20, new StringTextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
 			b.active = index != screen.getCurrentConfigIndex();
 			this.components.add(b);
 			
-			x += buttonWidth;
+			x += tabButtonWidth;
 			i++;
 		}
 		
@@ -63,9 +66,16 @@ public class GuiRoot extends FocusableGui implements INestedGuiComponent
 		this.components.add(this.searchField);
 		
 		// Scroll
-		this.scrollPane = new BetterScrollPane(screen.getMinecraft(), X_PADDING, Y_PADDING + CONTAINER_HEADER_HEIGHT, screen.width - 2 * X_PADDING, screen.height - 2 * Y_PADDING - CONTAINER_HEADER_HEIGHT, content);
+		this.scrollPane = new BetterScrollPane(screen.getMinecraft(), X_PADDING, Y_PADDING + CONTAINER_HEADER_HEIGHT, screen.width - 2 * X_PADDING, screen.height - 2 * Y_PADDING - CONTAINER_HEADER_HEIGHT - CONTAINER_FOOTER_HEIGHT, content);
 		this.components.add(this.scrollPane);
 		this.scrollPane.setYgetHeight(Y_PADDING + CONTAINER_HEADER_HEIGHT, this.filter);
+		
+		// Cancel/Save buttons
+		int buttonWidth = (this.screen.width - 2 * X_PADDING) / 2;
+		Button cancelButton = new Button(X_PADDING, screen.height - Y_PADDING - 20, buttonWidth, 20, new TranslationTextComponent(CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_TOOLTIP);
+		this.components.add(cancelButton);
+		Button saveButton = new Button(X_PADDING + buttonWidth, screen.height - Y_PADDING - 20, buttonWidth, 20, new TranslationTextComponent(SAVE_CONFIG_KEY), thisButton -> this.screen.closeScreen(), Button.NO_TOOLTIP);
+		this.components.add(saveButton);
 	}
 	
 	// Layout

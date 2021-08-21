@@ -22,7 +22,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 	
 	protected ListBase(List<P> properties)
 	{
-		super(properties, IReadableProperty::get);
+		super(properties, IReadableProperty::getValue);
 		this.elementProperties = Collections.unmodifiableList(this.parent);
 	}
 
@@ -47,7 +47,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 	protected void addElement(int index, P newProperty)
 	{
 		ListBase.this.parent.add(index, newProperty);
-		listeners.forEach(l -> l.onElementAdded(index, newProperty.get()));
+		listeners.forEach(l -> l.onElementAdded(index, newProperty.getValue()));
 	}
 
 	protected P removeElement(int index)
@@ -68,7 +68,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		}
 
 		@Override
-		public T get()
+		public T getValue()
 		{
 			return this.currentValue;
 		}

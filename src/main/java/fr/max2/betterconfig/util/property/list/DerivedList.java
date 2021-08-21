@@ -37,7 +37,7 @@ public class DerivedList<T, R> extends ListBase<R, IReadableProperty<R>>
 	{
 		public DerivedProperty(int index, IReadableProperty<? extends T> baseProperty)
 		{
-			super(derivationMapper.apply(index, baseProperty.get()));
+			super(derivationMapper.apply(index, baseProperty.getValue()));
 			baseProperty.onChanged(newVal -> this.setValue(derivationMapper.apply(index, newVal)));
 		}
 	}

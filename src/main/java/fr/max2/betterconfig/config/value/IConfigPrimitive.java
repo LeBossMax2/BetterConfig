@@ -1,13 +1,15 @@
 package fr.max2.betterconfig.config.value;
 
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
+import fr.max2.betterconfig.util.property.IReadableProperty;
 
-public interface IConfigPrimitive<T> extends IConfigNode<T>
+public interface IConfigPrimitive<T> extends IConfigNode<T>, IReadableProperty<T>
 {
 	/**
 	 * Gets the current configuration value
 	 * @return the current temporary value
 	 */
+	@Override
 	T getValue();
 	
 	/**

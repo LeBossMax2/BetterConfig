@@ -8,7 +8,6 @@ import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
 import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.client.gui.FocusableGui;
 
-//TODO [1.0] Add save / discard changes buttons
 /** The ui for a group of components */
 public class GuiGroup extends FocusableGui implements INestedGuiComponent, IBetterElement
 {

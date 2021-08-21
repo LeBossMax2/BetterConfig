@@ -44,6 +44,8 @@ public class BetterConfigScreen extends Screen
 	/** The current user interface */
 	private IGuiComponent ui;
 	
+	private boolean autoSave = true;
+	
 	protected BetterConfigScreen(IConfigUIBuilder uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
 	{
 		super(new StringTextComponent(mod.getModId() + " configuration : " + configs.get(index).getFileName()));
@@ -82,6 +84,14 @@ public class BetterConfigScreen extends Screen
 	@Override
 	public void onClose()
 	{
+		if (this.autoSave)
+		{
+			saveChanges();
+		}
+	}
+	
+	public void saveChanges()
+	{
 		if (this.configChanged())
 		{
 			// Save changes to config
@@ -89,8 +99,18 @@ public class BetterConfigScreen extends Screen
 			{
 				property.sendChanges();
 			}
+			this.modifiedProperties.clear();
 			// After a save, ConfigFileTypeHandler automatically sends config update event if you're lucky
             this.currentConfig.save();
+		}
+	}
+	
+	public void cancelChanges()
+	{
+		if (this.configChanged())
+		{
+			this.autoSave = false;
+			this.openConfig(this.configIndex);
 		}
 	}
 	
@@ -179,7 +199,7 @@ public class BetterConfigScreen extends Screen
 	{
 		return (mc, prevScreen) ->
 		{
-			// TODO [1.1] Get ui builder and style from mod properties
+			// TODO [#2] Get ui builder and style from mod properties
 			IConfigUIBuilder uiBuilder = BetterConfigBuilder::build;
 			BetterConfigScreen screen = new BetterConfigScreen(uiBuilder, mod, configs, 0);
 			screen.setPrevScreen(prevScreen);

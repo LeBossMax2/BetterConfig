@@ -30,6 +30,6 @@ public class ObservableList<T> extends ListBase<T, ListBase.PropertyBase<T>>
 	@Override
 	public T remove(int index)
 	{
-		return this.removeElement(index).get();
+		return this.removeElement(index).getValue();
 	}
 }

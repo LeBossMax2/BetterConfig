@@ -38,6 +38,8 @@ public class ModLanguagesProvider implements IDataProvider
 		add(CycleOptionButton.NO_OPTION_KEY, "NONE", "AUCUN");
 		add(CycleOptionButton.TRUE_OPTION_KEY, "ON", "Oui");
 		add(CycleOptionButton.FALSE_OPTION_KEY, "OFF", "Non");
+		add(Constants.CANCEL_CONFIG_KEY, "Cancel changes", "Annuler les modifications");
+		
 		add(Constants.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
 		add(Constants.SEARCH_BAR_KEY, "Search", "Rechercher");
 		add(Constants.ADD_ELEMENT_KEY, "Add", "Ajouter");

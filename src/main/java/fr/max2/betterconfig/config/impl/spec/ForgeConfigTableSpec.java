@@ -29,13 +29,14 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	/** The table containing the specification of each entry */
 	private final UnmodifiableConfig spec;
 	
-	private Map<String, ConfigTableEntrySpec> specMap;
+	private final Map<String, ConfigTableEntrySpec> specMap;
 	
 	private ForgeConfigTableSpec(ConfigLocation loc, UnmodifiableConfig spec, Function<ConfigLocation, String> levelComments)
 	{
 		this.levelComments = levelComments;
 		this.spec = spec;
 		this.tableLoc = loc;
+		this.specMap = new MappedMapView<>(this.spec.valueMap(), (key, childSpec) -> childNode(key, childSpec));
 	}
 	
 	public ForgeConfigTableSpec(ForgeConfigSpec spec)
@@ -46,7 +47,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	@Override
 	public UnmodifiableConfig getDefaultValue()
 	{
-		throw new UnsupportedOperationException(); // TODO [2.0] Implement default value for tables
+		throw new UnsupportedOperationException(); // TODO [#5] Implement default value for tables
 	}
 	
 	/** Gets the comments from the spec */
@@ -59,10 +60,6 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	@Override
 	public Map<String, ConfigTableEntrySpec> getSpecMap()
 	{
-		if (this.specMap == null)
-		{
-			this.specMap = new MappedMapView<>(this.spec.valueMap(), (key, spec) -> childNode(key, spec));
-		}
 		return this.specMap;
 	}
 	
@@ -130,7 +127,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 			}
 			if (UnmodifiableConfig.class.isAssignableFrom(valClass))
 			{
-				// TODO [2.0] Implement list of tables
+				// TODO [#5] Implement list of tables
 				// Don't know how to deal with list of tables
 				return new ForgeListPrimitiveSpec<>(Object.class);
 			}

@@ -186,7 +186,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 			ConfigValue<T> configVal = (ConfigValue<T>)param;
 			ForgeConfigPrimitive<T, TableChildInfo> node = new ForgeConfigPrimitive<>(primitiveSpec, this.info, configVal.get());
 			ForgeConfigProperty<T> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getValue);
-			node.addChangeListener(property::onValueChanged);
+			node.onChanged(newVal -> property.onValueChanged());
 			return node;
 		}
 	}

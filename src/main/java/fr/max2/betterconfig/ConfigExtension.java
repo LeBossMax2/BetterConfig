@@ -63,7 +63,7 @@ public class ConfigExtension
 	/** Checks if the given config can be edited */
 	private static boolean isConfigEditable(ModConfig config)
 	{
-		// TODO [2.0] Allow default server config to be changed
+		// TODO [#3, #4] Allow server config to be changed
 		return config.getSpec().isLoaded();
 	}
 }

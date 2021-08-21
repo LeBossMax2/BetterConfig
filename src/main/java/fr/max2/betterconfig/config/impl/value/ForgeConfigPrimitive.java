@@ -1,15 +1,16 @@
 package fr.max2.betterconfig.config.impl.value;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.util.property.IListener;
 
 public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<T, IConfigPrimitiveSpec<T>, Info> implements IConfigPrimitive<T>
 {
-	private final List<Runnable> elemChangeListeners = new ArrayList<>();
+	protected final Set<IListener<T>> listeners = new HashSet<>();
 	private final T initialValue;
 	private T currentValue;
 	
@@ -18,12 +19,6 @@ public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeC
 		super(spec, info);
 		this.initialValue = initialValue;
 		this.currentValue = initialValue;
-	}
-	
-	public ForgeConfigPrimitive<T, Info> addChangeListener(Runnable listener)
-	{
-		this.elemChangeListeners.add(listener);
-		return this;
 	}
 	
 	@Override
@@ -39,15 +34,33 @@ public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeC
 	}
 
 	@Override
-	public void setValue(T value)
+	public void setValue(T newValue)
 	{
-		this.currentValue = value;
-		this.elemChangeListeners.forEach(Runnable::run);
+		this.currentValue = newValue;
+		this.onValiChanged();
 	}
 	
 	@Override
 	public void undoChanges()
 	{
-		this.currentValue = this.initialValue;
+		this.setValue(this.initialValue);
+	}
+
+
+	@Override
+	public void onChanged(IListener<T> listener)
+	{
+		this.listeners.add(listener);
+	}
+	
+	@Override
+	public void removeOnChangedListener(IListener<? super T> listener)
+	{
+		this.listeners.remove(listener);
+	}
+	
+	protected void onValiChanged()
+	{
+		this.listeners.forEach(l -> l.onValueChanged(this.currentValue));
 	}
 }

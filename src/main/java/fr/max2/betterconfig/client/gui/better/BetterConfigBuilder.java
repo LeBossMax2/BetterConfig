@@ -154,6 +154,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	@Override
 	public IBetterElement visitBoolean(IConfigPrimitive<Boolean> property, Void entry)
 	{
+		//TODO [#1] Make displayed value update when config value change 
 		return OptionButton.booleanOption(this.screen.width - VALUE_OFFSET, property);
 	}
 	
@@ -183,7 +184,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	
 	private static class ListElemInfo
 	{
-		private int index; //TODO [1.0] Find an alternative to this int holder class
+		private int index; //TODO [#2] Find an alternative to this int holder class
 		
 		public ListElemInfo(int index)
 		{

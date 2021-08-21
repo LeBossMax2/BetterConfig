@@ -56,9 +56,8 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 		this.screen = screen;
 		this.property = property;
 		this.content = content;
-		// TODO [1.0] Actually make the undo button undo the change
-		// TODO [2.0] Gray out the button when value is unchanged
-		// TODO [2.0] Add reset to default button
+		// TODO [#2] Gray out the button when value is unchanged
+		// TODO [#2] Add reset to default button
 		this.button = new BetterButton.Icon(screen, this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4, 48, 0, new TranslationTextComponent(UNDO_TOOLTIP_KEY), thiz ->
 		{
 			property.undoChanges();
