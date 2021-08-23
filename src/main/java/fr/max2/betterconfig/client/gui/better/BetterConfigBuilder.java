@@ -113,6 +113,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 			@Override
 			public void invalidate()
 			{
+				super.invalidate();
 				content.removeOnChangedListener(listListener);
 			}
 		});

@@ -222,4 +222,10 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 			GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY, this.screen.width, this.screen.height, 200, font);
 		}
 	}
+	
+	@Override
+	public void invalidate()
+	{
+		this.content.invalidate();
+	}
 }

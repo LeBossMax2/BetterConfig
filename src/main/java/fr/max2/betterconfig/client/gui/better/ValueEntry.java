@@ -175,4 +175,10 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 			GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY + yOffset, this.screen.width, this.screen.height, 200, font);
 		}
 	}
+	
+	@Override
+	public void invalidate()
+	{
+		this.children.forEach(IGuiComponent::invalidate);
+	}
 }
