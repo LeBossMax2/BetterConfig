@@ -78,9 +78,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		
 		List<ListElemInfo> entries = new ArrayList<>();
 		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, offset, mainElements, entries, index));
-		mainElements.add(1, new GuiGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, content));
-		
-		content.onChanged(new IListListener<IBetterElement>()
+		IListListener<IBetterElement> listListener = new IListListener<IBetterElement>()
 		{
 			@Override
 			public void onElementAdded(int index, IBetterElement newValue)
@@ -109,7 +107,17 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 				
 				mainGroup.updateLayout();
 			}
+		};
+		mainElements.add(1, new GuiGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, content)
+		{
+			@Override
+			public void invalidate()
+			{
+				content.removeOnChangedListener(listListener);
+			}
 		});
+		
+		content.onChanged(listListener);
 
 		
 		if (entries.size() >= 1)
