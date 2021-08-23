@@ -38,4 +38,7 @@ public interface IGuiComponent extends IRenderable, IGuiEventListener
 	 */
 	default void onLayoutChanged()
 	{ }
+	
+	default void invalidate()
+	{ }
 }

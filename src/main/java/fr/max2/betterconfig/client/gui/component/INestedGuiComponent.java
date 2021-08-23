@@ -57,4 +57,13 @@ public interface INestedGuiComponent extends IGuiComponent, INestedGuiEventHandl
 			elem.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 		}
 	}
+	
+	@Override
+	default void invalidate()
+	{
+		for (IGuiComponent elem : this.getEventListeners())
+		{
+			elem.invalidate();
+		}
+	}
 }

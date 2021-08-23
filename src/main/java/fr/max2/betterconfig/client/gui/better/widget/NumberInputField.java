@@ -7,6 +7,7 @@ import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.ITextComponent;
 
@@ -17,6 +18,7 @@ public class NumberInputField<N extends Number> extends NumberField<N> implement
 {
 	/** The property to edit */
 	private final IConfigPrimitive<N> property;
+	private final IListener<N> propertyListener;
 
 	public NumberInputField(FontRenderer fontRenderer, int x, INumberType<N> numberType, IConfigPrimitive<N> property, ITextComponent title)
 	{
@@ -24,7 +26,8 @@ public class NumberInputField<N extends Number> extends NumberField<N> implement
 		this.property = property;
 		this.inputField.setResponder(this::updateTextColor);
 		
-		property.onChanged(this::setValue);
+		this.propertyListener = this::setValue;
+		this.property.onChanged(this.propertyListener);
 	}
 
 	/** Updates the color of the text to indicates an error */
@@ -56,6 +59,12 @@ public class NumberInputField<N extends Number> extends NumberField<N> implement
 		{
 			this.property.setValue(value);
 		}
+	}
+	
+	@Override
+	public void invalidate()
+	{
+		this.property.removeOnChangedListener(this.propertyListener);
 	}
 
 	/** Creates a widget for number values */

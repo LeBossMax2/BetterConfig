@@ -64,7 +64,6 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 		}, new TranslationTextComponent(UNDO_TOOLTIP_KEY));
 		this.children = Arrays.asList(content, this.button);
 		this.baseX = x;
-		this.updateTexts();
 	}
 	
 	// Layout

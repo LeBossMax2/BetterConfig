@@ -1,9 +1,11 @@
 package fr.max2.betterconfig.config.impl.value;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
@@ -38,7 +40,11 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		this.changeListener = changeListener;
 		
 		this.configValues = configValues;
-		this.valueMap = new MappedMapView<>(this.getSpec().getSpecMap(), (key, value) -> childNode(key, value));
+		this.valueMap = new LinkedHashMap<>();
+		for (Map.Entry<String, ConfigTableEntrySpec> entry : this.getSpec().getSpecMap().entrySet())
+		{
+			this.valueMap.put(entry.getKey(), childNode(entry.getKey(), entry.getValue()));
+		}
 	}
 	
 	public static ForgeConfigTable<?> create(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?>> changeListener)
@@ -189,5 +195,11 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 			node.onChanged(newVal -> property.onValueChanged());
 			return node;
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "{" + this.getValueMap().entrySet().stream().map(pair -> pair.getKey() + ": " + pair.getValue()).collect(Collectors.joining(", ")) + "}";
 	}
 }

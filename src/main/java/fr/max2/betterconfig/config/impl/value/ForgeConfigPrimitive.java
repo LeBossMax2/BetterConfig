@@ -10,7 +10,7 @@ import fr.max2.betterconfig.util.property.IListener;
 
 public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<T, IConfigPrimitiveSpec<T>, Info> implements IConfigPrimitive<T>
 {
-	protected final Set<IListener<T>> listeners = new HashSet<>();
+	protected final Set<IListener<? super T>> listeners = new HashSet<>();
 	private final T initialValue;
 	private T currentValue;
 	
@@ -48,7 +48,7 @@ public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeC
 
 
 	@Override
-	public void onChanged(IListener<T> listener)
+	public void onChanged(IListener<? super T> listener)
 	{
 		this.listeners.add(listener);
 	}
@@ -62,5 +62,11 @@ public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeC
 	protected void onValiChanged()
 	{
 		this.listeners.forEach(l -> l.onValueChanged(this.currentValue));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.getValue().toString();
 	}
 }

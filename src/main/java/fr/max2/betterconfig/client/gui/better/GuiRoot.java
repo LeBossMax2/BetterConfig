@@ -50,7 +50,6 @@ public class GuiRoot extends FocusableGui implements INestedGuiComponent
 		int i = 0;
 		for (ModConfig config : screen.getModConfigs())
 		{
-			//TODO [#1] Don't save on switching config type
 			final int index = i;
 			Button b = new Button(x, Y_PADDING, tabButtonWidth, 20, new StringTextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
 			b.active = index != screen.getCurrentConfigIndex();

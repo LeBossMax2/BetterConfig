@@ -1,5 +1,6 @@
 package fr.max2.betterconfig.config.impl.spec;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -11,7 +12,6 @@ import fr.max2.betterconfig.config.spec.ConfigLocation;
 import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
-import fr.max2.betterconfig.util.MappedMapView;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.LanguageMap;
 import net.minecraft.util.text.StringTextComponent;
@@ -36,7 +36,11 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 		this.levelComments = levelComments;
 		this.spec = spec;
 		this.tableLoc = loc;
-		this.specMap = new MappedMapView<>(this.spec.valueMap(), (key, childSpec) -> childNode(key, childSpec));
+		this.specMap = new LinkedHashMap<>();
+		for (Map.Entry<String, Object> entry : this.spec.valueMap().entrySet())
+		{
+			this.specMap.put(entry.getKey(), childNode(entry.getKey(), entry.getValue()));
+		}
 	}
 	
 	public ForgeConfigTableSpec(ForgeConfigSpec spec)
@@ -88,7 +92,6 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
     		
     		if (List.class.isAssignableFrom(valueClass))
     		{
-        		name.mergeStyle(TextFormatting.BOLD, TextFormatting.YELLOW);
     			valSpec = new ForgeConfigListSpec<>(getSpecForValues((List<?>)forgeSpec.getDefault()));
     		}
     		else

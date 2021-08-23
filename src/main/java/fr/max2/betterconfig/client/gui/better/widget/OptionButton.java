@@ -9,6 +9,7 @@ import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.CycleOptionButton;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -18,6 +19,9 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 /** The widget for option buttons */
 public class OptionButton<V> extends CycleOptionButton<V> implements IBetterElement
 {
+	private final IConfigPrimitive<V> property;
+	private final IListener<V> propertyListener;
+	
 	private OptionButton(int xPos, List<? extends V> acceptedValues,
 		Function<? super V, ITextComponent> valueToText, IConfigPrimitive<V> property)
 	{
@@ -27,7 +31,9 @@ public class OptionButton<V> extends CycleOptionButton<V> implements IBetterElem
 			property.getValue(), thiz -> property.setValue(thiz.getCurrentValue()),
 			NO_TOOLTIP);
 		
-		property.onChanged(this::setCurrentValue);
+		this.property = property;
+		this.propertyListener = this::setCurrentValue;
+		this.property.onChanged(this.propertyListener);
 	}
 
 	@Override
@@ -56,5 +62,11 @@ public class OptionButton<V> extends CycleOptionButton<V> implements IBetterElem
 			Arrays.asList(((Class<E>)property.getSpec().getValueClass()).getEnumConstants()),
 			enuw -> new StringTextComponent(enuw.name()),
 			property);
+	}
+	
+	@Override
+	public void invalidate()
+	{
+		this.property.removeOnChangedListener(this.propertyListener);
 	}
 }

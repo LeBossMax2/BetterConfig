@@ -2,6 +2,7 @@ package fr.max2.betterconfig.config.impl.value;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
@@ -117,6 +118,12 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 	private void onValueChanged()
 	{
 		this.elemChangeListeners.forEach(Runnable::run);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "[" + getValueList().stream().map(val -> val.toString()).collect(Collectors.joining(", ")) + "]";
 	}
 	
 	private static interface IElementBuilder<T>

@@ -29,14 +29,12 @@ public class BetterConfigScreen extends Screen
 	
 	/** The list of available configurations in the mod */
 	private final List<ModConfig> modConfigs;
-	/** The index of the current edited configuration in the list */
-	private final int configIndex;
-	/** The current edited configuration */
-	private final ModConfig currentConfig;
 	/** The current edited configuration table */
-	private final IConfigTable currentTable;
+	private final IConfigTable[] currentTables;
 	/** The set of properties that changed and need to be saved */
 	private final Set<ForgeConfigProperty<?>> modifiedProperties = new HashSet<>();
+	/** The index of the current edited configuration in the list */
+	private int configIndex;
 	
 	/** The screen to open when this screen closes */
 	private Screen prevScreen = null;
@@ -53,16 +51,19 @@ public class BetterConfigScreen extends Screen
 		this.mod = mod;
 		this.modConfigs = configs;
 		this.configIndex = index;
-		this.currentConfig = this.modConfigs.get(this.configIndex);
-		this.currentTable = ForgeConfigTable.create(this.currentConfig.getSpec(), this::onPropertyChanged);
+		this.currentTables = new IConfigTable[configs.size()];
 	}
 	
 	@Override
 	protected void init()
 	{
-		this.modifiedProperties.clear();
+		if (this.ui != null)
+			this.ui.invalidate();
+		
+		if (this.currentTables[this.configIndex] == null)
+			this.currentTables[this.configIndex] = ForgeConfigTable.create(this.modConfigs.get(this.configIndex).getSpec(), this::onPropertyChanged);
 		// Builds the user interface
-		this.ui = this.uiBuilder.build(this, this.currentTable);
+		this.ui = this.uiBuilder.build(this, this.currentTables[this.configIndex]);
 		this.addListener(this.ui);
 	}
 
@@ -85,9 +86,7 @@ public class BetterConfigScreen extends Screen
 	public void onClose()
 	{
 		if (this.autoSave)
-		{
 			saveChanges();
-		}
 	}
 	
 	public void saveChanges()
@@ -101,7 +100,7 @@ public class BetterConfigScreen extends Screen
 			}
 			this.modifiedProperties.clear();
 			// After a save, ConfigFileTypeHandler automatically sends config update event if you're lucky
-            this.currentConfig.save();
+			this.getCurrentConfig().save();
 		}
 	}
 	
@@ -110,7 +109,10 @@ public class BetterConfigScreen extends Screen
 		if (this.configChanged())
 		{
 			this.autoSave = false;
-			this.openConfig(this.configIndex);
+			// Reopen gui
+			BetterConfigScreen newScreen = new BetterConfigScreen(this.uiBuilder, this.mod, this.modConfigs, this.configIndex);
+			newScreen.setPrevScreen(this.prevScreen);
+			this.minecraft.displayGuiScreen(newScreen);
 		}
 	}
 	
@@ -155,9 +157,9 @@ public class BetterConfigScreen extends Screen
 	public void openConfig(int index)
 	{
 		Preconditions.checkElementIndex(index, this.modConfigs.size(), "index must be insize mod config list");
-		BetterConfigScreen newScreen = new BetterConfigScreen(this.uiBuilder, this.mod, this.modConfigs, index);
-		newScreen.setPrevScreen(this.prevScreen);
-		this.minecraft.displayGuiScreen(newScreen);
+		this.configIndex = index;
+		this.init(this.minecraft, this.width, this.height);
+		
 	}
 
 	/** Gets the mod this configuration is from */
@@ -181,7 +183,7 @@ public class BetterConfigScreen extends Screen
 	/** Gets the current edited configuration */
 	public ModConfig getCurrentConfig()
 	{
-		return this.currentConfig;
+		return this.modConfigs.get(this.configIndex);
 	}
 
 	/** Gets the font renderer of the screen */

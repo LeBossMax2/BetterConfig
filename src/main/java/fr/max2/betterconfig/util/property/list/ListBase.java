@@ -59,7 +59,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 	
 	protected static class PropertyBase<T> implements IReadableProperty<T>
 	{
-		protected final Set<IListener<T>> listeners = new HashSet<>();
+		protected final Set<IListener<? super T>> listeners = new HashSet<>();
 		protected T currentValue;
 
 		protected PropertyBase(T initialValue)
@@ -74,7 +74,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		}
 
 		@Override
-		public void onChanged(IListener<T> listener)
+		public void onChanged(IListener<? super T> listener)
 		{
 			this.listeners.add(listener);
 		}

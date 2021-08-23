@@ -5,6 +5,7 @@ import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.ITextComponent;
 
@@ -15,6 +16,7 @@ public class StringInputField extends TextField implements IBetterElement
 {
 	/** The property to edit */
 	private final IConfigPrimitive<String> property;
+	private final IListener<String> propertyListener;
 	
 	private StringInputField(FontRenderer fontRenderer, int x, IConfigPrimitive<String> property, ITextComponent title)
 	{
@@ -23,7 +25,8 @@ public class StringInputField extends TextField implements IBetterElement
 		this.setText(property.getValue());
 		this.setResponder(this::updateTextColor);
 		
-		property.onChanged(this::setText);
+		this.propertyListener = this::setText;
+		this.property.onChanged(this.propertyListener);
 	}
 	
 	/** Updates the color of the text to indicates an error */
@@ -46,6 +49,12 @@ public class StringInputField extends TextField implements IBetterElement
 		{
 			this.property.setValue(text);
 		}
+	}
+	
+	@Override
+	public void invalidate()
+	{
+		this.property.removeOnChangedListener(this.propertyListener);
 	}
 
 	/** Creates a widget for string values */
