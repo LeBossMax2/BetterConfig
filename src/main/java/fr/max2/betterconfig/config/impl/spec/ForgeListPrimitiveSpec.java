@@ -8,7 +8,7 @@ public class ForgeListPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 {
 	private final Class<? super T> valueClass;
 
-	public ForgeListPrimitiveSpec(Class<? super T> valueClass)
+	public ForgeListPrimitiveSpec(Class<T> valueClass)
 	{
 		this.valueClass = valueClass;
 	}

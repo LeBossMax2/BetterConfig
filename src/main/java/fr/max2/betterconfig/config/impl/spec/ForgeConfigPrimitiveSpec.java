@@ -9,7 +9,7 @@ public class ForgeConfigPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 	private final ValueSpec spec;
 	private final Class<? super T> valueClass;
 
-	public ForgeConfigPrimitiveSpec(ValueSpec spec, Class<? super T> valueClass)
+	public ForgeConfigPrimitiveSpec(ValueSpec spec, Class<T> valueClass)
 	{
 		this.spec = spec;
 		this.valueClass = valueClass;
