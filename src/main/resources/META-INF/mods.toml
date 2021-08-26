@@ -27,7 +27,7 @@ displayName="BetterConfig"
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://github.com/LeBossMax2/BetterConfig" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-# logoFile="examplemod.png" #optional
+logoFile="BetterConfig-Logo.png" #optional
 # A text field displayed in the mod UI
 # credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI
