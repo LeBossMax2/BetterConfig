@@ -1,10 +1,12 @@
-package fr.max2.betterconfig.client.gui.component;
+package fr.max2.betterconfig.client.gui.component.widget;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import fr.max2.betterconfig.BetterConfig;
+import fr.max2.betterconfig.client.gui.component.IComponentParent;
+import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
@@ -28,9 +30,9 @@ public class CycleOptionButton<V> extends Button
 	private int index;
 
 	@SuppressWarnings("unchecked")
-	public CycleOptionButton(int xPos, int yPos, int width, int height, List<? extends V> acceptedValues, Function<? super V, Component> valueToText, V currentValue, Consumer<CycleOptionButton<V>> handler, OnTooltip tooltip)
+	public CycleOptionButton(IComponentParent layoutManager, List<? extends V> acceptedValues, Function<? super V, Component> valueToText, V currentValue, Consumer<CycleOptionButton<V>> handler, OnTooltip tooltip)
 	{
-		super(xPos, yPos, width, height, getValueText(valueToText, currentValue), thiz ->
+		super(layoutManager, getValueText(valueToText, currentValue), thiz ->
 		{
 			CycleOptionButton<V> thisButton = ((CycleOptionButton<V>)thiz); 
 			thisButton.cycleOption();
@@ -50,7 +52,7 @@ public class CycleOptionButton<V> extends Button
 	protected void setCurrentValue(V newValue)
 	{
 		this.index = this.acceptedValues.indexOf(newValue);
-		this.setMessage(getValueText(this.valueToText, newValue));
+		this.widget.setMessage(getValueText(this.valueToText, newValue));
 	}
 	
 	/** Selects the next available option */
@@ -61,7 +63,7 @@ public class CycleOptionButton<V> extends Button
 		{
 			this.index = 0;
 		}
-		this.setMessage(getValueText(this.valueToText, this.getCurrentValue()));
+		this.widget.setMessage(getValueText(this.valueToText, this.getCurrentValue()));
 	}
 	
 	/** Gets the text corresponding to the given option value using the given translation function */

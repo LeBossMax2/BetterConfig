@@ -6,23 +6,22 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.better.BetterConfigBuilder;
-import fr.max2.betterconfig.client.gui.component.IGuiComponent;
+import fr.max2.betterconfig.client.gui.component.ComponentScreen;
+import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ModConfig;
 
-public class BetterConfigScreen extends Screen
+public class BetterConfigScreen extends ComponentScreen
 {
 	/** The config user interface builder */
 	private final IConfigUIBuilder uiBuilder;
@@ -41,9 +40,6 @@ public class BetterConfigScreen extends Screen
 	/** The screen to open when this screen closes */
 	private Screen prevScreen = null;
 	
-	/** The current user interface */
-	private IGuiComponent ui;
-	
 	private boolean autoSave = true;
 	
 	protected BetterConfigScreen(IConfigUIBuilder uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
@@ -56,26 +52,13 @@ public class BetterConfigScreen extends Screen
 		this.currentTables = new IConfigTable[configs.size()];
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void init()
 	{
-		if (this.ui != null)
-			this.ui.invalidate();
-		
 		if (this.currentTables[this.configIndex] == null)
 			this.currentTables[this.configIndex] = ForgeConfigTable.create(this.modConfigs.get(this.configIndex).<ForgeConfigSpec>getSpec().self(), this::onPropertyChanged);
 		// Builds the user interface
-		this.ui = this.uiBuilder.build(this, this.currentTables[this.configIndex]);
-		((List<GuiEventListener>)this.children()).add(this.ui);
-	}
-
-	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
-	{
-		this.ui.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.ui.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		this.setContent(this.uiBuilder.build(this, this.currentTables[this.configIndex]));
 	}
 	
 	@Override
@@ -88,6 +71,7 @@ public class BetterConfigScreen extends Screen
 	@Override
 	public void removed()
 	{
+		super.removed();
 		if (this.autoSave)
 			saveChanges();
 	}
@@ -215,6 +199,6 @@ public class BetterConfigScreen extends Screen
 	@FunctionalInterface
 	public static interface IConfigUIBuilder
 	{
-		IGuiComponent build(BetterConfigScreen screen, IConfigTable config);
+		IComponent build(BetterConfigScreen screen, IConfigTable config);
 	}
 }

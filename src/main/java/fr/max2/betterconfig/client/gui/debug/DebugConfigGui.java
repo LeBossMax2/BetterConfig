@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.ILayoutManager;
-import fr.max2.betterconfig.client.gui.component.IGuiComponent;
+import fr.max2.betterconfig.client.gui.component.UnitComponent;
+import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
@@ -21,17 +21,26 @@ import net.minecraft.client.gui.Font;
 /**
  * A user interface builder that only shows the available configuration properties but doesn't allow edition
  */
-public class DebugConfigGui  implements IGuiComponent
+public class DebugConfigGui extends UnitComponent
 {
 	/** The parent screen */
 	private final BetterConfigScreen parent;
 	/** The list of labels to display */
 	private final List<String> labels;
+	
+	private final UnitLayoutConfig config = new UnitLayoutConfig();
 
 	public DebugConfigGui(BetterConfigScreen parent, List<String> labels)
 	{
+		super(parent);
 		this.parent = parent;
 		this.labels = labels;
+	}
+
+	@Override
+	protected UnitLayoutConfig getLayoutConfig()
+	{
+		return this.config;
 	}
 
 	@Override
@@ -54,22 +63,6 @@ public class DebugConfigGui  implements IGuiComponent
 	@Override
 	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{ }
-
-	@Override
-	public void setLayoutManager(ILayoutManager manager)
-	{ }
-
-	@Override
-	public int getWidth()
-	{
-		return this.parent.width;
-	}
-
-	@Override
-	public int getHeight()
-	{
-		return this.parent.height;
-	}
 
 	/**
 	 * Builds the debug user interface

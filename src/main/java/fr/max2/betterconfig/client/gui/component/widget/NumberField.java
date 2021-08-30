@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.client.gui.component;
+package fr.max2.betterconfig.client.gui.component.widget;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,12 +7,16 @@ import java.util.Optional;
 import com.google.common.base.Strings;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import fr.max2.betterconfig.client.gui.ILayoutManager;
+import fr.max2.betterconfig.client.gui.component.CompositeComponent;
+import fr.max2.betterconfig.client.gui.component.IComponent;
+import fr.max2.betterconfig.client.gui.component.IComponentParent;
+import fr.max2.betterconfig.client.gui.layout.Axis;
+import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
+import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.INumberType.Increment;
 import fr.max2.betterconfig.client.util.INumberType.Operator;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -20,14 +24,14 @@ import net.minecraft.network.chat.Component;
  * A widget for entering a number
  * @param <N> the type of accepted number
  */
-public abstract class NumberField<N> extends AbstractContainerEventHandler implements INestedGuiComponent
+public class NumberField<N> extends CompositeComponent
 {
 	/** The default width of the '+' and '-' buttons */
 	protected static final int BUTTON_SIZE = 20;
 	/** The spacing between the buttons and the text field */
 	protected static final int SPACING = 2;
 	/** The list of children ui components */
-	protected final List<IGuiComponent> elements;
+	protected final List<IComponent> elements;
 	/** The text field to directly enter the number */
 	protected final TextField inputField;
 	/** The minus button to decrement the number */
@@ -39,17 +43,13 @@ public abstract class NumberField<N> extends AbstractContainerEventHandler imple
 	/** The current increment for each button click */
 	protected Increment currentIncrement = Increment.NORMAL;
 	
-	protected int baseX, baseY, w, h;
-	protected ILayoutManager layout;
+	private final CompositeLayoutConfig config = new CompositeLayoutConfig();
 
-	public NumberField(Font fontRenderer, int x, int y, int width, int height, Component title, INumberType<N> numberType, N value)
+	public NumberField(IComponentParent layout, Font fontRenderer, Component title, int width, int height, INumberType<N> numberType, N value)
 	{
+		super(layout);
 		this.numberType = numberType;
-		this.baseX = x;
-		this.baseY = y;
-		this.w = width;
-		this.h = height;
-		this.inputField = new TextField(fontRenderer, x + BUTTON_SIZE + SPACING + 1, y + 1, width - 2 * (BUTTON_SIZE + SPACING + 1), height - 2, title)
+		this.inputField = new TextField(layout, fontRenderer, title)
 		{
 			@Override
 			protected void onValidate(String text)
@@ -65,73 +65,35 @@ public abstract class NumberField<N> extends AbstractContainerEventHandler imple
 				}
 			}
 		};
-		this.minusButton = new Button(
-			x, y, BUTTON_SIZE, height,
+		this.minusButton = new Button(layout,
 			Increment.NORMAL.getMinusText(),
 			thisButton -> applyOperator(Operator.MINUS));
-		this.plusButton = new Button(
-			x + width - BUTTON_SIZE, y, BUTTON_SIZE, height,
+		this.plusButton = new Button(layout,
 			Increment.NORMAL.getPlusText(),
 			thisButton -> applyOperator(Operator.PLUS));
 		this.elements = Arrays.asList(this.minusButton, this.inputField, this.plusButton);
-		this.inputField.setFilter(this::isValid);
+		this.inputField.widget.setFilter(this::isValid);
 		this.setValue(value);
+		
+		this.plusButton.config.sizeOverride = new Size(BUTTON_SIZE, height);
+		this.minusButton.config.sizeOverride = new Size(BUTTON_SIZE, height);
+		this.config.sizeOverride = new Size(width, height);
+		this.config.spacing = SPACING;
+		this.config.dir = Axis.HORIZONTAL;
 	}
 	
 	// Layout
 	
 	@Override
-	public void setLayoutManager(ILayoutManager manager)
-	{
-		this.layout = manager;
-		INestedGuiComponent.super.setLayoutManager(manager);
-	}
-
-	@Override
-	public int getWidth()
-	{
-		return this.w;
-	}
-
-	@Override
-	public int getHeight()
-	{
-		return this.h;
-	}
-
-	/** Sets the x position of this button relative to the layout position */
-	public void setX(int x)
-	{
-		this.baseX = x;
-		this.inputField.setX(x + BUTTON_SIZE + SPACING + 1);
-		this.minusButton.setX(x);
-		this.plusButton.setX(x + this.w - BUTTON_SIZE);
-	}
-
-	/** Sets the y position of this button relative to the layout position */
-	public void setY(int y)
-	{
-		this.baseY = y;
-		this.inputField.setY(y + 1);
-		this.minusButton.setY(y);
-		this.plusButton.setY(y);
-	}
-	
-	@Override
-	public List<? extends IGuiComponent> children()
+	public List<? extends IComponent> getChildren()
 	{
 		return this.elements;
 	}
-	
+
 	@Override
-	public boolean isMouseOver(double mouseX, double mouseY)
+	protected CompositeLayoutConfig getLayoutConfig()
 	{
-		int x = this.baseX + this.layout.getLayoutX();
-		int y = this.baseY + this.layout.getLayoutY();
-		return mouseX >= x
-		    && mouseY >= y
-		    && mouseX < x + this.w
-		    && mouseY < y + this.h;
+		return this.config;
 	}
 	
 	// Rendering
@@ -140,7 +102,7 @@ public abstract class NumberField<N> extends AbstractContainerEventHandler imple
 	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.updateIncrement();
-		INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	// Value manipulation methods

@@ -66,32 +66,30 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
             Component name = new TextComponent(location.getName()).withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW);
         	return new ConfigTableEntrySpec(location, new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments), name, this.levelComments.apply(location));
         }
-        else
-        {
-            ValueSpec forgeSpec = (ValueSpec)spec;
-            
-            Component name = null;
-            // Try getting name from translation key 
-    		String translationKey = forgeSpec.getTranslationKey();
-    		if (!Strings.isNullOrEmpty(translationKey) && Language.getInstance().has(translationKey))
-    			name = new TranslatableComponent(translationKey);
-    		else // Get name from path
-    			name = new TextComponent(key);
-    		
-    		IConfigSpecNode<?> valSpec;
-    		Class<?> valueClass = valueClass(forgeSpec);
-    		
-    		if (List.class.isAssignableFrom(valueClass))
-    		{
-    			valSpec = new ForgeConfigListSpec<>(getSpecForValues((List<?>)forgeSpec.getDefault()));
-    		}
-    		else
-    		{
-    			valSpec = new ForgeConfigPrimitiveSpec<>(forgeSpec, valueClass);
-    		}
-            
-            return new ConfigTableEntrySpec(location, valSpec, name, forgeSpec.getComment());
-        }
+		
+        ValueSpec forgeSpec = (ValueSpec)spec;
+        
+        Component name = null;
+        // Try getting name from translation key 
+		String translationKey = forgeSpec.getTranslationKey();
+		if (!Strings.isNullOrEmpty(translationKey) && Language.getInstance().has(translationKey))
+			name = new TranslatableComponent(translationKey);
+		else // Get name from path
+			name = new TextComponent(key);
+		
+		IConfigSpecNode<?> valSpec;
+		Class<?> valueClass = valueClass(forgeSpec);
+		
+		if (List.class.isAssignableFrom(valueClass))
+		{
+			valSpec = new ForgeConfigListSpec<>(getSpecForValues((List<?>)forgeSpec.getDefault()));
+		}
+		else
+		{
+			valSpec = new ForgeConfigPrimitiveSpec<>(forgeSpec, valueClass);
+		}
+        
+        return new ConfigTableEntrySpec(location, valSpec, name, forgeSpec.getComment());
 	}
 	
 	private static Class<?> valueClass(ValueSpec spec)

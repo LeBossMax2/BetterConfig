@@ -6,86 +6,56 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.ILayoutManager;
-import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
+import fr.max2.betterconfig.client.gui.component.CompositeComponent;
+import fr.max2.betterconfig.client.gui.component.IComponent;
+import fr.max2.betterconfig.client.gui.component.IComponentParent;
+import fr.max2.betterconfig.client.gui.component.widget.Button.OnPress;
+import fr.max2.betterconfig.client.gui.layout.Axis;
+import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
+import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.config.ConfigFilter;
-import net.minecraft.client.gui.components.Button.OnPress;
-import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
-public class ListElementEntry extends AbstractContainerEventHandler implements INestedGuiComponent, IBetterElement
+public class ListElementEntry extends CompositeComponent implements IBetterElement
 {
-	private final BetterConfigScreen screen;
 	private final IBetterElement content;
-	private final IBetterElement button;
-	private final List<IBetterElement> children;
-	private final int width;
-	private int height = 0;
-	private final int baseX;
-	private int baseY;
+	private final BetterButton button;
+	private final List<IComponent> children;
 	private boolean hidden;
-	private ILayoutManager layout;
+
+	private final CompositeLayoutConfig config = new CompositeLayoutConfig();
 	
-	public ListElementEntry(BetterConfigScreen screen, IBetterElement content, int x, int width, OnPress deleteAction)
+	public ListElementEntry(BetterConfigScreen screen, IComponentParent layoutManager, IBetterElement content, OnPress deleteAction)
 	{
-		this.screen = screen;
+		super(screen);
 		this.content = content;
-		this.button = new BetterButton.Icon(screen, x, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(REMOVE_TOOLTIP_KEY));
-		this.children = Arrays.asList(content, this.button);
-		this.baseX = x;
-		this.width = width;
-	}
-
-	@Override
-	public int getWidth()
-	{
-		return this.width;
-	}
-
-	@Override
-	public int getHeight()
-	{
-		return this.height;
+		this.button = new BetterButton.Icon(screen, layoutManager, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(REMOVE_TOOLTIP_KEY));
+		this.children = Arrays.asList(this.button, content);
+		this.button.config.outerPadding = new Padding((VALUE_CONTAINER_HEIGHT - VALUE_HEIGHT) / 2, 0, 0, 0);
+		//this.config.innerPadding = new Padding(0, RIGHT_PADDING, 0, X_PADDING);?
+		this.config.dir = Axis.HORIZONTAL;
 	}
 	
 	@Override
-	public void setLayoutManager(ILayoutManager manager)
+	protected CompositeLayoutConfig getLayoutConfig()
 	{
-		this.layout = manager;
-		INestedGuiComponent.super.setLayoutManager(manager);
+		return this.config;
+	}
+	
+	@Override
+	public boolean filterElements(ConfigFilter filter)
+	{
+		this.hidden = this.content.filterElements(filter);
+		return this.hidden;
 	}
 
 	@Override
-	public int setYgetHeight(int y, ConfigFilter filter)
-	{
-		this.baseY = y;
-		this.height = this.content.setYgetHeight(y, filter);
-		this.hidden = this.height == 0;
-		this.button.setYgetHeight(y + (VALUE_CONTAINER_HEIGHT - VALUE_HEIGHT) / 2, this.hidden ? ConfigFilter.NONE : filter);
-		return this.height;
-	}
-
-	@Override
-	public List<? extends IGuiComponent> children()
+	public List<? extends IComponent> getChildren()
 	{
 		return this.children;
-	}
-	
-	@Override
-	public boolean isMouseOver(double mouseX, double mouseY)
-	{
-		if (this.hidden)
-			return false;
-		
-		int y = this.baseY  + this.layout.getLayoutY();
-		return mouseX >= this.baseX + this.layout.getLayoutX()
-		    && mouseY >= y
-		    && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING
-		    && mouseY < y + this.height;
 	}
 	
 	@Override
@@ -94,7 +64,7 @@ public class ListElementEntry extends AbstractContainerEventHandler implements I
 		if (this.hidden)
 			return;
 		
-		if (this.isMouseOver(mouseX, mouseY))
+		if (this.isPointInside(mouseX, mouseY))
 		{
 			this.button.render(matrixStack, mouseX, mouseY, partialTicks);
 		}

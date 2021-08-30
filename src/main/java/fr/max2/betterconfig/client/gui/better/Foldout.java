@@ -9,14 +9,17 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.ILayoutManager;
-import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
+import fr.max2.betterconfig.client.gui.component.CompositeComponent;
+import fr.max2.betterconfig.client.gui.component.EventState;
+import fr.max2.betterconfig.client.gui.component.IComponent;
+import fr.max2.betterconfig.client.gui.component.IComponentParent;
+import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
+import fr.max2.betterconfig.client.gui.layout.Padding;
+import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.FormattedText;
@@ -27,7 +30,7 @@ import net.minecraftforge.fmlclient.gui.GuiUtils;
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 /** The ui for a expand/collapse subsection */
-public class Foldout extends AbstractContainerEventHandler implements INestedGuiComponent, IBetterElement
+public class Foldout extends CompositeComponent implements IBetterElement
 {
 	/** The height of the fouldout header */
 	private static final int FOLDOUT_HEADER_HEIGHT = 24;
@@ -40,64 +43,53 @@ public class Foldout extends AbstractContainerEventHandler implements INestedGui
 	private final IBetterElement content;
 	/** The extra info to show on the tooltip */
 	private final List<FormattedText> extraInfo = new ArrayList<>();
-	/** The layout to notify for layout update */
-	private ILayoutManager layout;
-	/** The x coordinate of this component */
-	private final int baseX;
-	/** The y coordinate of this component */
-	private int baseY = 0;
-	/** The current height of this component */
-	private int height = 0;
 	
 	/** {@code true} when the content is collapsed, {@code false} otherwise */
 	private boolean folded = false;
 	/** Indicates if the section is hidden or not */
 	private boolean hidden = false;
 
-	public Foldout(BetterConfigScreen screen, IConfigNode<?> node, IBetterElement content, int x)
+	private final CompositeLayoutConfig config = new CompositeLayoutConfig();
+
+	public Foldout(BetterConfigScreen screen, IComponentParent layoutManager, IConfigNode<?> node, IBetterElement content)
 	{
+		super(layoutManager);
 		this.screen = screen;
 		this.node = node;
 		this.content = content;
 		this.extraInfo.add(FormattedText.of(node.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
 		this.extraInfo.addAll(node.getDisplayComment());
-		this.baseX = x;
+		
+		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING;
+		this.config.innerPadding = new Padding(FOLDOUT_HEADER_HEIGHT, 0, 0, 0);
 	}
 	
 	// Layout
-
+	
 	@Override
-	public List<? extends IGuiComponent> children()
+	public boolean filterElements(ConfigFilter filter)
 	{
-		return this.folded || this.hidden ? Collections.emptyList() : Arrays.asList(this.content);
+		boolean matchFilter = filter.matches(this.node);
+		return this.content.filterElements(matchFilter ? ConfigFilter.ALL : filter);
+	}
+	
+	@Override
+	protected CompositeLayoutConfig getLayoutConfig()
+	{
+		return this.config;
 	}
 
 	@Override
-	public int setYgetHeight(int y, ConfigFilter filter)
+	public List<? extends IComponent> getChildren()
 	{
-		boolean matchFilter = filter.matches(this.node);
-		this.baseY = y;
-		int contentHeight = this.content.setYgetHeight(y + FOLDOUT_HEADER_HEIGHT, matchFilter ? ConfigFilter.ALL : filter);
-		
-		if (contentHeight == 0)
-		{
-			// Disable this section
-			this.hidden = true;
-			this.height = 0;
-			updateTexts();
-			return 0;
-		}
-		
-		this.hidden = false;
-
-		if (this.folded)
-		{
-			contentHeight = 0;
-		}
-		
-		this.height = contentHeight + FOLDOUT_HEADER_HEIGHT;
+		return this.folded || this.hidden ? Collections.emptyList() : Arrays.asList(this.content);
+	}
+	
+	@Override
+	public void computeLayout(Rectangle availableRect)
+	{
+		super.computeLayout(availableRect);
 		updateTexts();
-		return this.height;
 	}
 	
 	private void updateTexts()
@@ -107,78 +99,42 @@ public class Foldout extends AbstractContainerEventHandler implements INestedGui
 		this.extraInfo.addAll(this.node.getDisplayComment());
 	}
 	
-	@Override
-	public void setLayoutManager(ILayoutManager manager)
-	{
-		this.layout = manager;
-		this.content.setLayoutManager(manager);
-	}
-	
-	@Override
-	public void onLayoutChanged()
-	{
-		this.content.onLayoutChanged();
-	}
-
-	@Override
-	public int getWidth()
-	{
-		return this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
-	}
-
-	@Override
-	public int getHeight()
-	{
-		return this.height;
-	}
-	
 	// Mouse interaction
 	
 	public void toggleFolding()
 	{
 		this.folded = !this.folded;
-		this.layout.marksLayoutDirty();
+		this.layoutManager.marksLayoutDirty();
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	public void mouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
 		if (this.isOverHeader(mouseX, mouseY))
 		{
 			this.screen.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			this.toggleFolding();
-			return true;
+			state.consume();
+			return;
 		}
 		
 		if (this.folded)
-			return false;
+			return;
 		
-		return super.mouseClicked(mouseX, mouseY, button);
-	}
-	
-	@Override
-	public boolean isMouseOver(double mouseX, double mouseY)
-	{
-		if (this.hidden)
-			return false;
-		
-		int y = this.baseY  + this.layout.getLayoutY();
-		return mouseX >= this.baseX + this.layout.getLayoutX()
-		    && mouseY >= y
-		    && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING
-		    && mouseY < y + this.height;
+		super.mouseClicked(mouseX, mouseY, button, state);
 	}
 	
 	private boolean isOverHeader(double mouseX, double mouseY)
 	{
 		if (this.hidden)
 			return false;
+
+		Rectangle rect = this.getRect();
 		
-		int y = this.baseY  + this.layout.getLayoutY();
-		return mouseX >= this.baseX + this.layout.getLayoutX()
-		    && mouseY >= y
-		    && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING
-		    && mouseY < y + FOLDOUT_HEADER_HEIGHT;
+		return mouseX >= rect.x
+		    && mouseY >= rect.y
+		    && mouseX < rect.getRight()
+		    && mouseY < rect.y + FOLDOUT_HEADER_HEIGHT;
 	}
 	
 	// Rendering
@@ -189,27 +145,26 @@ public class Foldout extends AbstractContainerEventHandler implements INestedGui
 		if (this.hidden)
 			return;
 		
-		INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.renderFoldoutHeader(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	protected void renderFoldoutHeader(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		int x = this.baseX  + this.layout.getLayoutX();
-		int y = this.baseY  + this.layout.getLayoutY();
+		Rectangle rect = this.getRect();
 		// Draw background
-		fill(matrixStack, x, y + 2, this.screen.width - X_PADDING - RIGHT_PADDING, y + FOLDOUT_HEADER_HEIGHT - 2, 0xC0_33_33_33);
+		fill(matrixStack, rect.x, rect.y + 2, rect.getRight(), rect.y + FOLDOUT_HEADER_HEIGHT - 2, 0xC0_33_33_33);
 
 		// Draw foreground arrow icon
 		int arrowU = this.folded ? 16 : 32;
 		int arrowV = this.isOverHeader(mouseX, mouseY) ? 16 : 0;
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, BETTER_ICONS);
-		blit(matrixStack, x, y + 4, arrowU, arrowV, 16, 16, 256, 256);
+		blit(matrixStack, rect.x, rect.y + 4, arrowU, arrowV, 16, 16, 256, 256);
 		
 		// Draw foreground text
 		Font font = this.screen.getFont(); 
-		font.draw(matrixStack, this.node.getDisplayName(), x + 16, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.lineHeight) / 2, 0xFF_FF_FF_FF);
+		font.draw(matrixStack, this.node.getDisplayName(), rect.x + 16, rect.y + 1 + (FOLDOUT_HEADER_HEIGHT - font.lineHeight) / 2, 0xFF_FF_FF_FF);
 	}
 	
 	@Override
@@ -218,7 +173,7 @@ public class Foldout extends AbstractContainerEventHandler implements INestedGui
 		if (this.hidden)
 			return;
 		
-		INestedGuiComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 		if (this.isOverHeader(mouseX, mouseY))
 		{
 			Font font = this.screen.getFont();

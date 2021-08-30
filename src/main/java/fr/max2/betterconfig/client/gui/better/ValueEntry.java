@@ -9,14 +9,18 @@ import java.util.Objects;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.ILayoutManager;
-import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
+import fr.max2.betterconfig.client.gui.component.CompositeComponent;
+import fr.max2.betterconfig.client.gui.component.IComponent;
+import fr.max2.betterconfig.client.gui.component.IComponentParent;
+import fr.max2.betterconfig.client.gui.component.UnitComponent;
+import fr.max2.betterconfig.client.gui.layout.Axis;
+import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
+import fr.max2.betterconfig.client.gui.layout.Rectangle;
+import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
@@ -27,114 +31,95 @@ import net.minecraftforge.fmlclient.gui.GuiUtils;
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 /** The container for table entries */
-public class ValueEntry extends AbstractContainerEventHandler implements INestedGuiComponent, IBetterElement
+public class ValueEntry extends CompositeComponent implements IBetterElement
 {
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	/** The edited property */
 	private final IConfigPrimitive<?> property;
-	private final IBetterElement content;
-	private final IBetterElement button;
-	private final List<IBetterElement> children;
+	private final IComponent content;
+	private final IComponent button;
+	private final List<IComponent> children;
 	/** The title of the property */
 	private List<FormattedCharSequence> nameLines;
 	/** The extra info to show on the tooltip */
 	private final List<FormattedText> extraInfo = new ArrayList<>();
-	/** The parent layout */
-	private ILayoutManager layout = ILayoutManager.NONE;
-	/** The x coordinate of the component */
-	private final int baseX;
-	/** The y coordinate of the component */
-	private int baseY = 0;
-	/** The height of the component */
-	private int height = 0;
 	/** Indicates if the property is hidden or not */
 	private boolean hidden = false;
 
-	public ValueEntry(BetterConfigScreen screen, IConfigPrimitive<?> property, IBetterElement content, int x)
+	private final CompositeLayoutConfig config = new CompositeLayoutConfig();
+
+	public ValueEntry(BetterConfigScreen screen, IComponentParent layoutManager, IConfigPrimitive<?> property, IComponent content)
 	{
+		super(layoutManager);
 		this.screen = screen;
 		this.property = property;
 		this.content = content;
 		// TODO [#2] Gray out the button when value is unchanged
 		// TODO [#2] Add reset to default button
-		this.button = new BetterButton.Icon(screen, this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
+		this.button = new BetterButton.Icon(screen, layoutManager, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
 		{
 			property.undoChanges();
 		}, new TranslatableComponent(UNDO_TOOLTIP_KEY));
-		this.children = Arrays.asList(content, this.button);
-		this.baseX = x;
+		//this.button.x = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4;
+		IComponent spacing = new UnitComponent(layoutManager)
+		{
+			private final UnitLayoutConfig config = new UnitLayoutConfig(); 
+			
+			@Override
+			public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTicks)
+			{ }
+			
+			@Override
+			protected UnitLayoutConfig getLayoutConfig()
+			{
+				return this.config;
+			}
+		};
+		this.children = Arrays.asList(spacing, content, this.button);
+		this.config.dir = Axis.HORIZONTAL;
+		this.config.sizeOverride.height = VALUE_CONTAINER_HEIGHT; // Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
+		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
+		//this.config.justification = Justification.CENTER;
+		//this.config.alignment = Alignment.END;
 	}
 	
 	// Layout
-
+	
 	@Override
-	public List<? extends IGuiComponent> children()
+	protected CompositeLayoutConfig getLayoutConfig()
 	{
-		return this.hidden ? Collections.emptyList() : this.children;
+		return this.config;
 	}
 
 	@Override
-	public int setYgetHeight(int y, ConfigFilter filter)
+	public List<? extends IComponent> getChildren()
 	{
-		this.baseY = y;
+		return this.hidden ? Collections.emptyList() : this.children;
+	}
+	
+	@Override
+	public boolean filterElements(ConfigFilter filter)
+	{
 		this.hidden = !filter.matches(this.property);
-		
-		if (this.hidden)
-		{
-			this.height = 0;
-			return 0;
-		}
-
+		return this.hidden;
+	}
+	
+	@Override
+	public void computeLayout(Rectangle availableRect)
+	{
+		super.computeLayout(availableRect);
 		updateTexts();
-		this.height = Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight);
-		for (IBetterElement elem : this.children)
-		{
-			elem.setYgetHeight(y + (this.height - VALUE_HEIGHT) / 2, ConfigFilter.ALL);
-		}
-		return this.height;
 	}
 	
 	private void updateTexts()
 	{
 		Font font = this.screen.getFont();
-		this.nameLines = font.split(this.property.getDisplayName(), this.screen.width - this.baseX - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4);
+		this.nameLines = font.split(this.property.getDisplayName(), this.screen.width /*- this.getRect().x*/ - VALUE_WIDTH - X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4);
 		this.extraInfo.clear();
 		this.extraInfo.add(FormattedText.of(this.property.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
 		this.extraInfo.addAll(this.property.getDisplayComment());
 		this.extraInfo.add((new TranslatableComponent(DEFAULT_VALUE_KEY, new TextComponent(Objects.toString(this.property.getSpec().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
-	}
-
-	@Override
-	public void setLayoutManager(ILayoutManager manager)
-	{
-		this.layout = manager;
-		for (IBetterElement elem : this.children)
-		{
-			elem.setLayoutManager(manager);
-		}
-	}
-
-	@Override
-	public int getWidth()
-	{
-		return this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
-	}
-
-	@Override
-	public int getHeight()
-	{
-		return this.height;
-	}
-	
-	@Override
-	public boolean isMouseOver(double mouseX, double mouseY)
-	{
-		if (this.hidden)
-			return false;
-		
-		int y = this.baseY + this.layout.getLayoutY();
-		return mouseX >= this.baseX + this.layout.getLayoutX() && mouseY >= y && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING && mouseY < y + this.height;
 	}
 	
 	// Rendering
@@ -145,14 +130,16 @@ public class ValueEntry extends AbstractContainerEventHandler implements INested
 		if (this.hidden)
 			return;
 		
+		Rectangle rect = this.getRect();
+		
 		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
-		if (this.isMouseOver(mouseX, mouseY))
+		if (this.isPointInside(mouseX, mouseY))
 			this.button.render(matrixStack, mouseX, mouseY, partialTicks);
 		Font font = this.screen.getFont();
-		int y = this.baseY + this.layout.getLayoutY() + (this.height - this.nameLines.size() * this.screen.getFont().lineHeight) / 2 + 1;
+		int y = rect.y + (rect.size.height - this.nameLines.size() * this.screen.getFont().lineHeight) / 2 + 1;
 		for(FormattedCharSequence line : this.nameLines)
 		{
-			font.draw(matrixStack, line, this.baseX + this.layout.getLayoutX() + 1, y, 0xFF_FF_FF_FF);
+			font.draw(matrixStack, line, rect.x + 1, y, 0xFF_FF_FF_FF);
 			y += 9;
 		}
 	}
@@ -163,9 +150,10 @@ public class ValueEntry extends AbstractContainerEventHandler implements INested
 		if (this.hidden)
 			return;
 		
-		INestedGuiComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
-		int y = this.baseY + this.layout.getLayoutY();
-		if ( mouseX >= this.baseX + this.layout.getLayoutX() && mouseY >= y && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING - VALUE_HEIGHT && mouseY < y + this.height)
+		Rectangle rect = this.getRect();
+		
+		super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		if ( mouseX >= rect.x && mouseY >= rect.y && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING - VALUE_HEIGHT && mouseY < rect.getBottom())
 		{
 			Font font = this.screen.getFont();
 			int yOffset = 0;
@@ -179,6 +167,6 @@ public class ValueEntry extends AbstractContainerEventHandler implements INested
 	@Override
 	public void invalidate()
 	{
-		this.children.forEach(IGuiComponent::invalidate);
+		this.children.forEach(IComponent::invalidate);
 	}
 }

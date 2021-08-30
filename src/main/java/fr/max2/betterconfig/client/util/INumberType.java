@@ -113,7 +113,7 @@ public interface INumberType<N>
 		/** Gets the multiplier to apply before an addition */
 		public int getMultiplier()
 		{
-			return multiplier;
+			return this.multiplier;
 		}
 	}
 }

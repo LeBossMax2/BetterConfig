@@ -9,7 +9,10 @@ import fr.max2.betterconfig.client.gui.better.widget.NumberInputField;
 import fr.max2.betterconfig.client.gui.better.widget.OptionButton;
 import fr.max2.betterconfig.client.gui.better.widget.StringInputField;
 import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
-import fr.max2.betterconfig.client.gui.component.IGuiComponent;
+import fr.max2.betterconfig.client.gui.component.IComponent;
+import fr.max2.betterconfig.client.gui.component.IComponentParent;
+import fr.max2.betterconfig.client.gui.layout.Padding;
+import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
@@ -23,7 +26,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 /** A builder for better configuration screen */
-public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterElement>, IConfigPrimitiveVisitor<Void, IBetterElement>
+public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterElement>, IConfigPrimitiveVisitor<Void, IComponent>
 {
 	/**
 	 * Builds the user interface
@@ -31,28 +34,28 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	 * @param config the edited configuration
 	 * @return the user interface
 	 */
-	public static IGuiComponent build(BetterConfigScreen screen, IConfigTable config)
+	public static IComponent build(BetterConfigScreen screen, IConfigTable config)
 	{
-		return new GuiRoot(screen, BetterConfigBuilder.buildTable(screen, config, 0));
+		return new GuiRoot(screen, lm -> new BetterConfigBuilder(screen, lm).buildTable(config));
 	}
 	
-	/** The position of the value widgets relative to the right side */
-	private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4 + VALUE_HEIGHT;
+	// private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4 + VALUE_HEIGHT;
 	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
-	private final int xOffset;
+	private final IComponentParent layoutManager;
 
-	private BetterConfigBuilder(BetterConfigScreen screen, int xOffset)
+	private BetterConfigBuilder(BetterConfigScreen screen, IComponentParent layoutManager)
 	{
 		this.screen = screen;
-		this.xOffset = xOffset;
+		this.layoutManager = layoutManager;
 	}
 	
-	private static IBetterElement buildTable(BetterConfigScreen screen, IConfigTable table, int xOffset)
+	private GuiGroup buildTable(IConfigTable table)
 	{
-		List<IBetterElement> content = table.exploreEntries(value -> value.exploreNode(new BetterConfigBuilder(screen, xOffset))).collect(Collectors.toList());
-		return new GuiGroup(screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset, content);
+		List<IBetterElement> content = table.exploreEntries(value -> value.exploreNode(this)).collect(Collectors.toList());
+		return new GuiGroup(this.layoutManager, content);
+		// config.width = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset
 	}
 	
 	// Table entry visitor
@@ -60,24 +63,26 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	@Override
 	public IBetterElement visitTable(IConfigTable table, Void entry)
 	{
-		return new Foldout(this.screen, table, buildTable(this.screen, table, this.xOffset + SECTION_TAB_SIZE), this.xOffset);
+		GuiGroup tableGroup = this.buildTable(table);
+		tableGroup.config.outerPadding = new Padding(0, 0, 0, SECTION_TAB_SIZE);
+		return new Foldout(this.screen, this.layoutManager, table, tableGroup);
 	}
 	
 	@Override
 	public <T> IBetterElement visitList(IConfigList<T> list, Void entry)
 	{
-		int offset = this.xOffset + SECTION_TAB_SIZE;
-		List<IBetterElement> mainElements = new ArrayList<>();
-		GuiGroup mainGroup = new GuiGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, mainElements);
+		List<IComponent> mainElements = new ArrayList<>();
+		GuiGroup mainGroup = new GuiGroup(this.layoutManager, mainElements);
+		mainGroup.config.outerPadding = new Padding(0, 0, 0, SECTION_TAB_SIZE);
 		
 		IReadableList<IConfigNode<T>> values = list.getValueList();
-		mainElements.add(new BetterButton(this.screen, offset, this.screen.width - offset - VALUE_OFFSET + VALUE_WIDTH, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
+		mainElements.add(new BetterButton(this.screen, this.layoutManager, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(0);
 		}, new TranslatableComponent(ADD_FIRST_TOOLTIP_KEY)));
 		
 		List<ListElemInfo> entries = new ArrayList<>();
-		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, offset, mainElements, entries, index));
+		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, entries, index));
 		IListListener<IBetterElement> listListener = new IListListener<>()
 		{
 			@Override
@@ -89,7 +94,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 				}
 				
 				if (entries.size() == 1)
-					mainElements.add(buildAddLastButton(list, offset));
+					mainElements.add(buildAddLastButton(list));
 				
 				mainGroup.updateLayout();
 			}
@@ -108,7 +113,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 				mainGroup.updateLayout();
 			}
 		};
-		mainElements.add(1, new GuiGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, content)
+		mainElements.add(1, new GuiGroup(this.layoutManager, content)
 		{
 			@Override
 			public void invalidate()
@@ -117,77 +122,80 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 				content.removeOnChangedListener(listListener);
 			}
 		});
+		// config.width = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset
 		
 		content.onChanged(listListener);
 
 		
 		if (entries.size() >= 1)
-			mainElements.add(buildAddLastButton(list, offset));
+			mainElements.add(buildAddLastButton(list));
 		
 		mainGroup.updateLayout();
 		
-		return new Foldout(this.screen, list, mainGroup, this.xOffset);
+		return new Foldout(this.screen, this.layoutManager, list, mainGroup);
 	}
 
-	private <T> BetterButton buildAddLastButton(IConfigList<T> list, int offset)
+	private <T> BetterButton buildAddLastButton(IConfigList<T> list)
 	{
-		return new BetterButton(screen, offset, screen.width - offset - VALUE_OFFSET + VALUE_WIDTH, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
+		return new BetterButton(this.screen, this.layoutManager, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(list.getValueList().size());
 		}, new TranslatableComponent(ADD_LAST_TOOLTIP_KEY));
 	}
 	
-	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, int xOffset, List<IBetterElement> content, List<ListElemInfo> entries, int index)
+	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, List<ListElemInfo> entries, int index)
 	{
 		ListElemInfo info = new ListElemInfo(index);
 		entries.add(index, info);
-		IBetterElement child = elem.exploreNode(new BetterConfigBuilder(this.screen, xOffset));
+		IBetterElement child = elem.exploreNode(this);
 		
-		return new ListElementEntry(this.screen, child, xOffset - SECTION_TAB_SIZE, this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE, deleteButton ->
+		return new ListElementEntry(this.screen, this.layoutManager, child, deleteButton ->
 		{
 			int myIndex = info.getIndex();
 			entries.remove(myIndex);
 			list.removeValueAt(myIndex);
 		});
+		// x = xOffset - SECTION_TAB_SIZE;
+		// width = this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE
 	}
 	
 	@Override
 	public <T> IBetterElement visitPrimitive(IConfigPrimitive<T> primitive, Void entry)
 	{
-		IBetterElement widget = primitive.exploreType(this, entry);
-		return new ValueEntry(this.screen, primitive, widget, this.xOffset);
+		IComponent widget = primitive.exploreType(this, entry);
+		return new ValueEntry(this.screen, this.layoutManager, primitive, widget);
 	}
 	
 	// Property visitor
 	
 	@Override
-	public IBetterElement visitBoolean(IConfigPrimitive<Boolean> property, Void entry)
+	public IComponent visitBoolean(IConfigPrimitive<Boolean> property, Void entry)
 	{
-		return OptionButton.booleanOption(this.screen.width - VALUE_OFFSET, property);
+		return OptionButton.booleanOption(this.layoutManager, property);
 	}
 	
 	@Override
-	public IBetterElement visitNumber(IConfigPrimitive<? extends Number> property, Void entry)
+	public IComponent visitNumber(IConfigPrimitive<? extends Number> property, Void entry)
 	{
-		return NumberInputField.numberOption(this.screen, this.screen.width - VALUE_OFFSET, property);
+		return NumberInputField.numberOption(this.screen, this.layoutManager, property);
 	}
 	
 	@Override
-	public IBetterElement visitString(IConfigPrimitive<String> property, Void entry)
+	public IComponent visitString(IConfigPrimitive<String> property, Void entry)
 	{
-		return StringInputField.stringOption(this.screen, this.screen.width - VALUE_OFFSET, property);
+		return StringInputField.stringOption(this.screen, this.layoutManager, property);
 	}
 	
 	@Override
-	public <E extends Enum<E>> IBetterElement visitEnum(IConfigPrimitive<E> property, Void entry)
+	public <E extends Enum<E>> IComponent visitEnum(IConfigPrimitive<E> property, Void entry)
 	{
-		return OptionButton.enumOption(this.screen.width - VALUE_OFFSET, property);
+		return OptionButton.enumOption(this.layoutManager, property);
 	}
 	
 	@Override
-	public IBetterElement visitUnknown(IConfigPrimitive<?> property, Void entry)
+	public IComponent visitUnknown(IConfigPrimitive<?> property, Void entry)
 	{
-		return new UnknownOptionWidget(this.screen.width - VALUE_OFFSET, property);
+		return new UnknownOptionWidget(this.layoutManager, property);
 	}
 	
 	private static class ListElemInfo

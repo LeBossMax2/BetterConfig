@@ -2,70 +2,60 @@ package fr.max2.betterconfig.client.gui.better;
 
 import java.util.List;
 
-import fr.max2.betterconfig.client.gui.ILayoutManager;
-import fr.max2.betterconfig.client.gui.component.IGuiComponent;
-import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
+import fr.max2.betterconfig.client.gui.component.CompositeComponent;
+import fr.max2.betterconfig.client.gui.component.IComponent;
+import fr.max2.betterconfig.client.gui.component.IComponentParent;
+import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.config.ConfigFilter;
-import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 
 /** The ui for a group of components */
-public class GuiGroup extends AbstractContainerEventHandler implements INestedGuiComponent, IBetterElement
+public class GuiGroup extends CompositeComponent implements IBetterElement
 {
 	/** The list of entries of the group */
-	private final List<IBetterElement> content;
-	private final int width;
-	private int height = 0;
-	private ILayoutManager layout;
+	private final List<IBetterElement> betterElements;
+	private final List<? extends IComponent> content;
 
-	public GuiGroup(int width, List<IBetterElement> content)
+	public final CompositeLayoutConfig config = new CompositeLayoutConfig();
+
+	public GuiGroup(IComponentParent layoutManager, List<? extends IComponent> content)
 	{
+		super(layoutManager);
 		this.content = content;
-		this.width = width;
+		this.betterElements = content.stream().filter(cmp -> cmp instanceof IBetterElement).map(cmp -> (IBetterElement)cmp).toList();
 	}
 
 	public void updateLayout()
 	{
-		if (this.layout != null)
+		this.layoutManager.marksLayoutDirty();
+	}
+	
+	@Override
+	protected CompositeLayoutConfig getLayoutConfig()
+	{
+		return this.config;
+	}
+	
+	@Override
+	public boolean filterElements(ConfigFilter filter)
+	{
+		boolean anyVisible = false;
+		for (IBetterElement child : this.betterElements)
 		{
-			INestedGuiComponent.super.setLayoutManager(this.layout);
-			this.layout.marksLayoutDirty();
+			anyVisible |= child.filterElements(filter);
 		}
+		return anyVisible;
 	}
 
 	@Override
-	public List<? extends IGuiComponent> children()
+	public List<? extends IComponent> getChildren()
 	{
 		return this.content;
 	}
 	
 	@Override
-	public void setLayoutManager(ILayoutManager manager)
+	public void invalidate()
 	{
-		this.layout = manager;
-		INestedGuiComponent.super.setLayoutManager(manager);
-	}
-	
-	@Override
-	public int setYgetHeight(int y, ConfigFilter filter)
-	{
-		int h = 0;
-		for (IBetterElement elem : this.content)
-		{
-			h += elem.setYgetHeight(y + h, filter);
-		}
-		this.height = h;
-		return h;
-	}
-
-	@Override
-	public int getWidth()
-	{
-		return this.width;
-	}
-
-	@Override
-	public int getHeight()
-	{
-		return this.height;
+		// No sure why we need this but can't compile without
+		super.invalidate();
 	}
 }
