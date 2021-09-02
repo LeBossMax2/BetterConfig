@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.better.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
@@ -14,9 +14,11 @@ import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -46,7 +48,7 @@ public class BetterConfigScreen extends Screen
 	
 	protected BetterConfigScreen(IConfigUIBuilder uiBuilder, ModContainer mod, List<ModConfig> configs, int index)
 	{
-		super(new StringTextComponent(mod.getModId() + " configuration : " + configs.get(index).getFileName()));
+		super(new TextComponent(mod.getModId() + " configuration : " + configs.get(index).getFileName()));
 		this.uiBuilder = uiBuilder;
 		this.mod = mod;
 		this.modConfigs = configs;
@@ -54,6 +56,7 @@ public class BetterConfigScreen extends Screen
 		this.currentTables = new IConfigTable[configs.size()];
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void init()
 	{
@@ -61,14 +64,14 @@ public class BetterConfigScreen extends Screen
 			this.ui.invalidate();
 		
 		if (this.currentTables[this.configIndex] == null)
-			this.currentTables[this.configIndex] = ForgeConfigTable.create(this.modConfigs.get(this.configIndex).getSpec(), this::onPropertyChanged);
+			this.currentTables[this.configIndex] = ForgeConfigTable.create(this.modConfigs.get(this.configIndex).<ForgeConfigSpec>getSpec().self(), this::onPropertyChanged);
 		// Builds the user interface
 		this.ui = this.uiBuilder.build(this, this.currentTables[this.configIndex]);
-		this.addListener(this.ui);
+		((List<GuiEventListener>)this.children()).add(this.ui);
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.ui.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -76,14 +79,14 @@ public class BetterConfigScreen extends Screen
 	}
 	
 	@Override
-	public void closeScreen()
+	public void onClose()
 	{
 		// Open back the previous screen
-		this.minecraft.displayGuiScreen(this.prevScreen);
+		this.minecraft.setScreen(this.prevScreen);
 	}
 	
 	@Override
-	public void onClose()
+	public void removed()
 	{
 		if (this.autoSave)
 			saveChanges();
@@ -112,7 +115,7 @@ public class BetterConfigScreen extends Screen
 			// Reopen gui
 			BetterConfigScreen newScreen = new BetterConfigScreen(this.uiBuilder, this.mod, this.modConfigs, this.configIndex);
 			newScreen.setPrevScreen(this.prevScreen);
-			this.minecraft.displayGuiScreen(newScreen);
+			this.minecraft.setScreen(newScreen);
 		}
 	}
 	
@@ -187,7 +190,7 @@ public class BetterConfigScreen extends Screen
 	}
 
 	/** Gets the font renderer of the screen */
-	public FontRenderer getFont()
+	public Font getFont()
 	{
 		return this.font;
 	}

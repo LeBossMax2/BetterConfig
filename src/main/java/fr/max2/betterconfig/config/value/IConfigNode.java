@@ -3,7 +3,7 @@ package fr.max2.betterconfig.config.value;
 import java.util.List;
 
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public interface IConfigNode<T>
 {
@@ -11,13 +11,13 @@ public interface IConfigNode<T>
 	
 	String getName();
 	
-	ITextComponent getDisplayName();
+	Component getDisplayName();
 
 	List<String> getPath();
 	
 	String getCommentString();
 	
-	List<? extends ITextComponent> getDisplayComment();
+	List<? extends Component> getDisplayComment();
 	
 	void undoChanges();
 	

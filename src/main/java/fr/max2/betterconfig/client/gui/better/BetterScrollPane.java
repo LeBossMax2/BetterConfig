@@ -1,6 +1,6 @@
 package fr.max2.betterconfig.client.gui.better;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.component.ScrollPane;
 import fr.max2.betterconfig.config.ConfigFilter;
@@ -123,7 +123,7 @@ public class BetterScrollPane extends ScrollPane implements IBetterElement
 	}
 	
 	@Override
-	public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.isMouseOver(mouseX, mouseY))
 			super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);

@@ -7,19 +7,19 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Strings;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class ConfigTableEntrySpec
 {
 	private ConfigLocation loc;
 	private final IConfigSpecNode<?> node;
-	private ITextComponent displayName;
+	private Component displayName;
 	private final String commentString;
 	/** The comments describing the property */
-	private List<? extends ITextComponent> commentLines = null;
+	private List<? extends Component> commentLines = null;
 	
-	public ConfigTableEntrySpec(ConfigLocation loc, IConfigSpecNode<?> node, ITextComponent displayName, String comment)
+	public ConfigTableEntrySpec(ConfigLocation loc, IConfigSpecNode<?> node, Component displayName, String comment)
 	{
 		this.loc = loc;
 		this.node = node;
@@ -45,12 +45,12 @@ public class ConfigTableEntrySpec
 	/**
 	 * Gets the display name of the property
 	 */
-	public ITextComponent getDisplayName()
+	public Component getDisplayName()
 	{
 		return this.displayName;
 	}
 	
-	public void setDisplayName(ITextComponent displayName)
+	public void setDisplayName(Component displayName)
 	{
 		this.displayName = displayName;
 	}
@@ -67,7 +67,7 @@ public class ConfigTableEntrySpec
 	 * Gets the comment associated with the config node for display
 	 * @return an unmodifiable list containing the comments
 	 */
-	public List<? extends ITextComponent> getDisplayComment()
+	public List<? extends Component> getDisplayComment()
 	{
 		if (this.commentLines == null)
 		{
@@ -78,7 +78,7 @@ public class ConfigTableEntrySpec
 			}
 			else
 			{
-				this.commentLines = Stream.of(comment.split("\n")).map(StringTextComponent::new).collect(Collectors.toList());
+				this.commentLines = Stream.of(comment.split("\n")).map(TextComponent::new).collect(Collectors.toList());
 			}
 		}
 		return this.commentLines;

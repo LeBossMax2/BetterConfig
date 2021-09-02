@@ -6,8 +6,8 @@ import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
@@ -18,14 +18,14 @@ public class StringInputField extends TextField implements IBetterElement
 	private final IConfigPrimitive<String> property;
 	private final IListener<String> propertyListener;
 	
-	private StringInputField(FontRenderer fontRenderer, int x, IConfigPrimitive<String> property, ITextComponent title)
+	private StringInputField(Font fontRenderer, int x, IConfigPrimitive<String> property, Component title)
 	{
 		super(fontRenderer, x + 1, 0, VALUE_WIDTH - 2, VALUE_HEIGHT - 2, title);
 		this.property = property;
-		this.setText(property.getValue());
+		this.setValue(property.getValue());
 		this.setResponder(this::updateTextColor);
 		
-		this.propertyListener = this::setText;
+		this.propertyListener = this::setValue;
 		this.property.onChanged(this.propertyListener);
 	}
 	

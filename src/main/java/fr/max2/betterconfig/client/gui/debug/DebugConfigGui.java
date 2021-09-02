@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
@@ -16,7 +16,7 @@ import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import fr.max2.betterconfig.util.property.list.IReadableList;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Font;
 
 /**
  * A user interface builder that only shows the available configuration properties but doesn't allow edition
@@ -35,24 +35,24 @@ public class DebugConfigGui  implements IGuiComponent
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		FontRenderer font = this.parent.getFont(); 
+		Font font = this.parent.getFont(); 
 		this.parent.renderBackground(matrixStack);
 		int y = 1;
-		font.drawString(matrixStack, "Better Config Debug", 1, y, 0xFFFFFFFF);
-		y += font.FONT_HEIGHT + 2;
-		font.drawString(matrixStack, "Configs : " + this.parent.getModConfigs().stream().map(config -> "'" + config.getFileName() + "'").collect(Collectors.joining(", ")), 1, y, 0xFFFFFFFF);
-		y += font.FONT_HEIGHT + 2;
+		font.draw(matrixStack, "Better Config Debug", 1, y, 0xFFFFFFFF);
+		y += font.lineHeight + 2;
+		font.draw(matrixStack, "Configs : " + this.parent.getModConfigs().stream().map(config -> "'" + config.getFileName() + "'").collect(Collectors.joining(", ")), 1, y, 0xFFFFFFFF);
+		y += font.lineHeight + 2;
 		for (String txt : this.labels)
 		{
-			font.drawString(matrixStack, txt, 1, y, 0xFFFFFFFF);
-			y += font.FONT_HEIGHT + 2;
+			font.draw(matrixStack, txt, 1, y, 0xFFFFFFFF);
+			y += font.lineHeight + 2;
 		}
 	}
 
 	@Override
-	public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{ }
 
 	@Override

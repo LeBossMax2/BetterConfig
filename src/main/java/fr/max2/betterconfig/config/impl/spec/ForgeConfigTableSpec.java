@@ -12,14 +12,12 @@ import fr.max2.betterconfig.config.spec.ConfigLocation;
 import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.LanguageMap;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraft.ChatFormatting;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class ForgeConfigTableSpec implements IConfigTableSpec
 {
@@ -43,22 +41,15 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 		}
 	}
 	
-	public ForgeConfigTableSpec(ForgeConfigSpec spec)
+	public ForgeConfigTableSpec(UnmodifiableConfig spec, Function<ConfigLocation, String> levelComments)
 	{
-		this(ConfigLocation.ROOT, spec.getSpec(), getSpecComments(spec));
+		this(ConfigLocation.ROOT, spec, levelComments);
 	}
 	
 	@Override
 	public UnmodifiableConfig getDefaultValue()
 	{
 		throw new UnsupportedOperationException(); // TODO [#5] Implement default value for tables
-	}
-	
-	/** Gets the comments from the spec */
-	private static Function<ConfigLocation, String> getSpecComments(ForgeConfigSpec spec)
-	{
-		Map<List<String>, String> map = ObfuscationReflectionHelper.getPrivateValue(ForgeConfigSpec.class, spec, "levelComments");
-		return loc -> map.get(loc.getPath());
 	}
 	
 	@Override
@@ -72,20 +63,20 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 		ConfigLocation location = new ConfigLocation(this.tableLoc, key);
 		if (spec instanceof UnmodifiableConfig)
         {
-            IFormattableTextComponent name = new StringTextComponent(location.getName()).mergeStyle(TextFormatting.BOLD, TextFormatting.YELLOW);
+            Component name = new TextComponent(location.getName()).withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW);
         	return new ConfigTableEntrySpec(location, new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments), name, this.levelComments.apply(location));
         }
         else
         {
             ValueSpec forgeSpec = (ValueSpec)spec;
             
-            IFormattableTextComponent name = null;
+            Component name = null;
             // Try getting name from translation key 
     		String translationKey = forgeSpec.getTranslationKey();
-    		if (!Strings.isNullOrEmpty(translationKey) && LanguageMap.getInstance().func_230506_b_(translationKey)) // func_230506_b_ is equivalent to "I18n.hasKey"
-    			name = new TranslationTextComponent(translationKey);
+    		if (!Strings.isNullOrEmpty(translationKey) && Language.getInstance().has(translationKey))
+    			name = new TranslatableComponent(translationKey);
     		else // Get name from path
-    			name = new StringTextComponent(key);
+    			name = new TextComponent(key);
     		
     		IConfigSpecNode<?> valSpec;
     		Class<?> valueClass = valueClass(forgeSpec);

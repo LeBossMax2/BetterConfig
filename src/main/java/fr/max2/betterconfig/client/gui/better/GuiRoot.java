@@ -3,7 +3,7 @@ package fr.max2.betterconfig.client.gui.better;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
@@ -12,16 +12,16 @@ import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
 import fr.max2.betterconfig.client.gui.component.TextField;
 import fr.max2.betterconfig.config.ConfigFilter;
-import net.minecraft.client.gui.FocusableGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.config.ModConfig;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 /** The container for the main section */
-public class GuiRoot extends FocusableGui implements INestedGuiComponent
+public class GuiRoot extends AbstractContainerEventHandler implements INestedGuiComponent
 {
 	/** The the height of the header */
 	private static final int CONTAINER_HEADER_HEIGHT = 60;
@@ -51,7 +51,7 @@ public class GuiRoot extends FocusableGui implements INestedGuiComponent
 		for (ModConfig config : screen.getModConfigs())
 		{
 			final int index = i;
-			Button b = new Button(x, Y_PADDING, tabButtonWidth, 20, new StringTextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
+			Button b = new Button(x, Y_PADDING, tabButtonWidth, 20, new TextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
 			b.active = index != screen.getCurrentConfigIndex();
 			this.components.add(b);
 			
@@ -60,7 +60,7 @@ public class GuiRoot extends FocusableGui implements INestedGuiComponent
 		}
 		
 		// Search bar
-		this.searchField = new TextField(screen.getFont(), X_PADDING + SEARCH_LABEL_WIDTH + 1, 20 + 2 * Y_PADDING + 1, this.screen.width - 2 * X_PADDING - SEARCH_LABEL_WIDTH - 2, 20 - 2, new TranslationTextComponent(SEARCH_BAR_KEY));
+		this.searchField = new TextField(screen.getFont(), X_PADDING + SEARCH_LABEL_WIDTH + 1, 20 + 2 * Y_PADDING + 1, this.screen.width - 2 * X_PADDING - SEARCH_LABEL_WIDTH - 2, 20 - 2, new TranslatableComponent(SEARCH_BAR_KEY));
 		this.searchField.setResponder(this::updateFilter);
 		this.components.add(this.searchField);
 		
@@ -71,16 +71,16 @@ public class GuiRoot extends FocusableGui implements INestedGuiComponent
 		
 		// Cancel/Save buttons
 		int buttonWidth = (this.screen.width - 2 * X_PADDING) / 2;
-		Button cancelButton = new Button(X_PADDING, screen.height - Y_PADDING - 20, buttonWidth, 20, new TranslationTextComponent(CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_TOOLTIP);
+		Button cancelButton = new Button(X_PADDING, screen.height - Y_PADDING - 20, buttonWidth, 20, new TranslatableComponent(CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_TOOLTIP);
 		this.components.add(cancelButton);
-		Button saveButton = new Button(X_PADDING + buttonWidth, screen.height - Y_PADDING - 20, buttonWidth, 20, new TranslationTextComponent(SAVE_CONFIG_KEY), thisButton -> this.screen.closeScreen(), Button.NO_TOOLTIP);
+		Button saveButton = new Button(X_PADDING + buttonWidth, screen.height - Y_PADDING - 20, buttonWidth, 20, new TranslatableComponent(SAVE_CONFIG_KEY), thisButton -> this.screen.onClose(), Button.NO_TOOLTIP);
 		this.components.add(saveButton);
 	}
 	
 	// Layout
 
 	@Override
-	public List<? extends IGuiComponent> getEventListeners()
+	public List<? extends IGuiComponent> children()
 	{
 		return this.components;
 	}
@@ -118,16 +118,16 @@ public class GuiRoot extends FocusableGui implements INestedGuiComponent
 	// Rendering
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.screen.renderBackground(matrixStack);
 		INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
-		FontRenderer font = this.screen.getFont();
-		font.drawText(matrixStack, this.searchField.getMessage(), X_PADDING, 20 + 2 * Y_PADDING + (20 - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+		Font font = this.screen.getFont();
+		font.draw(matrixStack, this.searchField.getMessage(), X_PADDING, 20 + 2 * Y_PADDING + (20 - font.lineHeight) / 2, 0xFF_FF_FF_FF);
 		this.renderHeader(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
-	protected void renderHeader(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void renderHeader(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{ }
 	
 }

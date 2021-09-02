@@ -3,9 +3,9 @@ package fr.max2.betterconfig.client.util;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 /**
  * Represents a type of numbers
@@ -64,31 +64,31 @@ public interface INumberType<N>
 		/** A small increment, smaller than 1 */
 		LOW("-", "+"),
 		/** A regular increment, about 1 */
-		NORMAL("-", "+", TextFormatting.BOLD),
+		NORMAL("-", "+", ChatFormatting.BOLD),
 		/** A bug increment, bigger than 1 */
-		HIGH("--", "++", TextFormatting.BOLD);
+		HIGH("--", "++", ChatFormatting.BOLD);
 		
 		/** The text to show on a plus button with this increment */
-		private final ITextComponent minusText;
+		private final Component minusText;
 		/** The text to show on a minus button with this increment */
-		private final ITextComponent plusText;
+		private final Component plusText;
 		
-		private Increment(String minusText, String plusText, TextFormatting... formats)
+		private Increment(String minusText, String plusText, ChatFormatting... formats)
 		{
-			this.minusText = new StringTextComponent(minusText).mergeStyle(formats);
-			this.plusText = new StringTextComponent(plusText).mergeStyle(formats);
+			this.minusText = new TextComponent(minusText).withStyle(formats);
+			this.plusText = new TextComponent(plusText).withStyle(formats);
 		}
 
 		/** The text to show on a plus button with this increment */
-		public ITextComponent getMinusText()
+		public Component getMinusText()
 		{
-			return minusText;
+			return this.minusText;
 		}
 
 		/** The text to show on a minus button with this increment */
-		public ITextComponent getPlusText()
+		public Component getPlusText()
 		{
-			return plusText;
+			return this.plusText;
 		}
 	}
 	

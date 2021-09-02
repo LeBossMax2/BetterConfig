@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
@@ -13,19 +14,20 @@ import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigNode;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.FocusableGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.client.gui.GuiUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraftforge.fmlclient.gui.GuiUtils;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 /** The ui for a expand/collapse subsection */
-public class Foldout extends FocusableGui implements INestedGuiComponent, IBetterElement
+public class Foldout extends AbstractContainerEventHandler implements INestedGuiComponent, IBetterElement
 {
 	/** The height of the fouldout header */
 	private static final int FOLDOUT_HEADER_HEIGHT = 24;
@@ -37,7 +39,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	/** The content that will be collapsed */
 	private final IBetterElement content;
 	/** The extra info to show on the tooltip */
-	private final List<ITextProperties> extraInfo = new ArrayList<>();
+	private final List<FormattedText> extraInfo = new ArrayList<>();
 	/** The layout to notify for layout update */
 	private ILayoutManager layout;
 	/** The x coordinate of this component */
@@ -57,7 +59,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 		this.screen = screen;
 		this.node = node;
 		this.content = content;
-		this.extraInfo.add(ITextProperties.func_240653_a_(node.getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+		this.extraInfo.add(FormattedText.of(node.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
 		this.extraInfo.addAll(node.getDisplayComment());
 		this.baseX = x;
 	}
@@ -65,7 +67,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	// Layout
 
 	@Override
-	public List<? extends IGuiComponent> getEventListeners()
+	public List<? extends IGuiComponent> children()
 	{
 		return this.folded || this.hidden ? Collections.emptyList() : Arrays.asList(this.content);
 	}
@@ -101,7 +103,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	private void updateTexts()
 	{
 		this.extraInfo.clear();
-		this.extraInfo.add(ITextProperties.func_240653_a_(this.node.getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+		this.extraInfo.add(FormattedText.of(this.node.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
 		this.extraInfo.addAll(this.node.getDisplayComment());
 	}
 	
@@ -143,7 +145,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	{
 		if (this.isOverHeader(mouseX, mouseY))
 		{
-			this.screen.getMinecraft().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+			this.screen.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			this.toggleFolding();
 			return true;
 		}
@@ -182,7 +184,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 	// Rendering
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.hidden)
 			return;
@@ -191,7 +193,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 		this.renderFoldoutHeader(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
-	protected void renderFoldoutHeader(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void renderFoldoutHeader(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		int x = this.baseX  + this.layout.getLayoutX();
 		int y = this.baseY  + this.layout.getLayoutY();
@@ -201,16 +203,17 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 		// Draw foreground arrow icon
 		int arrowU = this.folded ? 16 : 32;
 		int arrowV = this.isOverHeader(mouseX, mouseY) ? 16 : 0;
-		this.screen.getMinecraft().getTextureManager().bindTexture(BETTER_ICONS);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, BETTER_ICONS);
 		blit(matrixStack, x, y + 4, arrowU, arrowV, 16, 16, 256, 256);
 		
 		// Draw foreground text
-		FontRenderer font = this.screen.getFont(); 
-		font.drawText(matrixStack, this.node.getDisplayName(), x + 16, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.FONT_HEIGHT) / 2, 0xFF_FF_FF_FF);
+		Font font = this.screen.getFont(); 
+		font.draw(matrixStack, this.node.getDisplayName(), x + 16, y + 1 + (FOLDOUT_HEADER_HEIGHT - font.lineHeight) / 2, 0xFF_FF_FF_FF);
 	}
 	
 	@Override
-	public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.hidden)
 			return;
@@ -218,7 +221,7 @@ public class Foldout extends FocusableGui implements INestedGuiComponent, IBette
 		INestedGuiComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 		if (this.isOverHeader(mouseX, mouseY))
 		{
-			FontRenderer font = this.screen.getFont();
+			Font font = this.screen.getFont();
 			GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY, this.screen.width, this.screen.height, 200, font);
 		}
 	}

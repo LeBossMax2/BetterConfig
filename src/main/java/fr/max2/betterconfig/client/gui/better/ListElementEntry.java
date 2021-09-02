@@ -3,21 +3,21 @@ package fr.max2.betterconfig.client.gui.better;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
 import fr.max2.betterconfig.config.ConfigFilter;
-import net.minecraft.client.gui.FocusableGui;
-import net.minecraft.client.gui.widget.button.Button.IPressable;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button.OnPress;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
-public class ListElementEntry extends FocusableGui implements INestedGuiComponent, IBetterElement
+public class ListElementEntry extends AbstractContainerEventHandler implements INestedGuiComponent, IBetterElement
 {
 	private final BetterConfigScreen screen;
 	private final IBetterElement content;
@@ -30,11 +30,11 @@ public class ListElementEntry extends FocusableGui implements INestedGuiComponen
 	private boolean hidden;
 	private ILayoutManager layout;
 	
-	public ListElementEntry(BetterConfigScreen screen, IBetterElement content, int x, int width, IPressable deleteAction)
+	public ListElementEntry(BetterConfigScreen screen, IBetterElement content, int x, int width, OnPress deleteAction)
 	{
 		this.screen = screen;
 		this.content = content;
-		this.button = new BetterButton.Icon(screen, x, 0, 0, new StringTextComponent("X"), deleteAction, new TranslationTextComponent(REMOVE_TOOLTIP_KEY));
+		this.button = new BetterButton.Icon(screen, x, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(REMOVE_TOOLTIP_KEY));
 		this.children = Arrays.asList(content, this.button);
 		this.baseX = x;
 		this.width = width;
@@ -70,7 +70,7 @@ public class ListElementEntry extends FocusableGui implements INestedGuiComponen
 	}
 
 	@Override
-	public List<? extends IGuiComponent> getEventListeners()
+	public List<? extends IGuiComponent> children()
 	{
 		return this.children;
 	}
@@ -89,7 +89,7 @@ public class ListElementEntry extends FocusableGui implements INestedGuiComponen
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.hidden)
 			return;

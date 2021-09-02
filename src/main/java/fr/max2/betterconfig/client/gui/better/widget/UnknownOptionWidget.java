@@ -7,7 +7,7 @@ import fr.max2.betterconfig.client.gui.component.Button;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.TextComponent;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
@@ -19,11 +19,11 @@ public class UnknownOptionWidget extends Button implements IBetterElement
 	
 	public UnknownOptionWidget(int xPos, IConfigPrimitive<?> property)
 	{
-		super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT, new StringTextComponent(Objects.toString(property.getValue())), thiz -> {}, NO_TOOLTIP);
+		super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT, new TextComponent(Objects.toString(property.getValue())), thiz -> {}, NO_TOOLTIP);
 		this.active = false;
 		
 		this.property = property;
-		this.propertyListener = newVal -> this.setMessage(new StringTextComponent(Objects.toString(newVal)));
+		this.propertyListener = newVal -> this.setMessage(new TextComponent(Objects.toString(newVal)));
 		this.property.onChanged(this.propertyListener);
 	}
 

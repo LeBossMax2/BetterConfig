@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.ILayoutManager;
@@ -14,20 +14,20 @@ import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
-import net.minecraft.client.gui.FocusableGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.client.gui.GuiUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraftforge.fmlclient.gui.GuiUtils;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 /** The container for table entries */
-public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBetterElement
+public class ValueEntry extends AbstractContainerEventHandler implements INestedGuiComponent, IBetterElement
 {
 	/** The parent screen */
 	private final BetterConfigScreen screen;
@@ -37,9 +37,9 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 	private final IBetterElement button;
 	private final List<IBetterElement> children;
 	/** The title of the property */
-	private List<IReorderingProcessor> nameLines;
+	private List<FormattedCharSequence> nameLines;
 	/** The extra info to show on the tooltip */
-	private final List<ITextProperties> extraInfo = new ArrayList<>();
+	private final List<FormattedText> extraInfo = new ArrayList<>();
 	/** The parent layout */
 	private ILayoutManager layout = ILayoutManager.NONE;
 	/** The x coordinate of the component */
@@ -58,10 +58,10 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 		this.content = content;
 		// TODO [#2] Gray out the button when value is unchanged
 		// TODO [#2] Add reset to default button
-		this.button = new BetterButton.Icon(screen, this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4, 48, 0, new TranslationTextComponent(UNDO_TOOLTIP_KEY), thiz ->
+		this.button = new BetterButton.Icon(screen, this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
 		{
 			property.undoChanges();
-		}, new TranslationTextComponent(UNDO_TOOLTIP_KEY));
+		}, new TranslatableComponent(UNDO_TOOLTIP_KEY));
 		this.children = Arrays.asList(content, this.button);
 		this.baseX = x;
 	}
@@ -69,7 +69,7 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 	// Layout
 
 	@Override
-	public List<? extends IGuiComponent> getEventListeners()
+	public List<? extends IGuiComponent> children()
 	{
 		return this.hidden ? Collections.emptyList() : this.children;
 	}
@@ -87,7 +87,7 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 		}
 
 		updateTexts();
-		this.height = Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().FONT_HEIGHT);
+		this.height = Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight);
 		for (IBetterElement elem : this.children)
 		{
 			elem.setYgetHeight(y + (this.height - VALUE_HEIGHT) / 2, ConfigFilter.ALL);
@@ -97,12 +97,12 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 	
 	private void updateTexts()
 	{
-		FontRenderer font = this.screen.getFont();
-		this.nameLines = font.trimStringToWidth(this.property.getDisplayName(), this.screen.width - this.baseX - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4);
+		Font font = this.screen.getFont();
+		this.nameLines = font.split(this.property.getDisplayName(), this.screen.width - this.baseX - VALUE_WIDTH - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4);
 		this.extraInfo.clear();
-		this.extraInfo.add(ITextProperties.func_240653_a_(this.property.getName(), Style.EMPTY.setFormatting(TextFormatting.YELLOW)));
+		this.extraInfo.add(FormattedText.of(this.property.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
 		this.extraInfo.addAll(this.property.getDisplayComment());
-		this.extraInfo.add((new TranslationTextComponent(DEFAULT_VALUE_KEY, new StringTextComponent(Objects.toString(this.property.getSpec().getDefaultValue())))).mergeStyle(TextFormatting.GRAY));
+		this.extraInfo.add((new TranslatableComponent(DEFAULT_VALUE_KEY, new TextComponent(Objects.toString(this.property.getSpec().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 	// Rendering
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.hidden)
 			return;
@@ -148,17 +148,17 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
 		if (this.isMouseOver(mouseX, mouseY))
 			this.button.render(matrixStack, mouseX, mouseY, partialTicks);
-		FontRenderer font = this.screen.getFont();
-		int y = this.baseY + this.layout.getLayoutY() + (this.height - this.nameLines.size() * this.screen.getFont().FONT_HEIGHT) / 2 + 1;
-		for(IReorderingProcessor line : this.nameLines)
+		Font font = this.screen.getFont();
+		int y = this.baseY + this.layout.getLayoutY() + (this.height - this.nameLines.size() * this.screen.getFont().lineHeight) / 2 + 1;
+		for(FormattedCharSequence line : this.nameLines)
 		{
-			font.func_238422_b_(matrixStack, line, this.baseX + this.layout.getLayoutX() + 1, y, 0xFF_FF_FF_FF);
+			font.draw(matrixStack, line, this.baseX + this.layout.getLayoutX() + 1, y, 0xFF_FF_FF_FF);
 			y += 9;
 		}
 	}
 	
 	@Override
-	public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.hidden)
 			return;
@@ -167,7 +167,7 @@ public class ValueEntry extends FocusableGui implements INestedGuiComponent, IBe
 		int y = this.baseY + this.layout.getLayoutY();
 		if ( mouseX >= this.baseX + this.layout.getLayoutX() && mouseY >= y && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING - VALUE_HEIGHT && mouseY < y + this.height)
 		{
-			FontRenderer font = this.screen.getFont();
+			Font font = this.screen.getFont();
 			int yOffset = 0;
 			if (mouseX >= this.screen.width - X_PADDING - VALUE_WIDTH - RIGHT_PADDING - VALUE_HEIGHT)
 				yOffset = 24; // Fixes the overlay text covering the text on the content

@@ -19,8 +19,8 @@ import fr.max2.betterconfig.util.MappedListView;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
 import fr.max2.betterconfig.util.property.list.ReadableLists;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<List<T>, IConfigListSpec<T>, Info> implements IConfigList<T>
 {
@@ -154,9 +154,9 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 		}
 
 		@Override
-		public ITextComponent getDisplayName()
+		public Component getDisplayName()
 		{
-			return new TranslationTextComponent(LIST_ELEMENT_LABEL_KEY, this.parent.getName(), this.index);
+			return new TranslatableComponent(LIST_ELEMENT_LABEL_KEY, this.parent.getName(), this.index);
 		}
 		
 		@Override
@@ -172,7 +172,7 @@ public class ForgeConfigList<T, Info extends IForgeNodeInfo> extends ForgeConfig
 		}
 
 		@Override
-		public List<? extends ITextComponent> getDisplayComment()
+		public List<? extends Component> getDisplayComment()
 		{
 			return this.parent.getDisplayComment();
 		}

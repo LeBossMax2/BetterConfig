@@ -6,10 +6,10 @@ import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.gui.component.IGuiComponent;
 import fr.max2.betterconfig.client.gui.component.INestedGuiComponent;
 import fr.max2.betterconfig.config.ConfigFilter;
-import net.minecraft.client.gui.FocusableGui;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 
 /** The ui for a group of components */
-public class GuiGroup extends FocusableGui implements INestedGuiComponent, IBetterElement
+public class GuiGroup extends AbstractContainerEventHandler implements INestedGuiComponent, IBetterElement
 {
 	/** The list of entries of the group */
 	private final List<IBetterElement> content;
@@ -33,7 +33,7 @@ public class GuiGroup extends FocusableGui implements INestedGuiComponent, IBett
 	}
 
 	@Override
-	public List<? extends IGuiComponent> getEventListeners()
+	public List<? extends IGuiComponent> children()
 	{
 		return this.content;
 	}

@@ -5,8 +5,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import fr.max2.betterconfig.BetterConfig;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * A button for cycling between several options
@@ -23,12 +23,12 @@ public class CycleOptionButton<V> extends Button
 	/** The list of available option values */
 	private final List<? extends V> acceptedValues;
 	/** The function to get the text to show from the selection option */
-	private final Function<? super V, ITextComponent> valueToText;
+	private final Function<? super V, Component> valueToText;
 	/** The index of the selected option in the list */
 	private int index;
 
 	@SuppressWarnings("unchecked")
-	public CycleOptionButton(int xPos, int yPos, int width, int height, List<? extends V> acceptedValues, Function<? super V, ITextComponent> valueToText, V currentValue, Consumer<CycleOptionButton<V>> handler, ITooltip tooltip)
+	public CycleOptionButton(int xPos, int yPos, int width, int height, List<? extends V> acceptedValues, Function<? super V, Component> valueToText, V currentValue, Consumer<CycleOptionButton<V>> handler, OnTooltip tooltip)
 	{
 		super(xPos, yPos, width, height, getValueText(valueToText, currentValue), thiz ->
 		{
@@ -65,9 +65,9 @@ public class CycleOptionButton<V> extends Button
 	}
 	
 	/** Gets the text corresponding to the given option value using the given translation function */
-	private static <V> ITextComponent getValueText(Function<? super V, ITextComponent> valueToText, V value)
+	private static <V> Component getValueText(Function<? super V, Component> valueToText, V value)
 	{
-		return value == null ? new TranslationTextComponent(NO_OPTION_KEY) : valueToText.apply(value);
+		return value == null ? new TranslatableComponent(NO_OPTION_KEY) : valueToText.apply(value);
 	}
 	
 }

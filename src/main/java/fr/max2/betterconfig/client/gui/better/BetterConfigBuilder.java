@@ -18,7 +18,7 @@ import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
@@ -71,14 +71,14 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		GuiGroup mainGroup = new GuiGroup(this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset, mainElements);
 		
 		IReadableList<IConfigNode<T>> values = list.getValueList();
-		mainElements.add(new BetterButton(this.screen, offset, this.screen.width - offset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+		mainElements.add(new BetterButton(this.screen, offset, this.screen.width - offset - VALUE_OFFSET + VALUE_WIDTH, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(0);
-		}, new TranslationTextComponent(ADD_FIRST_TOOLTIP_KEY)));
+		}, new TranslatableComponent(ADD_FIRST_TOOLTIP_KEY)));
 		
 		List<ListElemInfo> entries = new ArrayList<>();
 		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, offset, mainElements, entries, index));
-		IListListener<IBetterElement> listListener = new IListListener<IBetterElement>()
+		IListListener<IBetterElement> listListener = new IListListener<>()
 		{
 			@Override
 			public void onElementAdded(int index, IBetterElement newValue)
@@ -131,10 +131,10 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 
 	private <T> BetterButton buildAddLastButton(IConfigList<T> list, int offset)
 	{
-		return new BetterButton(screen, offset, screen.width - offset - VALUE_OFFSET + VALUE_WIDTH, new TranslationTextComponent(ADD_ELEMENT_KEY), thiz ->
+		return new BetterButton(screen, offset, screen.width - offset - VALUE_OFFSET + VALUE_WIDTH, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(list.getValueList().size());
-		}, new TranslationTextComponent(ADD_LAST_TOOLTIP_KEY));
+		}, new TranslatableComponent(ADD_LAST_TOOLTIP_KEY));
 	}
 	
 	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, int xOffset, List<IBetterElement> content, List<ListElemInfo> entries, int index)

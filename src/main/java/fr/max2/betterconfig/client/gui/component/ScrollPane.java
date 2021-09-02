@@ -3,21 +3,23 @@ package fr.max2.betterconfig.client.gui.component;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector4f;
 
 import fr.max2.betterconfig.client.gui.ILayoutManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FocusableGui;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector4f;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.util.Mth;
 
-public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILayoutManager
+public class ScrollPane extends AbstractContainerEventHandler implements INestedGuiComponent, ILayoutManager
 {
 	protected final Minecraft minecraft;
 	
@@ -51,7 +53,7 @@ public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILa
 	// Layout
 	
 	@Override
-	public List<? extends IGuiComponent> getEventListeners()
+	public List<? extends IGuiComponent> children()
 	{
 		return Arrays.asList(this.content);
 	}
@@ -140,7 +142,7 @@ public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILa
 	
 	protected void setScrollDistance(float scroll)
 	{
-		this.scrollDistance = MathHelper.clamp(scroll, 0.0f, this.getMaxScroll());
+		this.scrollDistance = Mth.clamp(scroll, 0.0f, this.getMaxScroll());
 		this.content.onLayoutChanged();
 	}
 	
@@ -169,7 +171,7 @@ public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILa
 	private int getScrollThumbSize()
 	{
 		int size = (int) ((float) (this.h * this.h) / this.content.getHeight());
-		size = MathHelper.clamp(size, 32, this.h - this.innerBorder * 2);
+		size = Mth.clamp(size, 32, this.h - this.innerBorder * 2);
 		return size;
 	}
 	
@@ -244,27 +246,29 @@ public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILa
 	
 	// Rendering
 	
-	protected void drawBackground(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void drawBackground(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		Matrix4f mat = matrixStack.getLast().getMatrix();
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		Matrix4f mat = matrixStack.last().pose();
+		Tesselator tessellator = Tesselator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuilder();
 		
 		int left = this.getX();
 		int top = this.getY();
 		int right = left + this.w - this.scrollBarWidth;
 		int bot = top + this.h;
 		
-		this.minecraft.getTextureManager().bindTexture(AbstractGui.BACKGROUND_LOCATION);
-		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-		bufferbuilder.pos(mat, left , bot, 0.0f).tex(left  / 32.0f, (bot + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
-		bufferbuilder.pos(mat, right, bot, 0.0f).tex(right / 32.0f, (bot + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
-		bufferbuilder.pos(mat, right, top, 0.0f).tex(right / 32.0f, (top + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
-		bufferbuilder.pos(mat, left , top, 0.0f).tex(left  / 32.0f, (top + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
-		tessellator.draw();
+
+		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShaderTexture(0, GuiComponent.BACKGROUND_LOCATION);
+		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+		bufferbuilder.vertex(mat, left , bot, 0.0f).uv(left  / 32.0f, (bot + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
+		bufferbuilder.vertex(mat, right, bot, 0.0f).uv(right / 32.0f, (bot + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
+		bufferbuilder.vertex(mat, right, top, 0.0f).uv(right / 32.0f, (top + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
+		bufferbuilder.vertex(mat, left , top, 0.0f).uv(left  / 32.0f, (top + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
+		tessellator.end();
 	}
 	
-	protected void drawForeground(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void drawForeground(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		int left = this.getX();
 		int top = this.getY();
@@ -277,12 +281,12 @@ public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILa
 		this.fillGradient(matrixStack, left, bot - shadingHeight, right, bot, 0x00_00_00_00, 0xFF_00_00_00);
 	}
 	
-	protected void drawContent(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void drawContent(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 
-	private void drawSrollBar(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	private void drawSrollBar(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		int x = this.getX();
 		int top = this.getY();
@@ -301,13 +305,14 @@ public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILa
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.w > 0 && this.h > 0)
 		{
 			int x = this.getX();
 			int y = this.getY();
 			
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			this.drawBackground(matrixStack, mouseX, mouseY, partialTicks);
 			
 			int slotWidth = this.w - this.scrollBarWidth - this.innerBorder * 2;
@@ -332,19 +337,19 @@ public class ScrollPane extends FocusableGui implements INestedGuiComponent, ILa
 		}
 	}
 
-	protected void enableScissor(MatrixStack matrixStack, int x, int y, int width, int height)
+	protected void enableScissor(PoseStack matrixStack, int x, int y, int width, int height)
 	{
-		Matrix4f mat = matrixStack.getLast().getMatrix();
+		Matrix4f mat = matrixStack.last().pose();
 
 		Vector4f topLeft = new Vector4f(x, y, 0.0f, 1.0f);
 		topLeft.transform(mat);
 		Vector4f size = new Vector4f(width, height, 0.0f, 0.0f);
 		size.transform(mat);
 		
-		double scale = this.minecraft.getMainWindow().getGuiScaleFactor();
-		int screenHeight = this.minecraft.getMainWindow().getHeight();
+		double scale = this.minecraft.getWindow().getGuiScale();
+		int screenHeight = this.minecraft.getWindow().getHeight();
 		
-		RenderSystem.enableScissor((int)(topLeft.getX() * scale), screenHeight - (int)((topLeft.getY() + size.getY()) * scale), (int)(size.getX() * scale), (int)(size.getY() * scale));
+		RenderSystem.enableScissor((int)(topLeft.x() * scale), screenHeight - (int)((topLeft.y() + size.y()) * scale), (int)(size.x() * scale), (int)(size.y() * scale));
 	}
 	
 }

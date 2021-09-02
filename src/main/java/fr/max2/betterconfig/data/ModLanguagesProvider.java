@@ -11,11 +11,11 @@ import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.CycleOptionButton;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigList;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.data.IDataProvider;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
 import net.minecraftforge.common.data.LanguageProvider;
 
-public class ModLanguagesProvider implements IDataProvider 
+public class ModLanguagesProvider implements DataProvider
 {
 	/** The list of supported languages */
 	private final List<PartialLanguageProvider> languages = new ArrayList<>();
@@ -52,12 +52,12 @@ public class ModLanguagesProvider implements IDataProvider
     }
 	
 	@Override
-	public void act(DirectoryCache cache) throws IOException
+	public void run(HashCache cache) throws IOException
 	{
 		this.addTranslations();
 		for (LanguageProvider language : this.languages)
 		{
-			language.act(cache);
+			language.run(cache);
 		}
 	}
 	

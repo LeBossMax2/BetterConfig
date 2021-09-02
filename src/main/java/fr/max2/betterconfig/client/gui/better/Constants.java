@@ -1,7 +1,7 @@
 package fr.max2.betterconfig.client.gui.better;
 
 import fr.max2.betterconfig.BetterConfig;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class Constants
 {

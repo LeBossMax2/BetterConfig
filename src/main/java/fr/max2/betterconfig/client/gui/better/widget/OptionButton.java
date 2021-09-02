@@ -10,9 +10,9 @@ import fr.max2.betterconfig.client.gui.component.CycleOptionButton;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
@@ -23,7 +23,7 @@ public class OptionButton<V> extends CycleOptionButton<V> implements IBetterElem
 	private final IListener<V> propertyListener;
 	
 	private OptionButton(int xPos, List<? extends V> acceptedValues,
-		Function<? super V, ITextComponent> valueToText, IConfigPrimitive<V> property)
+		Function<? super V, Component> valueToText, IConfigPrimitive<V> property)
 	{
 		super(xPos, 0, VALUE_WIDTH, VALUE_HEIGHT,
 			acceptedValues.stream().filter(property.getSpec()::isAllowed).collect(Collectors.toList()),
@@ -49,7 +49,7 @@ public class OptionButton<V> extends CycleOptionButton<V> implements IBetterElem
 		return new OptionButton<>(
 			xPos,
 			Arrays.asList(false, true),
-			bool -> new TranslationTextComponent(bool ? TRUE_OPTION_KEY : FALSE_OPTION_KEY),
+			bool -> new TranslatableComponent(bool ? TRUE_OPTION_KEY : FALSE_OPTION_KEY),
 			property);
 	}
 
@@ -60,7 +60,7 @@ public class OptionButton<V> extends CycleOptionButton<V> implements IBetterElem
 		return new OptionButton<>(
 			xPos,
 			Arrays.asList(((Class<E>)property.getSpec().getValueClass()).getEnumConstants()),
-			enuw -> new StringTextComponent(enuw.name()),
+			enuw -> new TextComponent(enuw.name()),
 			property);
 	}
 	

@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,16 +14,18 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
 import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
+import fr.max2.betterconfig.config.spec.ConfigLocation;
 import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecVisitor;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigNode;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNode<UnmodifiableConfig, IConfigTableSpec, Info> implements IConfigTable
 {
@@ -48,7 +51,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 	
 	public static ForgeConfigTable<?> create(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?>> changeListener)
 	{
-		return new ForgeConfigTable<>(new ForgeConfigTableSpec(spec), RootInfo.INSTANCE, changeListener, spec.getValues());
+		return new ForgeConfigTable<>(new ForgeConfigTableSpec(spec, getSpecComments(spec)), RootInfo.INSTANCE, changeListener, spec.getValues());
 	}
 
 	@Override
@@ -74,6 +77,13 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		return spec.getNode().exploreNode(new ConfigNodeCreator(this.changeListener, new TableChildInfo(this, spec)), this.configValues.get(key));
 	}
 	
+	/** Gets the comments from the spec */
+	private static Function<ConfigLocation, String> getSpecComments(ForgeConfigSpec spec)
+	{
+		Map<List<String>, String> map = ObfuscationReflectionHelper.getPrivateValue(ForgeConfigSpec.class, spec, "levelComments");
+		return loc -> map.get(loc.getPath());
+	}
+	
 	private static enum RootInfo implements IForgeNodeInfo
 	{
 		INSTANCE;
@@ -85,9 +95,9 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 
 		@Override
-		public ITextComponent getDisplayName()
+		public Component getDisplayName()
 		{
-			return new StringTextComponent("");
+			return new TextComponent("");
 		}
 		
 		@Override
@@ -103,9 +113,9 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 
 		@Override
-		public List<? extends ITextComponent> getDisplayComment()
+		public List<? extends Component> getDisplayComment()
 		{
-			return Arrays.asList(new StringTextComponent(""));
+			return Arrays.asList(new TextComponent(""));
 		}
 	}
 	
@@ -127,7 +137,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 
 		@Override
-		public ITextComponent getDisplayName()
+		public Component getDisplayName()
 		{
 			return this.entry.getDisplayName();
 		}
@@ -145,7 +155,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 
 		@Override
-		public List<? extends ITextComponent> getDisplayComment()
+		public List<? extends Component> getDisplayComment()
 		{
 			return this.entry.getDisplayComment();
 		}

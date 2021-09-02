@@ -3,14 +3,14 @@ package fr.max2.betterconfig.client.gui.component;
 import org.lwjgl.glfw.GLFW;
 
 import fr.max2.betterconfig.client.gui.ILayoutManager;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 
 /**
  * A widget for entering text
  */
-public class TextField extends TextFieldWidget implements IGuiComponent
+public class TextField extends EditBox implements IGuiComponent
 {
 	/** The parent layout */
 	private ILayoutManager layout = ILayoutManager.NONE;
@@ -19,18 +19,18 @@ public class TextField extends TextFieldWidget implements IGuiComponent
 	/** The y coordinate relative to the layout */
 	protected int baseY;
 	
-	public TextField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent title)
+	public TextField(Font fontRenderer, int x, int y, int width, int height, Component title)
 	{
 		super(fontRenderer, x, y, width, height, title);
-		this.setMaxStringLength(Integer.MAX_VALUE);
+		this.setMaxLength(Integer.MAX_VALUE);
 		this.baseX = x;
 		this.baseY = y;
 	}
 	
 	@Override
-	public void setText(String text)
+	public void setValue(String text)
 	{
-		super.setText(text == null ? "" : text);
+		super.setValue(text == null ? "" : text);
 	}
 	
 	// Layout
@@ -75,11 +75,11 @@ public class TextField extends TextFieldWidget implements IGuiComponent
 	}
 	
 	@Override
-	public void setFocused2(boolean focused)
+	public void setFocus(boolean focused)
 	{
 		if (this.isFocused() != focused)
 		{
-			super.setFocused2(focused);
+			super.setFocus(focused);
 			this.onFocusedChanged(focused);
 		}
 	}
@@ -90,7 +90,7 @@ public class TextField extends TextFieldWidget implements IGuiComponent
 		super.onFocusedChanged(focused);
 		if (!focused)
 		{
-			this.onValidate(this.getText());
+			this.onValidate(this.getValue());
 		}
 	}
 	
@@ -99,7 +99,7 @@ public class TextField extends TextFieldWidget implements IGuiComponent
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers)
 	{
-		if (!this.canWrite())
+		if (!this.canConsumeInput())
 			return false;
 		if (super.keyPressed(keyCode, scanCode, modifiers))
 			return true;
@@ -108,7 +108,7 @@ public class TextField extends TextFieldWidget implements IGuiComponent
 		{
 		case GLFW.GLFW_KEY_ENTER:
 		case GLFW.GLFW_KEY_KP_ENTER:
-			this.onValidate(this.getText());
+			this.onValidate(this.getValue());
 			return true;
 			
 		default:

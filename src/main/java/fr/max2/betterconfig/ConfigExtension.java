@@ -11,14 +11,14 @@ import org.apache.logging.log4j.Logger;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fmlclient.ConfigGuiHandler;
 
 @EventBusSubscriber(modid = BetterConfig.MODID, bus = Bus.MOD, value = Dist.CLIENT)
 public class ConfigExtension
@@ -38,7 +38,7 @@ public class ConfigExtension
 	 */
 	private static void setupConfigExtensionPoint(String modId, ModContainer mod)
 	{
-		if (mod.getCustomExtension(ExtensionPoint.CONFIGGUIFACTORY).isPresent())
+		if (mod.getCustomExtension(ConfigGuiHandler.ConfigGuiFactory.class).isPresent())
 			return; // No custom config screen if one already registered
 
 		List<ModConfig> configs = getModConfigs(mod);
@@ -46,7 +46,7 @@ public class ConfigExtension
 			return; // No config screen if the mod has no config
 		
 		LOGGER.debug("Registering extension point for " + modId);
-		mod.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> BetterConfigScreen.factory(mod, configs));
+		mod.registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class, () -> new ConfigGuiHandler.ConfigGuiFactory(BetterConfigScreen.factory(mod, configs)));
 	}
 
 	/** Gets the list of modifiable configurations for the fiven mod */
@@ -64,6 +64,6 @@ public class ConfigExtension
 	private static boolean isConfigEditable(ModConfig config)
 	{
 		// TODO [#3, #4] Allow server config to be changed
-		return config.getSpec().isLoaded();
+		return config.getConfigData() != null;
 	}
 }

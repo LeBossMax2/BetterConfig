@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.value.IConfigNode;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public abstract class ForgeConfigNode<T, Spec extends IConfigSpecNode<T>, Info extends IForgeNodeInfo> implements IConfigNode<T>
 {
@@ -32,7 +32,7 @@ public abstract class ForgeConfigNode<T, Spec extends IConfigSpecNode<T>, Info e
 	}
 	
 	@Override
-	public ITextComponent getDisplayName()
+	public Component getDisplayName()
 	{
 		return this.info.getDisplayName();
 	}
@@ -50,7 +50,7 @@ public abstract class ForgeConfigNode<T, Spec extends IConfigSpecNode<T>, Info e
 	}
 	
 	@Override
-	public List<? extends ITextComponent> getDisplayComment()
+	public List<? extends Component> getDisplayComment()
 	{
 		return this.info.getDisplayComment();
 	}

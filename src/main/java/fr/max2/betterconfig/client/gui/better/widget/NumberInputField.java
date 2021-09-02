@@ -8,8 +8,8 @@ import fr.max2.betterconfig.client.util.NumberTypes;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
@@ -20,7 +20,7 @@ public class NumberInputField<N extends Number> extends NumberField<N> implement
 	private final IConfigPrimitive<N> property;
 	private final IListener<N> propertyListener;
 
-	public NumberInputField(FontRenderer fontRenderer, int x, INumberType<N> numberType, IConfigPrimitive<N> property, ITextComponent title)
+	public NumberInputField(Font fontRenderer, int x, INumberType<N> numberType, IConfigPrimitive<N> property, Component title)
 	{
 		super(fontRenderer, x, 0, VALUE_WIDTH, VALUE_HEIGHT, title, numberType, property.getValue());
 		this.property = property;

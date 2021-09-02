@@ -5,22 +5,22 @@ import java.util.List;
 import java.util.Optional;
 
 import com.google.common.base.Strings;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.ILayoutManager;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.INumberType.Increment;
 import fr.max2.betterconfig.client.util.INumberType.Operator;
-import net.minecraft.client.gui.FocusableGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 /**
  * A widget for entering a number
  * @param <N> the type of accepted number
  */
-public abstract class NumberField<N> extends FocusableGui implements INestedGuiComponent
+public abstract class NumberField<N> extends AbstractContainerEventHandler implements INestedGuiComponent
 {
 	/** The default width of the '+' and '-' buttons */
 	protected static final int BUTTON_SIZE = 20;
@@ -42,7 +42,7 @@ public abstract class NumberField<N> extends FocusableGui implements INestedGuiC
 	protected int baseX, baseY, w, h;
 	protected ILayoutManager layout;
 
-	public NumberField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent title, INumberType<N> numberType, N value)
+	public NumberField(Font fontRenderer, int x, int y, int width, int height, Component title, INumberType<N> numberType, N value)
 	{
 		this.numberType = numberType;
 		this.baseX = x;
@@ -54,12 +54,12 @@ public abstract class NumberField<N> extends FocusableGui implements INestedGuiC
 			@Override
 			protected void onValidate(String text)
 			{
-				N value = getValue();
+				N value = NumberField.this.getValue();
 				if (!doCorrection(value))
 				{
 					String fixedText = fixInput(text);
 					if (!text.equals(fixedText))
-						setValue(value); // Force the text in the input field to be fixed
+						NumberField.this.setValue(value); // Force the text in the input field to be fixed
 					
 					NumberField.this.onValidate(value);
 				}
@@ -74,7 +74,7 @@ public abstract class NumberField<N> extends FocusableGui implements INestedGuiC
 			Increment.NORMAL.getPlusText(),
 			thisButton -> applyOperator(Operator.PLUS));
 		this.elements = Arrays.asList(this.minusButton, this.inputField, this.plusButton);
-		this.inputField.setValidator(this::isValid);
+		this.inputField.setFilter(this::isValid);
 		this.setValue(value);
 	}
 	
@@ -118,7 +118,7 @@ public abstract class NumberField<N> extends FocusableGui implements INestedGuiC
 	}
 	
 	@Override
-	public List<? extends IGuiComponent> getEventListeners()
+	public List<? extends IGuiComponent> children()
 	{
 		return this.elements;
 	}
@@ -137,7 +137,7 @@ public abstract class NumberField<N> extends FocusableGui implements INestedGuiC
 	// Rendering
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.updateIncrement();
 		INestedGuiComponent.super.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -173,13 +173,13 @@ public abstract class NumberField<N> extends FocusableGui implements INestedGuiC
 	/** Sets the number in the field */
 	protected void setValue(N value)
 	{
-		this.inputField.setText(this.numberType.intoString(value));
+		this.inputField.setValue(this.numberType.intoString(value));
 	}
 	
 	/** Gets the number from the field */
 	public N getValue()
 	{
-		return tryConvert(this.inputField.getText()).get();
+		return tryConvert(this.inputField.getValue()).get();
 	}
 	
 	/** Fixes the input to a valid one if it is almost valid */

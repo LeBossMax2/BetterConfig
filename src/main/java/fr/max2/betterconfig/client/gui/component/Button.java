@@ -1,21 +1,20 @@
 package fr.max2.betterconfig.client.gui.component;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.ILayoutManager;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fml.client.gui.widget.ExtendedButton;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraftforge.fmlclient.gui.widget.ExtendedButton;
 
 /**
  * A basic button
  */
 public class Button extends ExtendedButton implements IGuiComponent 
 {
-	/** An empty overlay */
-	public static final Button.ITooltip NO_TOOLTIP = EMPTY_TOOLTIP;
-
 	/** The overlay to show when the mouse is over the button */
-	private final ITooltip overlay;
+	private final OnTooltip overlay;
 	/** The parent layout */
 	private ILayoutManager layout = ILayoutManager.NONE;
 	/** The x coordinate relative to the layout */
@@ -23,7 +22,7 @@ public class Button extends ExtendedButton implements IGuiComponent
 	/** The y coordinate relative to the layout */
 	protected int baseY;
 
-	public Button(int x, int y, int width, int height, ITextComponent displayString, IPressable pressedHandler, ITooltip overlay)
+	public Button(int x, int y, int width, int height, Component displayString, OnPress pressedHandler, OnTooltip overlay)
 	{
 		super(x, y, width, height, displayString, pressedHandler);
 		this.baseX = x;
@@ -31,7 +30,7 @@ public class Button extends ExtendedButton implements IGuiComponent
 		this.overlay = overlay;
 	}
 
-	public Button(int xPos, int yPos, int width, int height, ITextComponent displayString, IPressable pressedHandler)
+	public Button(int xPos, int yPos, int width, int height, Component displayString, OnPress pressedHandler)
 	{
 		this(xPos, yPos, width, height, displayString, pressedHandler, NO_TOOLTIP);
 	}
@@ -69,13 +68,20 @@ public class Button extends ExtendedButton implements IGuiComponent
 	// Rendering
 	
 	@Override
-	public void renderToolTip(MatrixStack matrixStack, int mouseX, int mouseY)
+	public void renderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
+	{
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		super.renderButton(mStack, mouseX, mouseY, partial);
+	}
+	
+	@Override
+	public void renderToolTip(PoseStack matrixStack, int mouseX, int mouseY)
 	{
 		// Disable default tooltip overlay
 	}
 	
 	@Override
-	public void renderOverlay(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.overlay.onTooltip(this, matrixStack, mouseX, mouseY);
 	}
