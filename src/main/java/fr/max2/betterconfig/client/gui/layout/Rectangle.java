@@ -73,10 +73,10 @@ public class Rectangle
 	
 	public boolean isPointInside(double x, double y)
 	{
-		return x >= this.x
-		    && y >= this.y
-		    && x < this.x + this.size.width
-		    && y < this.y + this.size.height;
+		return x >= this.getLeft()
+		    && y >= this.getTop()
+		    && x < this.getRight()
+		    && y < this.getBottom();
 	}
 	@Override
 	public String toString()

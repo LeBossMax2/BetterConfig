@@ -94,7 +94,7 @@ public class TextField extends WidgetComponent<EditBox>
 
 		public InnerField(Font pFont, Component pMessage)
 		{
-			super(pFont, 0, 0, 0, 0, pMessage);
+			super(pFont, 0, 0, 100000, 0, pMessage);
 		}
 		
 		@Override

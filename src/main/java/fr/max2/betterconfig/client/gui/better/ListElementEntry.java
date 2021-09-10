@@ -30,13 +30,14 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	
 	public ListElementEntry(BetterConfigScreen screen, IComponentParent layoutManager, IBetterElement content, OnPress deleteAction)
 	{
-		super(screen);
+		super(layoutManager);
 		this.content = content;
 		this.button = new BetterButton.Icon(screen, layoutManager, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(REMOVE_TOOLTIP_KEY));
 		this.children = Arrays.asList(this.button, content);
 		this.button.config.outerPadding = new Padding((VALUE_CONTAINER_HEIGHT - VALUE_HEIGHT) / 2, 0, 0, 0);
 		//this.config.innerPadding = new Padding(0, RIGHT_PADDING, 0, X_PADDING);?
 		this.config.dir = Axis.HORIZONTAL;
+		this.config.outerPadding = new Padding(0, 0, 0, -VALUE_HEIGHT);
 	}
 	
 	@Override
@@ -63,11 +64,9 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	{
 		if (this.hidden)
 			return;
-		
-		if (this.isPointInside(mouseX, mouseY))
-		{
-			this.button.render(matrixStack, mouseX, mouseY, partialTicks);
-		}
+
 		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
+		if (this.isPointInside(mouseX, mouseY))
+			this.button.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 }

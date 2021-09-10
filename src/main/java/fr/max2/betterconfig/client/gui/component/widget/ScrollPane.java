@@ -34,8 +34,6 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	protected boolean scrolling = false;
 	private float scrollDistance = 0.0F;
 	protected int scrollBarWidth = 6;
-	protected int outerBorder = 1;
-	protected int innerBorder = 4;
 	protected Size contentSize;
 	
 	/** Indicates whether the layout is dirty */
@@ -90,13 +88,13 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	@Override
 	public int getLayoutX()
 	{
-		return this.getRect().x + this.innerBorder;
+		return this.getRect().x;
 	}
 	
 	@Override
 	public int getLayoutY()
 	{
-		return this.getRect().y + this.innerBorder - this.getScrollDistance();
+		return this.getRect().y - this.getScrollDistance();
 	}
 	
 	@Override
@@ -139,7 +137,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	
 	protected int getMaxScroll(Rectangle rect)
 	{
-		return Math.max(0, this.getContentHeight() + 2 * this.innerBorder - rect.size.height);
+		return Math.max(0, this.getContentHeight() - rect.size.height);
 	}
 	
 	protected float getWheelScrollFactor()
@@ -157,7 +155,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	private int getScrollThumbSize(Rectangle rect)
 	{
 		int size = (int) ((float) (rect.size.height * rect.size.height) / this.getContentHeight());
-		size = Mth.clamp(size, 32, rect.size.height - this.innerBorder * 2);
+		size = Mth.clamp(size, 32, rect.size.height);
 		return size;
 	}
 	
@@ -348,7 +346,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			this.drawBackground(matrixStack, mouseX, mouseY, partialTicks, rect);
 			
-			int slotWidth = rect.size.width - this.scrollBarWidth - this.innerBorder * 2;
+			int slotWidth = rect.size.width - this.scrollBarWidth;
 			
 			if (slotWidth > 0)
 			{

@@ -36,7 +36,12 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	 */
 	public static IComponent build(BetterConfigScreen screen, IConfigTable config)
 	{
-		return new GuiRoot(screen, lm -> new BetterConfigBuilder(screen, lm).buildTable(config));
+		return new GuiRoot(screen, lm ->
+		{
+			GuiGroup tableGroup = new BetterConfigBuilder(screen, lm).buildTable(config);
+			tableGroup.config.outerPadding = new Padding(6, 6 + 6, 6, 6);
+			return tableGroup;
+		});
 	}
 	
 	// private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4 + VALUE_HEIGHT;
