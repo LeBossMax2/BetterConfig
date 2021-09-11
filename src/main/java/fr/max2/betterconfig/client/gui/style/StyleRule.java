@@ -109,7 +109,9 @@ public class StyleRule
 				ComponentLayoutConfig.OUTER_PADDING,
 				CompositeLayoutConfig.DIR,
 				CompositeLayoutConfig.SPACING,
-				CompositeLayoutConfig.INNER_PADDING
+				CompositeLayoutConfig.INNER_PADDING,
+				CompositeLayoutConfig.JUSTIFICATION,
+				CompositeLayoutConfig.ALIGNMENT
 			));
 		
 		private final Map<String, PropertyIdentifier<?>> componentProperties;

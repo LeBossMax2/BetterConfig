@@ -15,7 +15,8 @@ public enum CompositeLayoutConfig implements ILayoutConfig<ICompositeComponent>
 	public static StyleProperty<Axis> DIR = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "dir"), Axis.VERTICAL);
 	public static StyleProperty<Integer> SPACING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "spacing"), 0);
 	public static StyleProperty<Padding> INNER_PADDING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "inner_padding"), new Padding());
-	// justification, alignment
+	public static StyleProperty<Alignment> JUSTIFICATION = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "justification"), Alignment.MIN);
+	public static StyleProperty<Alignment> ALIGNMENT = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "alignment"), Alignment.MIN);
 	
 	@Override
 	public Size measureLayout(ICompositeComponent component)
@@ -68,6 +69,11 @@ public enum CompositeLayoutConfig implements ILayoutConfig<ICompositeComponent>
 		int mainPos = innerRect.getPos(dir);
 		int crossPos = innerRect.getPos(crossDir);
 		
+		if (unconstrainedChildCount == 0)
+		{
+			mainPos += component.getStyleProperty(ALIGNMENT).getOffset(unconstrainedSize);
+		}
+		
 		for (IComponent child : children)
 		{
 			Size childPrefSize = child.getPrefSize();
@@ -80,7 +86,12 @@ public enum CompositeLayoutConfig implements ILayoutConfig<ICompositeComponent>
 				unconstrainedSize -= childMainSize;
 				unconstrainedChildCount--;
 			}
-			if (!Size.isConstrained(childCrossSize))
+			int childCrossPos = crossPos;
+			if (Size.isConstrained(childCrossSize))
+			{
+				childCrossPos += component.getStyleProperty(JUSTIFICATION).getOffset(innerRect.size.get(crossDir) - childCrossSize);
+			}
+			else
 			{
 				childCrossSize = innerRect.size.get(crossDir);
 			}
@@ -91,7 +102,7 @@ public enum CompositeLayoutConfig implements ILayoutConfig<ICompositeComponent>
 			childRect.size.set(crossDir, childCrossSize);
 			
 			childRect.setPos(dir, mainPos);
-			childRect.setPos(crossDir, crossPos); // TODO [#2] Layout justification
+			childRect.setPos(crossDir, childCrossPos);
 			
 			mainPos += childMainSize + spacing;
 			
