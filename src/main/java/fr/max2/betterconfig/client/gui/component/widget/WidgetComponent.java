@@ -83,7 +83,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	public void keyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		updatePosition();
-		if (!state.isConsumed() && this.widget.keyPressed(keyCode, scanCode, modifiers))
+		if (!state.isConsumed() && this.widget.isFocused() && this.widget.keyPressed(keyCode, scanCode, modifiers))
 			state.consume();
 	}
 	
@@ -91,7 +91,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	public void keyReleased(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		updatePosition();
-		if (!state.isConsumed() && this.widget.keyReleased(keyCode, scanCode, modifiers))
+		if (!state.isConsumed() && this.widget.isFocused() && this.widget.keyReleased(keyCode, scanCode, modifiers))
 			state.consume();
 	}
 	
@@ -99,7 +99,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	public void charTyped(char codePoint, int modifiers, EventState state)
 	{
 		updatePosition();
-		if (!state.isConsumed() && this.widget.charTyped(codePoint, modifiers))
+		if (!state.isConsumed() && this.widget.isFocused() && this.widget.charTyped(codePoint, modifiers))
 			state.consume();
 	}
 	
