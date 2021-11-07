@@ -14,9 +14,11 @@ import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.layout.Axis;
+import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
-import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
+import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import net.minecraft.ChatFormatting;
@@ -33,6 +35,11 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 /** The container for table entries */
 public class ValueEntry extends CompositeComponent implements IBetterElement
 {
+	public static final StyleRule STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:value_entry").then()
+			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
+			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_CONTAINER_HEIGHT))// Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
+			.build();
+	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	/** The edited property */
@@ -47,11 +54,9 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	/** Indicates if the property is hidden or not */
 	private boolean hidden = false;
 
-	private final CompositeLayoutConfig config = new CompositeLayoutConfig();
-
 	public ValueEntry(BetterConfigScreen screen, IComponentParent layoutManager, IConfigPrimitive<?> property, IComponent content)
 	{
-		super(layoutManager);
+		super(layoutManager, "better:value_entry");
 		this.screen = screen;
 		this.property = property;
 		this.content = content;
@@ -60,37 +65,21 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.button = new BetterButton.Icon(screen, layoutManager, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
 		{
 			property.undoChanges();
-		}, new TranslatableComponent(UNDO_TOOLTIP_KEY));
+		}, new TranslatableComponent(UNDO_TOOLTIP_KEY)).addClass("better:undo");
 		//this.button.x = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4;
-		IComponent spacing = new UnitComponent(layoutManager)
+		IComponent spacing = new UnitComponent(layoutManager, "spacing")
 		{
-			private final UnitLayoutConfig config = new UnitLayoutConfig(); 
-			
 			@Override
 			public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTicks)
 			{ }
-			
-			@Override
-			protected UnitLayoutConfig getLayoutConfig()
-			{
-				return this.config;
-			}
 		};
 		this.children = Arrays.asList(spacing, content, this.button);
-		this.config.dir = Axis.HORIZONTAL;
-		this.config.sizeOverride.height = VALUE_CONTAINER_HEIGHT; // Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
 		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
 		//this.config.justification = Justification.CENTER;
 		//this.config.alignment = Alignment.END;
 	}
 	
 	// Layout
-	
-	@Override
-	protected CompositeLayoutConfig getLayoutConfig()
-	{
-		return this.config;
-	}
 
 	@Override
 	public List<? extends IComponent> getChildren()

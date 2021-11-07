@@ -20,6 +20,7 @@ import fr.max2.betterconfig.client.gui.component.IScrollComponent;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.ScrollPaneLayout;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
@@ -39,13 +40,19 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	/** Indicates whether the layout is dirty */
 	protected boolean layoutDirty;
 	
-	private final ScrollPaneLayout config = new ScrollPaneLayout();
-	
 	public ScrollPane(IComponentParent layoutManager, Minecraft minecraft, Function<IComponentParent, IComponent> content)
 	{
-		super(layoutManager);
+		super(layoutManager, "scroll_pane");
 		this.minecraft = minecraft;
 		this.content = content.apply(this);
+	}
+	
+	// Style
+	
+	@Override
+	public StyleSheet getStyleSheet()
+	{
+		return this.layoutManager.getStyleSheet();
 	}
 	
 	// Layout
@@ -53,7 +60,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	@Override
 	protected ScrollPaneLayout getLayoutConfig()
 	{
-		return this.config;
+		return ScrollPaneLayout.INSTANCE;
 	}
 
 	@Override

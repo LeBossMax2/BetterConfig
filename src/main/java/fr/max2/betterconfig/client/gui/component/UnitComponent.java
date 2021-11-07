@@ -6,15 +6,18 @@ import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
 
 public abstract class UnitComponent extends Component<IComponent>
 {
-	public UnitComponent(IComponentParent layoutManager)
+	public UnitComponent(IComponentParent layoutManager, String type)
 	{
-		super(layoutManager);
+		super(layoutManager, type);
 	}
 
 	// Layout
 	
 	@Override
-	protected abstract UnitLayoutConfig getLayoutConfig();
+	protected UnitLayoutConfig getLayoutConfig()
+	{
+		return UnitLayoutConfig.INSTANCE;
+	}
 	
 	@Override
 	protected IComponent getLayoutParam()

@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 
 import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
+import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.network.chat.Component;
@@ -19,6 +21,10 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 /** The widget for option buttons */
 public class OptionButton<V> extends CycleOptionButton<V> 
 {
+	public static final StyleRule STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "better:option_button").then()
+			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(VALUE_WIDTH, VALUE_HEIGHT))
+			.build();
+	
 	private final IConfigPrimitive<V> property;
 	private final IListener<V> propertyListener;
 	
@@ -30,11 +36,11 @@ public class OptionButton<V> extends CycleOptionButton<V>
 			valueToText,
 			property.getValue(), thiz -> property.setValue(thiz.getCurrentValue()),
 			NO_TOOLTIP);
+		this.addClass("better:option_button");
 		
 		this.property = property;
 		this.propertyListener = this::setCurrentValue;
 		this.property.onChanged(this.propertyListener);
-		this.config.sizeOverride = new Size(VALUE_WIDTH, VALUE_HEIGHT);
 	}
 	
 	/** Creates a widget for boolean values */

@@ -5,7 +5,6 @@ import java.util.List;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.IComponentParent;
-import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.config.ConfigFilter;
 
 /** The ui for a group of components */
@@ -15,11 +14,9 @@ public class GuiGroup extends CompositeComponent implements IBetterElement
 	private final List<IBetterElement> betterElements;
 	private final List<? extends IComponent> content;
 
-	public final CompositeLayoutConfig config = new CompositeLayoutConfig();
-
 	public GuiGroup(IComponentParent layoutManager, List<? extends IComponent> content)
 	{
-		super(layoutManager);
+		super(layoutManager, "better:group");
 		this.content = content;
 		this.betterElements = content.stream().filter(cmp -> cmp instanceof IBetterElement).map(cmp -> (IBetterElement)cmp).toList();
 	}
@@ -27,12 +24,6 @@ public class GuiGroup extends CompositeComponent implements IBetterElement
 	public void updateLayout()
 	{
 		this.layoutManager.marksLayoutDirty();
-	}
-	
-	@Override
-	protected CompositeLayoutConfig getLayoutConfig()
-	{
-		return this.config;
 	}
 	
 	@Override

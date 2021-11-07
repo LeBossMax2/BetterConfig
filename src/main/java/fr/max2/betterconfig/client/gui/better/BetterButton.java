@@ -9,6 +9,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.Button;
+import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import net.minecraft.client.Minecraft;
@@ -30,9 +31,10 @@ public class BetterButton extends Button
 	public BetterButton(BetterConfigScreen screen, IComponentParent layoutManager, int width, Component displayString, OnPress pressedHandler, Component overlay)
 	{
 		super(layoutManager, displayString, pressedHandler);
+		this.addClass("better:button");
 		this.screen = screen;
 		this.tooltipInfo = Arrays.asList(overlay);
-		this.config.sizeOverride = new Size(width, VALUE_HEIGHT);
+		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, VALUE_HEIGHT));
 	}
 	
 	@Override

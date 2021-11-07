@@ -11,8 +11,10 @@ import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.layout.Axis;
+import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.INumberType.Increment;
 import fr.max2.betterconfig.client.util.INumberType.Operator;
@@ -30,6 +32,16 @@ public class NumberField<N> extends CompositeComponent
 	protected static final int BUTTON_SIZE = 20;
 	/** The spacing between the buttons and the text field */
 	protected static final int SPACING = 2;
+	
+	public static final StyleRule FIELD_STYLE = StyleRule.when().equals(COMPONENT_TYPE, "number_field").then()
+			//.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, height))
+			.set(CompositeLayoutConfig.SPACING, SPACING)
+			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
+			.build();
+
+	public static final StyleRule MINUS_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "number_field:minus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
+	public static final StyleRule PLUS_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "number_field:plus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
+	
 	/** The list of children ui components */
 	protected final List<IComponent> elements;
 	/** The text field to directly enter the number */
@@ -42,12 +54,10 @@ public class NumberField<N> extends CompositeComponent
 	protected final INumberType<N> numberType;
 	/** The current increment for each button click */
 	protected Increment currentIncrement = Increment.NORMAL;
-	
-	private final CompositeLayoutConfig config = new CompositeLayoutConfig();
 
 	public NumberField(IComponentParent layout, Font fontRenderer, Component title, int width, int height, INumberType<N> numberType, N value)
 	{
-		super(layout);
+		super(layout, "number_field");
 		this.numberType = numberType;
 		this.inputField = new TextField(layout, fontRenderer, title)
 		{
@@ -65,21 +75,22 @@ public class NumberField<N> extends CompositeComponent
 				}
 			}
 		};
+		this.inputField.addClass("number_field:text");
 		this.minusButton = new Button(layout,
 			Increment.NORMAL.getMinusText(),
 			thisButton -> applyOperator(Operator.MINUS));
+		this.minusButton.addClass("number_field:minus_button");
 		this.plusButton = new Button(layout,
 			Increment.NORMAL.getPlusText(),
 			thisButton -> applyOperator(Operator.PLUS));
+		this.plusButton.addClass("number_field:plus_button");
 		this.elements = Arrays.asList(this.minusButton, this.inputField, this.plusButton);
 		this.inputField.widget.setFilter(this::isValid);
 		this.setValue(value);
 		
-		this.plusButton.config.sizeOverride = new Size(BUTTON_SIZE, height);
-		this.minusButton.config.sizeOverride = new Size(BUTTON_SIZE, height);
-		this.config.sizeOverride = new Size(width, height);
-		this.config.spacing = SPACING;
-		this.config.dir = Axis.HORIZONTAL;
+		this.plusButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, height));
+		this.minusButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, height));
+		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, height));
 	}
 	
 	// Layout
@@ -88,12 +99,6 @@ public class NumberField<N> extends CompositeComponent
 	public List<? extends IComponent> getChildren()
 	{
 		return this.elements;
-	}
-
-	@Override
-	protected CompositeLayoutConfig getLayoutConfig()
-	{
-		return this.config;
 	}
 	
 	// Rendering

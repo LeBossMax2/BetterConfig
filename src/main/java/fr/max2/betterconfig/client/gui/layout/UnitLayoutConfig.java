@@ -2,17 +2,19 @@ package fr.max2.betterconfig.client.gui.layout;
 
 import fr.max2.betterconfig.client.gui.component.IComponent;
 
-public class UnitLayoutConfig extends LayoutConfig<IComponent>
+public enum UnitLayoutConfig implements ILayoutConfig<IComponent>
 {
+	INSTANCE;
+	
 	@Override
 	public Size measureLayout(IComponent component)
 	{
-		return this.getParentRequiredSize(this.sizeOverride);
+		return ComponentLayoutConfig.getParentRequiredSize(component, component.getStyleProperty(ComponentLayoutConfig.SIZE_OVERRIDE));
 	}
 
 	@Override
-	public Rectangle computeLayout(Rectangle availableRect, IComponent layout)
+	public Rectangle computeLayout(Rectangle availableRect, IComponent component)
 	{
-		return this.getChildRect(availableRect);
+		return ComponentLayoutConfig.getChildRect(component, availableRect);
 	}
 }

@@ -16,6 +16,7 @@ import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
+import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.ChatFormatting;
@@ -34,6 +35,11 @@ public class Foldout extends CompositeComponent implements IBetterElement
 {
 	/** The height of the fouldout header */
 	private static final int FOLDOUT_HEADER_HEIGHT = 24;
+	
+	public static final StyleRule STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:foldout").then()
+			.set(CompositeLayoutConfig.INNER_PADDING, new Padding(FOLDOUT_HEADER_HEIGHT, 0, 0, 0))
+			.build();
+	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	
@@ -49,11 +55,9 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	/** Indicates if the section is hidden or not */
 	private boolean hidden = false;
 
-	private final CompositeLayoutConfig config = new CompositeLayoutConfig();
-
 	public Foldout(BetterConfigScreen screen, IComponentParent layoutManager, IConfigNode<?> node, IBetterElement content)
 	{
-		super(layoutManager);
+		super(layoutManager, "better:foldout");
 		this.screen = screen;
 		this.node = node;
 		this.content = content;
@@ -61,7 +65,6 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		this.extraInfo.addAll(node.getDisplayComment());
 		
 		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING;
-		this.config.innerPadding = new Padding(FOLDOUT_HEADER_HEIGHT, 0, 0, 0);
 	}
 	
 	// Layout
@@ -71,12 +74,6 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	{
 		boolean matchFilter = filter.matches(this.node);
 		return this.content.filterElements(matchFilter ? ConfigFilter.ALL : filter);
-	}
-	
-	@Override
-	protected CompositeLayoutConfig getLayoutConfig()
-	{
-		return this.config;
 	}
 
 	@Override

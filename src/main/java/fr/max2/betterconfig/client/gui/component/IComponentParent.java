@@ -2,12 +2,25 @@ package fr.max2.betterconfig.client.gui.component;
 
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleSheet;
 
 /**
  * Manages the layout of a user interface
  */
 public interface IComponentParent
 {
+	/**
+	 * Register the given action to be ran at the end of the current GUI event
+	 * @param action the action to run
+	 */
+	void enqueueWork(Runnable action);
+	
+	// Style
+	
+	StyleSheet getStyleSheet();
+	
+	// Layout
+	
 	/**
 	 * Marks the layout dirty in order to update the layout
 	 */
@@ -22,12 +35,6 @@ public interface IComponentParent
 	 * Gets the x coordinate of the start of the layout
 	 */
 	int getLayoutY();
-	
-	/**
-	 * Register the given action to be ran at the end of the current GUI event
-	 * @param action the action to run
-	 */
-	void enqueueWork(Runnable action);
 	
 	default Size updateLayout(IComponent component, Size availableSize)
 	{

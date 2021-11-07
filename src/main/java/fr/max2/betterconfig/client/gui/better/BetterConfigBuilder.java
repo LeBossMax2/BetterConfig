@@ -9,10 +9,13 @@ import fr.max2.betterconfig.client.gui.better.widget.NumberInputField;
 import fr.max2.betterconfig.client.gui.better.widget.OptionButton;
 import fr.max2.betterconfig.client.gui.better.widget.StringInputField;
 import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
+import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.IComponentParent;
+import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
@@ -28,6 +31,16 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 /** A builder for better configuration screen */
 public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterElement>, IConfigPrimitiveVisitor<Void, IComponent>
 {
+	public static final StyleRule ROOT_STYLE = StyleRule.when().contains(Component.COMPONENT_CLASSES, "better:root_group").then()
+			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(6, 6 + 6, 6, 6))
+			.build();
+	public static final StyleRule TABLE_STYLE = StyleRule.when().contains(Component.COMPONENT_CLASSES, "better:table_group").then()
+			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, SECTION_TAB_SIZE))
+			.build();
+	public static final StyleRule LIST_STYLE = StyleRule.when().contains(Component.COMPONENT_CLASSES, "better:list_group").then()
+			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, SECTION_TAB_SIZE))
+			.build();
+	
 	/**
 	 * Builds the user interface
 	 * @param screen the parent screen
@@ -39,7 +52,8 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		return new GuiRoot(screen, lm ->
 		{
 			GuiGroup tableGroup = new BetterConfigBuilder(screen, lm).buildTable(config);
-			tableGroup.config.outerPadding = new Padding(6, 6 + 6, 6, 6);
+			tableGroup.addClass("better:table_group");
+			tableGroup.addClass("better:root_group");
 			return tableGroup;
 		});
 	}
@@ -69,7 +83,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	public IBetterElement visitTable(IConfigTable table, Void entry)
 	{
 		GuiGroup tableGroup = this.buildTable(table);
-		tableGroup.config.outerPadding = new Padding(0, 0, 0, SECTION_TAB_SIZE);
+		tableGroup.addClass("better:table_group");
 		return new Foldout(this.screen, this.layoutManager, table, tableGroup);
 	}
 	
@@ -78,7 +92,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	{
 		List<IComponent> mainElements = new ArrayList<>();
 		GuiGroup mainGroup = new GuiGroup(this.layoutManager, mainElements);
-		mainGroup.config.outerPadding = new Padding(0, 0, 0, SECTION_TAB_SIZE);
+		mainGroup.addClass("better:list_group");
 		
 		IReadableList<IConfigNode<T>> values = list.getValueList();
 		mainElements.add(new BetterButton(this.screen, this.layoutManager, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->

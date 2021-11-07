@@ -13,6 +13,7 @@ public class BetterScrollPane extends ScrollPane implements IBetterElement
 	public BetterScrollPane(IComponentParent layoutManager, Minecraft minecraft, Function<IComponentParent, IComponent> content)
 	{
 		super(layoutManager, minecraft, content);
+		this.addClass("better:scroll_pane");
 	}
 	
 	// Layout

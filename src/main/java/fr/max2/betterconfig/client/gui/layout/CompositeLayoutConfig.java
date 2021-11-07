@@ -2,40 +2,48 @@ package fr.max2.betterconfig.client.gui.layout;
 
 import java.util.List;
 
+import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.ICompositeComponent;
+import fr.max2.betterconfig.client.gui.style.StyleProperty;
+import net.minecraft.resources.ResourceLocation;
 
-public class CompositeLayoutConfig extends LayoutConfig<ICompositeComponent>
+public enum CompositeLayoutConfig implements ILayoutConfig<ICompositeComponent>
 {
-	public Axis dir = Axis.VERTICAL;
-	public int spacing = 0;
-	public Padding innerPadding = new Padding();
+	INSTANCE;
+	
+	public static StyleProperty<Axis> DIR = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "dir"), Axis.VERTICAL);
+	public static StyleProperty<Integer> SPACING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "spacing"), 0);
+	public static StyleProperty<Padding> INNER_PADDING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "inner_padding"), new Padding());
 	// justification, alignment
 	
 	@Override
 	public Size measureLayout(ICompositeComponent component)
 	{
+		Axis dir = component.getStyleProperty(DIR);
 		List<? extends IComponent> children = component.getChildren();
 		Size innerSize = new Size();
-		innerSize.set(this.dir, children.isEmpty() ? 0 : (children.size() - 1) * this.spacing);
+		innerSize.set(dir, children.isEmpty() ? 0 : (children.size() - 1) * component.getStyleProperty(SPACING));
 		
-		children.forEach(child -> innerSize.combine(child.measureLayout(), this.dir));
+		children.forEach(child -> innerSize.combine(child.measureLayout(), dir));
 
-		Size size = this.innerPadding.unpad(innerSize);
+		Size size = component.getStyleProperty(INNER_PADDING).unpad(innerSize);
 		
-		size.combine(this.sizeOverride, null);
+		size.combine(component.getStyleProperty(ComponentLayoutConfig.SIZE_OVERRIDE), null);
 		
-		return this.getParentRequiredSize(size);
+		return ComponentLayoutConfig.getParentRequiredSize(component, size);
 	}
 
 	@Override
 	public Rectangle computeLayout(Rectangle availableRect, ICompositeComponent component)
 	{
+		Axis dir = component.getStyleProperty(DIR);
+		int spacing = component.getStyleProperty(SPACING);
 		List<? extends IComponent> children = component.getChildren();
-		Rectangle rect = this.getChildRect(availableRect);
-		Rectangle innerRect = this.innerPadding.pad(rect);
+		Rectangle rect = ComponentLayoutConfig.getChildRect(component, availableRect);
+		Rectangle innerRect = component.getStyleProperty(INNER_PADDING).pad(rect);
 		
-		Axis crossDir = this.dir.perpendicular();
+		Axis crossDir = dir.perpendicular();
 		
 		int constrainedSize = 0;
 		int constrainedChildCount = 0;
@@ -43,7 +51,7 @@ public class CompositeLayoutConfig extends LayoutConfig<ICompositeComponent>
 		
 		for (IComponent child : children)
 		{
-			int childMainSize = child.getPrefSize().get(this.dir);
+			int childMainSize = child.getPrefSize().get(dir);
 			if (Size.isConstrained(childMainSize))
 			{
 				constrainedSize += childMainSize;
@@ -51,19 +59,19 @@ public class CompositeLayoutConfig extends LayoutConfig<ICompositeComponent>
 			}
 		}
 		
-		int totalSpacing = children.isEmpty() ? 0 : (children.size() - 1) * this.spacing;
-		int unconstrainedSize = innerRect.size.get(this.dir) - constrainedSize - totalSpacing;
+		int totalSpacing = children.isEmpty() ? 0 : (children.size() - 1) * spacing;
+		int unconstrainedSize = innerRect.size.get(dir) - constrainedSize - totalSpacing;
 		if (unconstrainedSize < 0) unconstrainedSize = 0;
 		int unconstrainedChildCount = childCount - constrainedChildCount;
 		if (unconstrainedChildCount < 0) unconstrainedChildCount = 0;
 		
-		int mainPos = innerRect.getPos(this.dir);
+		int mainPos = innerRect.getPos(dir);
 		int crossPos = innerRect.getPos(crossDir);
 		
 		for (IComponent child : children)
 		{
 			Size childPrefSize = child.getPrefSize();
-			int childMainSize = childPrefSize.get(this.dir);
+			int childMainSize = childPrefSize.get(dir);
 			int childCrossSize = childPrefSize.get(crossDir);
 			
 			if (!Size.isConstrained(childMainSize))
@@ -79,13 +87,13 @@ public class CompositeLayoutConfig extends LayoutConfig<ICompositeComponent>
 			
 			Rectangle childRect = new Rectangle();
 			
-			childRect.size.set(this.dir, childMainSize);
+			childRect.size.set(dir, childMainSize);
 			childRect.size.set(crossDir, childCrossSize);
 			
-			childRect.setPos(this.dir, mainPos);
+			childRect.setPos(dir, mainPos);
 			childRect.setPos(crossDir, crossPos); // TODO [#2] Layout justification
 			
-			mainPos += childMainSize + this.spacing;
+			mainPos += childMainSize + spacing;
 			
 			child.computeLayout(childRect);
 		}

@@ -6,6 +6,7 @@ import java.util.List;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -13,14 +14,25 @@ public class ComponentScreen extends Screen implements IComponentParent
 {
 	private final List<Runnable> delayedWork = new ArrayList<>();
 	
+	private final StyleSheet styleSheet;
+	
 	/** The current user interface */
 	private IComponent content;
 
 	protected boolean layoutDirty = false;
 
-	protected ComponentScreen(Component title)
+	protected ComponentScreen(Component title, StyleSheet styleSheet)
 	{
 		super(title);
+		this.styleSheet = styleSheet;
+	}
+	
+	// Style
+	
+	@Override
+	public StyleSheet getStyleSheet()
+	{
+		return this.styleSheet;
 	}
 	
 	// Layout

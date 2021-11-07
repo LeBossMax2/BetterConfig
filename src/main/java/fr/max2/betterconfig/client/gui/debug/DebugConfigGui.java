@@ -8,7 +8,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
-import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
@@ -27,20 +26,12 @@ public class DebugConfigGui extends UnitComponent
 	private final BetterConfigScreen parent;
 	/** The list of labels to display */
 	private final List<String> labels;
-	
-	private final UnitLayoutConfig config = new UnitLayoutConfig();
 
 	public DebugConfigGui(BetterConfigScreen parent, List<String> labels)
 	{
-		super(parent);
+		super(parent, "debug_gui");
 		this.parent = parent;
 		this.labels = labels;
-	}
-
-	@Override
-	protected UnitLayoutConfig getLayoutConfig()
-	{
-		return this.config;
 	}
 
 	@Override

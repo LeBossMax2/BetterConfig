@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleProperty;
 import net.minecraft.client.gui.components.Widget;
 
 /**
@@ -12,6 +13,10 @@ import net.minecraft.client.gui.components.Widget;
 // TODO [#2] Handle narration
 public interface IComponent extends Widget
 {
+	// Style
+
+	public <T> T getStyleProperty(StyleProperty<T> property);
+	
 	// Layout
 	
 	Size getPrefSize();

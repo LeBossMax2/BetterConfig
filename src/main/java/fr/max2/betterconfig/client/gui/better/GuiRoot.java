@@ -14,9 +14,11 @@ import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.Button;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
 import fr.max2.betterconfig.client.gui.layout.Axis;
+import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.TextComponent;
@@ -30,6 +32,18 @@ public class GuiRoot extends CompositeComponent
 {
 	/** The x position of the input field of the search bar */
 	private static final int SEARCH_LABEL_WIDTH = 80;
+	
+	public static final StyleRule ROOT_STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:root").then()
+			.set(CompositeLayoutConfig.DIR, Axis.VERTICAL)
+			.set(CompositeLayoutConfig.SPACING, Y_PADDING)
+			.set(CompositeLayoutConfig.INNER_PADDING, new Padding(Y_PADDING, X_PADDING, Y_PADDING, X_PADDING))
+			.build();
+	
+	public static final StyleRule SEARCH_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "better:search_field").then()
+			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(1, 1, 1, SEARCH_LABEL_WIDTH + 1))
+			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, 18))
+			.build();
+	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	/** The text field of the search bar */
@@ -41,11 +55,9 @@ public class GuiRoot extends CompositeComponent
 	/** The filter from the search bar */
 	private final ConfigFilter filter = new ConfigFilter();
 
-	private final CompositeLayoutConfig config = new CompositeLayoutConfig();
-
 	public GuiRoot(BetterConfigScreen screen, Function<IComponentParent, IComponent> content)
 	{
-		super(screen);
+		super(screen, "better:root");
 		this.screen = screen;
 		
 		// Tabs
@@ -56,19 +68,20 @@ public class GuiRoot extends CompositeComponent
 		{
 			final int index = i;
 			Button b = new Button(screen, new TextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
-			b.config.sizeOverride = new Size(tabButtonWidth, 20);
+			b.addClass("better:tab_button");
+			b.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(tabButtonWidth, 20));
 			b.widget.active = index != screen.getCurrentConfigIndex();
 			i++;
 			tabs.add(b);
 		}
 		HBox tabHolder = new HBox(screen, tabs);
+		tabHolder.addClass("better:tab_bar");
 		this.components.add(tabHolder);
 		
 		// Search bar
 		this.searchField = new TextField(screen, screen.getFont(), new TranslatableComponent(SEARCH_BAR_KEY));
+		this.searchField.addClass("better:search_field");
 		this.searchField.setResponder(this::updateFilter);
-		this.searchField.config.outerPadding = new Padding(1, 1, 1, SEARCH_LABEL_WIDTH + 1);
-		this.searchField.config.sizeOverride.height = 18;
 		this.components.add(this.searchField);
 		
 		// Scroll
@@ -80,27 +93,21 @@ public class GuiRoot extends CompositeComponent
 		List<IComponent> buttons = new ArrayList<>();
 		int buttonWidth = (this.screen.width - 2 * X_PADDING) / 2;
 		Button cancelButton = new Button(screen, new TranslatableComponent(CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_TOOLTIP);
-		cancelButton.config.sizeOverride = new Size(buttonWidth, 20);
+		cancelButton.addClass("better:cancel");
+		cancelButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(buttonWidth, 20));
 		buttons.add(cancelButton);
 		Button saveButton = new Button(screen, new TranslatableComponent(SAVE_CONFIG_KEY), thisButton -> this.screen.onClose(), Button.NO_TOOLTIP);
-		saveButton.config.sizeOverride = new Size(buttonWidth, 20);
+		saveButton.addClass("better:save");
+		saveButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(buttonWidth, 20));
 		buttons.add(saveButton);
 		HBox buttonBar = new HBox(screen, buttons);
+		buttonBar.addClass("better:bottom_bar");
 		this.components.add(buttonBar);
 		
-		this.config.dir = Axis.VERTICAL;
-		this.config.spacing = Y_PADDING;
-		this.config.sizeOverride = new Size(this.screen.width, this.screen.height);
-		this.config.innerPadding = new Padding(Y_PADDING, X_PADDING, Y_PADDING, X_PADDING);
+		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(this.screen.width, this.screen.height));
 	}
 	
 	// Layout
-	
-	@Override
-	protected CompositeLayoutConfig getLayoutConfig()
-	{
-		return this.config;
-	}
 
 	@Override
 	public List<? extends IComponent> getChildren()

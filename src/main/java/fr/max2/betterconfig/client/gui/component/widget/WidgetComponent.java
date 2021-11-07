@@ -13,9 +13,9 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 {
 	public final W widget;
 
-	public WidgetComponent(IComponentParent layoutManager, W widget)
+	public WidgetComponent(IComponentParent layoutManager, String type, W widget)
 	{
-		super(layoutManager);
+		super(layoutManager, type);
 		this.widget = widget;
 	}
 	

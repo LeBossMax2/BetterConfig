@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.component.IComponentParent;
-import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
 import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -18,11 +17,10 @@ public class Button extends WidgetComponent<Button.InnerButton>
 	public static final OnTooltip NO_TOOLTIP = net.minecraft.client.gui.components.Button.NO_TOOLTIP;
 	/** The overlay to show when the mouse is over the button */
 	private final OnTooltip overlay;
-	public final UnitLayoutConfig config = new UnitLayoutConfig();
 
 	public Button(IComponentParent layoutManager, Component displayString, OnPress pressedHandler, OnTooltip overlay)
 	{
-		super(layoutManager, new InnerButton(0, 0, 0, 0, displayString, pressedHandler));
+		super(layoutManager, "button", new InnerButton(0, 0, 0, 0, displayString, pressedHandler));
 		this.overlay = overlay;
 		this.widget.parent = this;
 	}
@@ -48,12 +46,6 @@ public class Button extends WidgetComponent<Button.InnerButton>
 	protected void renderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
 	{
 		this.widget.superRenderButton(mStack, mouseX, mouseY, partial);
-	}
-
-	@Override
-	protected UnitLayoutConfig getLayoutConfig()
-	{
-		return this.config;
 	}
 	
 	@FunctionalInterface

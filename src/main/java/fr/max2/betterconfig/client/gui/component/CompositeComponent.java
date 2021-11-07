@@ -4,13 +4,16 @@ import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 
 public abstract class CompositeComponent extends Component<ICompositeComponent> implements ICompositeComponent
 {
-	public CompositeComponent(IComponentParent layoutManager)
+	public CompositeComponent(IComponentParent layoutManager, String type)
 	{
-		super(layoutManager);
+		super(layoutManager, type);
 	}
 	
 	@Override
-	protected abstract CompositeLayoutConfig getLayoutConfig();
+	protected CompositeLayoutConfig getLayoutConfig()
+	{
+		return CompositeLayoutConfig.INSTANCE;
+	}
 
 	@Override
 	protected ICompositeComponent getLayoutParam()
