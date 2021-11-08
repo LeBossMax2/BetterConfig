@@ -4,11 +4,11 @@ import java.util.List;
 
 public class ProcessedStyleRule<T>
 {
-	private List<StyleCondition<?>> conditions;
+	private List<IComponentSelector> conditions;
 	private StyleProperty<T> property;
 	private T propertyValue;
 	
-	public ProcessedStyleRule(List<StyleCondition<?>> conditions, StyleValue<T> value)
+	public ProcessedStyleRule(List<IComponentSelector> conditions, StyleValue<T> value)
 	{
 		this.conditions = conditions;
 		this.property = value.getProperty();
@@ -17,9 +17,9 @@ public class ProcessedStyleRule<T>
 
 	public boolean matches(IStylableComponent component)
 	{
-		for (StyleCondition<?> condition : this.conditions)
+		for (IComponentSelector condition : this.conditions)
 		{
-			if (!condition.matches(component))
+			if (!condition.test(component))
 				return false;
 		}
 		return true;

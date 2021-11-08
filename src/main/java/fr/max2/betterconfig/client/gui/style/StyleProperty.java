@@ -5,11 +5,18 @@ import net.minecraft.resources.ResourceLocation;
 public class StyleProperty<T>
 {
 	public final ResourceLocation name;
+	public final Class<?> type;
 	public final T defaultValue;
+
+	public StyleProperty(ResourceLocation name, Class<?> type, T defaultValue)
+	{
+		this.name = name;
+		this.type = type;
+		this.defaultValue = defaultValue;
+	}
 
 	public StyleProperty(ResourceLocation name, T defaultValue)
 	{
-		this.name = name;
-		this.defaultValue = defaultValue;
+		this(name, defaultValue.getClass(), defaultValue);
 	}
 }

@@ -11,6 +11,7 @@ import fr.max2.betterconfig.client.gui.layout.ILayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.style.IStylableComponent;
+import fr.max2.betterconfig.client.gui.style.ListPropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.StyleProperty;
 import net.minecraft.client.gui.GuiComponent;
@@ -18,8 +19,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public abstract class Component<LP> extends GuiComponent implements IStylableComponent
 {
-	public static PropertyIdentifier<String> COMPONENT_TYPE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_type"));
-	public static PropertyIdentifier<List<String>> COMPONENT_CLASSES = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"));
+	public static PropertyIdentifier<String> COMPONENT_TYPE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_type"), String.class);
+	public static ListPropertyIdentifier<String> COMPONENT_CLASSES = new ListPropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"), String.class);
 	
 	protected final Map<PropertyIdentifier<?>, Supplier<?>> propertyMap = new HashMap<>();
 	protected final Map<StyleProperty<?>, Object> styleOverride = new HashMap<>();
