@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -26,17 +24,6 @@ import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 
 public class StyleRule
 {
-	public static Gson GSON = new GsonBuilder()
-			.registerTypeAdapter(StyleRule.class, new Serializer(Arrays.asList(
-						Component.COMPONENT_TYPE,
-						Component.COMPONENT_CLASSES
-					), Arrays.asList(
-						ComponentLayoutConfig.SIZE_OVERRIDE,
-						ComponentLayoutConfig.OUTER_PADDING,
-						CompositeLayoutConfig.DIR,
-						CompositeLayoutConfig.SPACING,
-						CompositeLayoutConfig.INNER_PADDING
-					))).create();
 	private final List<IComponentSelector> conditions;
 	private final List<StyleValue<?>> values;
 	
@@ -114,21 +101,32 @@ public class StyleRule
 	
 	public static class Serializer implements JsonSerializer<StyleRule>, JsonDeserializer<StyleRule>
 	{
+		public static Serializer INSTANCE = new Serializer(Arrays.asList(
+				Component.COMPONENT_TYPE,
+				Component.COMPONENT_CLASSES
+			), Arrays.asList(
+				ComponentLayoutConfig.SIZE_OVERRIDE,
+				ComponentLayoutConfig.OUTER_PADDING,
+				CompositeLayoutConfig.DIR,
+				CompositeLayoutConfig.SPACING,
+				CompositeLayoutConfig.INNER_PADDING
+			));
+		
 		private final Map<String, PropertyIdentifier<?>> componentProperties;
 		private final Map<String, StyleProperty<?>> styleProperties;
 		
 		
-		public Serializer(List<PropertyIdentifier<?>> componentProperties, List<StyleProperty<?>> styleProperties)
+		private Serializer(List<PropertyIdentifier<?>> componentProperties, List<StyleProperty<?>> styleProperties)
 		{
 			this.componentProperties = new HashMap<>();
 			this.styleProperties = new HashMap<>();
 			for (PropertyIdentifier<?> prop : componentProperties)
 			{
-				this.componentProperties.put(prop.name.toDebugFileName(), prop);
+				this.componentProperties.put(prop.name.toString(), prop);
 			}
 			for (StyleProperty<?> prop : styleProperties)
 			{
-				this.styleProperties.put(prop.name.toDebugFileName(), prop);
+				this.styleProperties.put(prop.name.toString(), prop);
 			}
 		}
 

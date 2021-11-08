@@ -18,6 +18,7 @@ public class ModDataProviders
         if (event.includeClient())
         {
             gen.addProvider(new ModLanguagesProvider(gen));
+            gen.addProvider(new ModStyleSheetProvider(gen));
         }
     }
 }

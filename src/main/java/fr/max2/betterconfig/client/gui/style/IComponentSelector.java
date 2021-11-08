@@ -68,7 +68,7 @@ public interface IComponentSelector extends Predicate<IStylableComponent>
 			JsonObject obj = new JsonObject();
 			obj.addProperty("property", this.property.name.toString());
 			obj.addProperty("operator", "contains");
-			obj.add("value", context.serialize(this.value, this.property.type));
+			obj.add("value", context.serialize(this.value, this.property.contentType));
 			return obj;
 		}
 		

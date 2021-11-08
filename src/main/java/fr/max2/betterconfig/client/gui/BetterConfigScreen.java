@@ -1,25 +1,19 @@
 package fr.max2.betterconfig.client.gui;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.client.gui.better.BetterConfigBuilder;
-import fr.max2.betterconfig.client.gui.better.Foldout;
-import fr.max2.betterconfig.client.gui.better.GuiRoot;
-import fr.max2.betterconfig.client.gui.better.ListElementEntry;
-import fr.max2.betterconfig.client.gui.better.ValueEntry;
-import fr.max2.betterconfig.client.gui.better.widget.OptionButton;
-import fr.max2.betterconfig.client.gui.better.widget.StringInputField;
-import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
 import fr.max2.betterconfig.client.gui.component.ComponentScreen;
-import fr.max2.betterconfig.client.gui.component.HBox;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.widget.NumberField;
-import fr.max2.betterconfig.client.gui.component.widget.TextField;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;
@@ -34,6 +28,8 @@ import net.minecraftforge.fml.config.ModConfig;
 
 public class BetterConfigScreen extends ComponentScreen
 {
+   private static final Logger LOGGER = LogManager.getLogger();
+   
 	/** The config user interface builder */
 	private final IConfigUIBuilder uiBuilder;
 	/** The mod this configuration is from */
@@ -201,9 +197,16 @@ public class BetterConfigScreen extends ComponentScreen
 		{
 			// TODO [#2] Get ui builder and style sheet from mod properties
 			IConfigUIBuilder uiBuilder = BetterConfigBuilder::build;
-			StyleSheet styleSheet = new StyleSheet(HBox.STYLE, TextField.STYLE, NumberField.FIELD_STYLE, NumberField.PLUS_STYLE, NumberField.MINUS_STYLE,
-					GuiRoot.ROOT_STYLE, GuiRoot.SEARCH_STYLE, Foldout.STYLE, ListElementEntry.STYLE, ListElementEntry.REMOVE_STYLE, ValueEntry.STYLE,
-					OptionButton.STYLE, StringInputField.STYLE, UnknownOptionWidget.STYLE, BetterConfigBuilder.ROOT_STYLE, BetterConfigBuilder.TABLE_STYLE, BetterConfigBuilder.LIST_STYLE);
+			StyleSheet styleSheet;
+			try
+			{
+				styleSheet = StyleSheet.findSheet(StyleSheet.DEFAULT_STYLESHEET);
+			} catch (IOException e)
+			{
+                LOGGER.warn("Exception loading stylesheet: {}: {}", StyleSheet.DEFAULT_STYLESHEET, e);
+				e.printStackTrace();
+				return prevScreen;
+			}
 			BetterConfigScreen screen = new BetterConfigScreen(uiBuilder, styleSheet, mod, configs, 0);
 			screen.setPrevScreen(prevScreen);
 			return screen;
