@@ -91,6 +91,14 @@ public class Button extends WidgetComponent<Button.InnerButton>
 		}
 		
 		@Override
+		public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers)
+		{
+			if (!this.isFocused())
+				return false;
+			return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+		}
+
+		@Override
 		public boolean isHovered()
 		{
 			return super.isHovered();

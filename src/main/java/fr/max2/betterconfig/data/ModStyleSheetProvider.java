@@ -40,9 +40,9 @@ public class ModStyleSheetProvider implements DataProvider
 	public void run(HashCache pCache) throws IOException
 	{
 		StyleSheet.Builder defaultStyleSheet = new StyleSheet.Builder(
-				HBox.STYLE, TextField.STYLE, NumberField.FIELD_STYLE, NumberField.PLUS_STYLE, NumberField.MINUS_STYLE,
 				GuiRoot.ROOT_STYLE, GuiRoot.SEARCH_STYLE, Foldout.STYLE, ListElementEntry.STYLE, ListElementEntry.REMOVE_STYLE, ValueEntry.STYLE,
-				OptionButton.STYLE, StringInputField.STYLE, UnknownOptionWidget.STYLE, BetterConfigBuilder.ROOT_STYLE, BetterConfigBuilder.TABLE_STYLE, BetterConfigBuilder.LIST_STYLE);
+				OptionButton.STYLE, StringInputField.STYLE, UnknownOptionWidget.STYLE, BetterConfigBuilder.ROOT_STYLE, BetterConfigBuilder.TABLE_STYLE, BetterConfigBuilder.LIST_STYLE,
+				HBox.STYLE, TextField.STYLE, NumberField.FIELD_STYLE, NumberField.PLUS_STYLE, NumberField.MINUS_STYLE);
 		
 		extracted(pCache, defaultStyleSheet, StyleSheet.DEFAULT_STYLESHEET);
 	}

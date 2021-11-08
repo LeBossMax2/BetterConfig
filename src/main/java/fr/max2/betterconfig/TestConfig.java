@@ -13,17 +13,13 @@ import net.minecraftforge.fml.config.ModConfig;
 public class TestConfig
 {
 	private static final ForgeConfigSpec CLIENT_SPEC;
-	private static final Client CLIENT;
 	private static final ForgeConfigSpec COMMON_SPEC;
-	private static final Common COMMON;
 	
 	static
 	{
 		Pair<Client, ForgeConfigSpec> clientPair = new ForgeConfigSpec.Builder().configure(Client::new);
-		CLIENT = clientPair.getLeft();
 		CLIENT_SPEC = clientPair.getRight();
 		Pair<Common, ForgeConfigSpec> commonPair = new ForgeConfigSpec.Builder().configure(Common::new);
-		COMMON = commonPair.getLeft();
 		COMMON_SPEC = commonPair.getRight();
 	}
 	
