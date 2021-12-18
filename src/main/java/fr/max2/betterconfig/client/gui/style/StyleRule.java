@@ -35,12 +35,12 @@ public class StyleRule
 
 	public List<IComponentSelector> getConditions()
 	{
-		return conditions;
+		return this.conditions;
 	}
 	
 	public List<StyleValue<?>> getValues()
 	{
-		return values;
+		return this.values;
 	}
 	
 	public static ConditionBuilder when()
@@ -185,9 +185,9 @@ public class StyleRule
 				return IComponentSelector.Equals.fromJson(obj, context, this);
 			case "contains":
 				return IComponentSelector.Contains.fromJson(obj, context, this);
+			default:
+				return null;
 			}
-			
-			return null;
 		}
 		
 		public PropertyIdentifier<?> getComponentProperty(String propertyIdentifier)

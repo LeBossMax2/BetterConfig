@@ -55,7 +55,10 @@ public class StyleSheet
 	public <T> T computePropertyValue(IStylableComponent component, StyleProperty<T> property)
 	{
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		List<ProcessedStyleRule<T>> rules = (List<ProcessedStyleRule<T>>)(List)this.rules.get(property);
+		List<ProcessedStyleRule<T>> rules = (List)this.rules.get(property);
+		if (rules == null)
+			return property.defaultValue;
+			
 		for (ProcessedStyleRule<T> rule : rules)
 		{
 			if (rule.matches(component))

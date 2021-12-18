@@ -27,6 +27,6 @@ public class ProcessedStyleRule<T>
 	
 	public T getPropertyValue()
 	{
-		return propertyValue;
+		return this.propertyValue;
 	}
 }

@@ -13,11 +13,11 @@ public class StyleValue<T>
 	
 	public StyleProperty<T> getProperty()
 	{
-		return property;
+		return this.property;
 	}
 	
 	public T getPropertyValue()
 	{
-		return propertyValue;
+		return this.propertyValue;
 	}
 }

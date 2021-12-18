@@ -201,7 +201,8 @@ public class BetterConfigScreen extends ComponentScreen
 			try
 			{
 				styleSheet = StyleSheet.findSheet(StyleSheet.DEFAULT_STYLESHEET);
-			} catch (IOException e)
+			}
+			catch (IOException e)
 			{
                 LOGGER.warn("Exception loading stylesheet: {}: {}", StyleSheet.DEFAULT_STYLESHEET, e);
 				e.printStackTrace();
