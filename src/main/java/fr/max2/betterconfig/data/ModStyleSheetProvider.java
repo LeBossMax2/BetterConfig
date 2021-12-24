@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import fr.max2.betterconfig.client.gui.better.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.GuiRoot;
+import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.better.ListElementEntry;
 import fr.max2.betterconfig.client.gui.better.ValueEntry;
 import fr.max2.betterconfig.client.gui.better.widget.OptionButton;
@@ -40,7 +41,7 @@ public class ModStyleSheetProvider implements DataProvider
 	public void run(HashCache pCache) throws IOException
 	{
 		StyleSheet.Builder defaultStyleSheet = new StyleSheet.Builder(
-				GuiRoot.ROOT_STYLE, GuiRoot.SEARCH_STYLE, Foldout.STYLE, ListElementEntry.STYLE, ListElementEntry.REMOVE_STYLE, ValueEntry.STYLE,
+				IBetterElement.STYLE, GuiRoot.ROOT_STYLE, GuiRoot.SEARCH_STYLE, Foldout.STYLE, ListElementEntry.STYLE, ListElementEntry.REMOVE_STYLE, ValueEntry.STYLE,
 				OptionButton.STYLE, StringInputField.STYLE, UnknownOptionWidget.STYLE, BetterConfigBuilder.ROOT_STYLE, BetterConfigBuilder.TABLE_STYLE, BetterConfigBuilder.LIST_STYLE,
 				HBox.STYLE, TextField.STYLE, NumberField.FIELD_STYLE, NumberField.PLUS_STYLE, NumberField.MINUS_STYLE);
 		

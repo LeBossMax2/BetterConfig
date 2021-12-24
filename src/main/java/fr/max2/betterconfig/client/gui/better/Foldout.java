@@ -51,9 +51,8 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private final List<FormattedText> extraInfo = new ArrayList<>();
 	
 	/** {@code true} when the content is collapsed, {@code false} otherwise */
-	private boolean folded = false;
-	/** Indicates if the section is hidden or not */
-	private boolean hidden = false;
+	private boolean folded = false; // TODO [#2] Use style class to tag folded sections
+	private boolean filteredOut = false;
 
 	public Foldout(BetterConfigScreen screen, IComponentParent layoutManager, IConfigNode<?> node, IBetterElement content)
 	{
@@ -63,6 +62,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		this.content = content;
 		this.extraInfo.add(FormattedText.of(node.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
 		this.extraInfo.addAll(node.getDisplayComment());
+		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 		
 		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING;
 	}
@@ -73,13 +73,14 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	public boolean filterElements(ConfigFilter filter)
 	{
 		boolean matchFilter = filter.matches(this.node);
-		return this.content.filterElements(matchFilter ? ConfigFilter.ALL : filter);
+		this.filteredOut = this.content.filterElements(matchFilter ? ConfigFilter.ALL : filter);
+		return this.filteredOut;
 	}
 
 	@Override
 	public List<? extends IComponent> getChildren()
 	{
-		return this.folded || this.hidden ? Collections.emptyList() : Arrays.asList(this.content);
+		return this.folded ? Collections.emptyList() : Arrays.asList(this.content);
 	}
 	
 	@Override
@@ -105,7 +106,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	}
 	
 	@Override
-	public void mouseClicked(double mouseX, double mouseY, int button, EventState state)
+	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
 		if (this.isOverHeader(mouseX, mouseY))
 		{
@@ -118,14 +119,11 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		if (this.folded)
 			return;
 		
-		super.mouseClicked(mouseX, mouseY, button, state);
+		super.onMouseClicked(mouseX, mouseY, button, state);
 	}
 	
 	private boolean isOverHeader(double mouseX, double mouseY)
 	{
-		if (this.hidden)
-			return false;
-
 		Rectangle rect = this.getRect();
 		
 		return mouseX >= rect.x
@@ -137,12 +135,9 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	// Rendering
 	
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		if (this.hidden)
-			return;
-		
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.onRender(matrixStack, mouseX, mouseY, partialTicks);
 		this.renderFoldoutHeader(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
@@ -165,12 +160,9 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	}
 	
 	@Override
-	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		if (this.hidden)
-			return;
-		
-		super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		super.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 		if (this.isOverHeader(mouseX, mouseY))
 		{
 			Font font = this.screen.getFont();

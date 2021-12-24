@@ -29,12 +29,14 @@ public class GuiGroup extends CompositeComponent implements IBetterElement
 	@Override
 	public boolean filterElements(ConfigFilter filter)
 	{
-		boolean anyVisible = false;
+		boolean allHidden = true;
 		for (IBetterElement child : this.betterElements)
 		{
-			anyVisible |= child.filterElements(filter);
+			allHidden &= child.filterElements(filter);
 		}
-		return anyVisible;
+		if (filter == ConfigFilter.ALL)
+			return false;
+		return allHidden;
 	}
 
 	@Override
@@ -46,7 +48,6 @@ public class GuiGroup extends CompositeComponent implements IBetterElement
 	@Override
 	public void invalidate()
 	{
-		// No sure why we need this but can't compile without
 		super.invalidate();
 	}
 }

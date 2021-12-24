@@ -119,16 +119,17 @@ public class GuiRoot extends CompositeComponent
 	private void updateFilter(String filterStr)
 	{
 		this.filter.setFilter(filterStr);
+		this.scrollPane.filterElements(this.filter);
 		this.scrollPane.marksLayoutDirty();
 	}
 	
 	// Rendering
 	
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.screen.renderBackground(matrixStack);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.onRender(matrixStack, mouseX, mouseY, partialTicks);
 		Font font = this.screen.getFont();
 		font.draw(matrixStack, this.searchField.getMessage(), X_PADDING, 20 + 2 * Y_PADDING + (20 - font.lineHeight) / 2, 0xFF_FF_FF_FF);
 		this.renderHeader(matrixStack, mouseX, mouseY, partialTicks);

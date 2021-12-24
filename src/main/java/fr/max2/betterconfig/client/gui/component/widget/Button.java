@@ -38,7 +38,7 @@ public class Button extends WidgetComponent<Button.InnerButton>
 	// Rendering
 	
 	@Override
-	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.overlay.onTooltip(this.widget, matrixStack, mouseX, mouseY);
 	}

@@ -38,7 +38,7 @@ public class BetterButton extends Button
 	}
 	
 	@Override
-	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.isPointInside(mouseX, mouseY))
 		{

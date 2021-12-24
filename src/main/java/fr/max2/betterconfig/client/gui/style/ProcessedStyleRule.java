@@ -5,13 +5,11 @@ import java.util.List;
 public class ProcessedStyleRule<T>
 {
 	private List<IComponentSelector> conditions;
-	private StyleProperty<T> property;
 	private T propertyValue;
 	
 	public ProcessedStyleRule(List<IComponentSelector> conditions, StyleValue<T> value)
 	{
 		this.conditions = conditions;
-		this.property = value.getProperty();
 		this.propertyValue = value.getPropertyValue();
 	}
 

@@ -18,6 +18,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
@@ -103,10 +104,12 @@ public class StyleRule
 	{
 		public static Serializer INSTANCE = new Serializer(Arrays.asList(
 				Component.COMPONENT_TYPE,
-				Component.COMPONENT_CLASSES
+				Component.COMPONENT_CLASSES,
+				IBetterElement.FILTERED_OUT
 			), Arrays.asList(
 				ComponentLayoutConfig.SIZE_OVERRIDE,
 				ComponentLayoutConfig.OUTER_PADDING,
+				ComponentLayoutConfig.VISIBILITY,
 				CompositeLayoutConfig.DIR,
 				CompositeLayoutConfig.SPACING,
 				CompositeLayoutConfig.INNER_PADDING,

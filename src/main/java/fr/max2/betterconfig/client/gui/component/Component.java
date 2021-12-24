@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import fr.max2.betterconfig.BetterConfig;
+import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.ILayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
@@ -19,8 +22,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public abstract class Component<LP> extends GuiComponent implements IStylableComponent
 {
-	public static PropertyIdentifier<String> COMPONENT_TYPE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_type"), String.class);
-	public static ListPropertyIdentifier<String> COMPONENT_CLASSES = new ListPropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"), String.class);
+	public static final PropertyIdentifier<String> COMPONENT_TYPE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_type"), String.class);
+	public static final ListPropertyIdentifier<String> COMPONENT_CLASSES = new ListPropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"), String.class);
 	
 	protected final Map<PropertyIdentifier<?>, Supplier<?>> propertyMap = new HashMap<>();
 	protected final Map<StyleProperty<?>, Object> styleOverride = new HashMap<>();
@@ -50,7 +53,10 @@ public abstract class Component<LP> extends GuiComponent implements IStylableCom
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getProperty(PropertyIdentifier<T> property) {
-		return (T)this.propertyMap.get(property).get();
+		Supplier<?> propertyValue = this.propertyMap.get(property);
+		if (propertyValue == null)
+			return null;
+		return (T)propertyValue.get();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -124,8 +130,136 @@ public abstract class Component<LP> extends GuiComponent implements IStylableCom
 		this.relativeRect = rect;
 	}
 	
+	// Rendering
+
+	@Override
+	public final void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick)
+	{
+		if (!this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isVisible())
+			return;
+		
+		this.onRender(pPoseStack, pMouseX, pMouseY, pPartialTick);
+	}
+	
+	protected abstract void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick);
+
+	@Override
+	public final void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	{
+		if (!this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isVisible())
+			return;
+		
+		this.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+	}
+
+	protected abstract void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks);
+	
+	// Mouse Handling
+	
 	protected boolean isPointInside(double x, double y)
 	{
 		return this.getRect().isPointInside(x, y);
 	}
+
+	@Override
+	public final void mouseMoved(double mouseX, double mouseY)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onMouseMoved(mouseX, mouseY);
+	}
+	
+	protected abstract void onMouseMoved(double mouseX, double mouseY);
+
+	@Override
+	public final void mouseClicked(double mouseX, double mouseY, int button, EventState state)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onMouseClicked(mouseX, mouseY, button, state);
+	}
+
+	protected abstract void onMouseClicked(double mouseX, double mouseY, int button, EventState state);
+
+	@Override
+	public final void mouseReleased(double mouseX, double mouseY, int button, EventState state)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onMouseReleased(mouseX, mouseY, button, state);
+	}
+
+	protected abstract void onMouseReleased(double mouseX, double mouseY, int button, EventState state);
+
+	@Override
+	public final void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onMouseDragged(mouseX, mouseY, button, dragX, dragY, state);
+	}
+
+	protected abstract void onMouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state);
+
+	@Override
+	public final void mouseScrolled(double mouseX, double mouseY, double delta, EventState state)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onMouseScrolled(mouseX, mouseY, delta, state);
+	}
+
+	protected abstract void onMouseScrolled(double mouseX, double mouseY, double delta, EventState state);
+	
+	// Input handling
+
+	@Override
+	public final void keyPressed(int keyCode, int scanCode, int modifiers, EventState state)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onKeyPressed(keyCode, scanCode, modifiers, state);
+	}
+
+	protected abstract void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state);
+
+	@Override
+	public final void keyReleased(int keyCode, int scanCode, int modifiers, EventState state)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onKeyReleased(keyCode, scanCode, modifiers, state);
+	}
+
+	protected abstract void onKeyReleased(int keyCode, int scanCode, int modifiers, EventState state);
+
+	@Override
+	public final void charTyped(char codePoint, int modifiers, EventState state)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onCharTyped(codePoint, modifiers, state);
+	}
+	
+	protected abstract void onCharTyped(char codePoint, int modifiers, EventState state);
+
+	@Override
+	public final void cycleFocus(boolean forward, CycleFocusState state)
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return;
+		
+		this.onCycleFocus(forward, state);
+	}
+	
+	protected abstract void onCycleFocus(boolean forward, CycleFocusState state);
+	
 }

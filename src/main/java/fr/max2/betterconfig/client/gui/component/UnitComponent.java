@@ -32,45 +32,45 @@ public abstract class UnitComponent extends Component<IComponent>
 	// Rendering
 
 	@Override
-	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{ }
 	
 	// Input handling
 
 	@Override
-	public void mouseMoved(double mouseX, double mouseY)
+	protected void onMouseMoved(double mouseX, double mouseY)
 	{ }
 
 	@Override
-	public void mouseClicked(double mouseX, double mouseY, int button, EventState state)
+	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{ }
 
 	@Override
-	public void mouseReleased(double mouseX, double mouseY, int button, EventState state)
+	protected void onMouseReleased(double mouseX, double mouseY, int button, EventState state)
 	{ }
 
 	@Override
-	public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
+	protected void onMouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
 	{ }
 
 	@Override
-	public void mouseScrolled(double mouseX, double mouseY, double delta, EventState state)
+	protected void onMouseScrolled(double mouseX, double mouseY, double delta, EventState state)
 	{ }
 
 	@Override
-	public void keyPressed(int keyCode, int scanCode, int modifiers, EventState state)
+	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{ }
 
 	@Override
-	public void keyReleased(int keyCode, int scanCode, int modifiers, EventState state)
+	protected void onKeyReleased(int keyCode, int scanCode, int modifiers, EventState state)
 	{ }
 
 	@Override
-	public void charTyped(char codePoint, int modifiers, EventState state)
+	protected void onCharTyped(char codePoint, int modifiers, EventState state)
 	{ }
 
 	@Override
-	public void cycleFocus(boolean forward, CycleFocusState state)
+	protected void onCycleFocus(boolean forward, CycleFocusState state)
 	{ }
 	
 }

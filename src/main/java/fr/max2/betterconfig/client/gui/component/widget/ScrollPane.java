@@ -169,14 +169,14 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	// Mouse handling
 	
 	@Override
-	public void mouseMoved(double mouseX, double mouseY)
+	protected void onMouseMoved(double mouseX, double mouseY)
 	{
 		this.checkLayout();
 		IScrollComponent.super.mouseMoved(mouseX, mouseY);
 	}
 	
 	@Override
-	public void mouseScrolled(double mouseX, double mouseY, double delta, EventState state)
+	protected void onMouseScrolled(double mouseX, double mouseY, double delta, EventState state)
 	{
 		this.checkLayout();
 		if (!this.isPointInside(mouseX, mouseY))
@@ -191,7 +191,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	}
 	
 	@Override
-	public void mouseClicked(double mouseX, double mouseY, int button, EventState state)
+	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
 		this.checkLayout();
 		if (!this.isPointInside(mouseX, mouseY))
@@ -214,7 +214,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	}
 	
 	@Override
-	public void mouseReleased(double mouseX, double mouseY, int button, EventState state)
+	protected void onMouseReleased(double mouseX, double mouseY, int button, EventState state)
 	{
 		this.checkLayout();
 		if (button == 0 && this.scrolling)
@@ -227,7 +227,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	}
 	
 	@Override
-	public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
+	protected void onMouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
 	{
 		this.checkLayout();
 		if (button == 0 && this.scrolling)
@@ -255,28 +255,28 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	// Other input
 	
 	@Override
-	public void keyPressed(int keyCode, int scanCode, int modifiers, EventState state)
+	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		this.checkLayout();
 		IScrollComponent.super.keyPressed(keyCode, scanCode, modifiers, state);
 	}
 	
 	@Override
-	public void keyReleased(int keyCode, int scanCode, int modifiers, EventState state)
+	protected void onKeyReleased(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		this.checkLayout();
 		IScrollComponent.super.keyReleased(keyCode, scanCode, modifiers, state);
 	}
 	
 	@Override
-	public void charTyped(char codePoint, int modifiers, EventState state)
+	protected void onCharTyped(char codePoint, int modifiers, EventState state)
 	{
 		this.checkLayout();
 		IScrollComponent.super.charTyped(codePoint, modifiers, state);
 	}
 	
 	@Override
-	public void cycleFocus(boolean forward, CycleFocusState state)
+	protected void onCycleFocus(boolean forward, CycleFocusState state)
 	{
 		this.checkLayout();
 		IScrollComponent.super.cycleFocus(forward, state);
@@ -342,7 +342,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	}
 	
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.checkLayout();
 		
@@ -376,7 +376,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	}
 	
 	@Override
-	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if (this.isPointInside(mouseX, mouseY))
 			IScrollComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);

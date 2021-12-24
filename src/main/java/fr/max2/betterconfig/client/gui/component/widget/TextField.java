@@ -55,11 +55,11 @@ public class TextField extends WidgetComponent<EditBox>
 	// Input handling
 	
 	@Override
-	public void keyPressed(int keyCode, int scanCode, int modifiers, EventState state)
+	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		if (state.isConsumed() || !this.widget.canConsumeInput())
 			return;
-		super.keyPressed(keyCode, scanCode, modifiers, state);
+		super.onKeyPressed(keyCode, scanCode, modifiers, state);
 		if (state.isConsumed())
 			return;
 		

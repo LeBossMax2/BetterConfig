@@ -34,21 +34,21 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	}
 	
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		updatePosition();
 		this.widget.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	@Override
-	public void mouseMoved(double mouseX, double mouseY)
+	protected void onMouseMoved(double mouseX, double mouseY)
 	{
 		updatePosition();
 		this.widget.mouseMoved(mouseX, mouseY);
 	}
 	
 	@Override
-	public void mouseClicked(double mouseX, double mouseY, int button, EventState state)
+	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
 		updatePosition();
 		if (this.widget.mouseClicked(mouseX, mouseY, button))
@@ -56,7 +56,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	}
 	
 	@Override
-	public void mouseReleased(double mouseX, double mouseY, int button, EventState state)
+	protected void onMouseReleased(double mouseX, double mouseY, int button, EventState state)
 	{
 		updatePosition();
 		if (!state.isConsumed() && this.widget.mouseReleased(mouseX, mouseY, button))
@@ -64,7 +64,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	}
 	
 	@Override
-	public void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
+	protected void onMouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
 	{
 		updatePosition();
 		if (!state.isConsumed() && this.widget.mouseDragged(mouseX, mouseY, button, dragX, dragY))
@@ -72,7 +72,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	}
 	
 	@Override
-	public void mouseScrolled(double mouseX, double mouseY, double delta, EventState state)
+	protected void onMouseScrolled(double mouseX, double mouseY, double delta, EventState state)
 	{
 		updatePosition();
 		if (!state.isConsumed() && this.widget.mouseScrolled(mouseX, mouseY, delta))
@@ -80,7 +80,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	}
 	
 	@Override
-	public void keyPressed(int keyCode, int scanCode, int modifiers, EventState state)
+	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		updatePosition();
 		if (!state.isConsumed() && this.widget.isFocused() && this.widget.keyPressed(keyCode, scanCode, modifiers))
@@ -88,7 +88,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	}
 	
 	@Override
-	public void keyReleased(int keyCode, int scanCode, int modifiers, EventState state)
+	protected void onKeyReleased(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		updatePosition();
 		if (!state.isConsumed() && this.widget.isFocused() && this.widget.keyReleased(keyCode, scanCode, modifiers))
@@ -96,7 +96,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	}
 	
 	@Override
-	public void charTyped(char codePoint, int modifiers, EventState state)
+	protected void onCharTyped(char codePoint, int modifiers, EventState state)
 	{
 		updatePosition();
 		if (!state.isConsumed() && this.widget.isFocused() && this.widget.charTyped(codePoint, modifiers))
@@ -104,7 +104,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	}
 	
 	@Override
-	public void cycleFocus(boolean forward, CycleFocusState state)
+	protected void onCycleFocus(boolean forward, CycleFocusState state)
 	{
 		updatePosition();
 		if (state.isConsumed())

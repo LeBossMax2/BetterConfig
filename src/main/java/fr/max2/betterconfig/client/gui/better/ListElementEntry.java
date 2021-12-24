@@ -34,7 +34,7 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	private final IBetterElement content;
 	private final BetterButton button;
 	private final List<IComponent> children;
-	private boolean hidden;
+	private boolean filteredOut = false;
 	
 	public ListElementEntry(BetterConfigScreen screen, IComponentParent layoutManager, IBetterElement content, OnPress deleteAction)
 	{
@@ -43,14 +43,15 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 		this.button = new BetterButton.Icon(screen, layoutManager, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(REMOVE_TOOLTIP_KEY));
 		this.button.addClass("better:list_remove");
 		this.children = Arrays.asList(this.button, content);
+		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 		//this.config.innerPadding = new Padding(0, RIGHT_PADDING, 0, X_PADDING);?
 	}
 	
 	@Override
 	public boolean filterElements(ConfigFilter filter)
 	{
-		this.hidden = this.content.filterElements(filter);
-		return this.hidden;
+		this.filteredOut = this.content.filterElements(filter);
+		return this.filteredOut;
 	}
 
 	@Override
@@ -60,11 +61,8 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	}
 	
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		if (this.hidden)
-			return;
-
 		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
 		if (this.isPointInside(mouseX, mouseY))
 			this.button.render(matrixStack, mouseX, mouseY, partialTicks);

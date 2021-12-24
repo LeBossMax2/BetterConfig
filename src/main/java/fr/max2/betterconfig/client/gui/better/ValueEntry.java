@@ -52,7 +52,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	/** The extra info to show on the tooltip */
 	private final List<FormattedText> extraInfo = new ArrayList<>();
 	/** Indicates if the property is hidden or not */
-	private boolean hidden = false;
+	private boolean filteredOut = false;
 
 	public ValueEntry(BetterConfigScreen screen, IComponentParent layoutManager, IConfigPrimitive<?> property, IComponent content)
 	{
@@ -70,10 +70,11 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		IComponent spacing = new UnitComponent(layoutManager, "spacing")
 		{
 			@Override
-			public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTicks)
+			protected void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTicks)
 			{ }
 		};
 		this.children = Arrays.asList(spacing, content, this.button);
+		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
 		//this.config.justification = Justification.CENTER;
 		//this.config.alignment = Alignment.END;
@@ -84,14 +85,14 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	@Override
 	public List<? extends IComponent> getChildren()
 	{
-		return this.hidden ? Collections.emptyList() : this.children;
+		return this.children;
 	}
 	
 	@Override
 	public boolean filterElements(ConfigFilter filter)
 	{
-		this.hidden = !filter.matches(this.property);
-		return this.hidden;
+		this.filteredOut = !filter.matches(this.property);
+		return this.filteredOut;
 	}
 	
 	@Override
@@ -114,11 +115,8 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	// Rendering
 	
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		if (this.hidden)
-			return;
-		
 		Rectangle rect = this.getRect();
 		
 		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -134,14 +132,11 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	}
 	
 	@Override
-	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		if (this.hidden)
-			return;
-		
 		Rectangle rect = this.getRect();
 		
-		super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		super.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks);
 		if ( mouseX >= rect.x && mouseY >= rect.y && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING - VALUE_HEIGHT && mouseY < rect.getBottom())
 		{
 			Font font = this.screen.getFont();

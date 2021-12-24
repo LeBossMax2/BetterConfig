@@ -18,11 +18,16 @@ public enum CompositeLayoutConfig implements ILayoutConfig<ICompositeComponent>
 	public static StyleProperty<Alignment> JUSTIFICATION = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "justification"), Alignment.MIN);
 	public static StyleProperty<Alignment> ALIGNMENT = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "alignment"), Alignment.MIN);
 	
+	private static List<? extends IComponent> getLayoutChildren(ICompositeComponent component)
+	{
+		return component.getChildren().stream().filter(child -> !child.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed()).toList();
+	}
+	
 	@Override
 	public Size measureLayout(ICompositeComponent component)
 	{
 		Axis dir = component.getStyleProperty(DIR);
-		List<? extends IComponent> children = component.getChildren();
+		List<? extends IComponent> children = getLayoutChildren(component);
 		Size innerSize = new Size();
 		innerSize.set(dir, children.isEmpty() ? 0 : (children.size() - 1) * component.getStyleProperty(SPACING));
 		
@@ -40,7 +45,7 @@ public enum CompositeLayoutConfig implements ILayoutConfig<ICompositeComponent>
 	{
 		Axis dir = component.getStyleProperty(DIR);
 		int spacing = component.getStyleProperty(SPACING);
-		List<? extends IComponent> children = component.getChildren();
+		List<? extends IComponent> children = getLayoutChildren(component);
 		Rectangle rect = ComponentLayoutConfig.getChildRect(component, availableRect);
 		Rectangle innerRect = component.getStyleProperty(INNER_PADDING).pad(rect);
 		

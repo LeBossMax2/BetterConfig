@@ -22,6 +22,6 @@ public class BetterScrollPane extends ScrollPane implements IBetterElement
 	public boolean filterElements(ConfigFilter filter)
 	{
 		((IBetterElement)this.getChild()).filterElements(filter);
-		return true;
+		return false;
 	}
 }

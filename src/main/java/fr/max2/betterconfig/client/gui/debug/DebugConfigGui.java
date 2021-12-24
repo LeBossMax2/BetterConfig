@@ -35,7 +35,7 @@ public class DebugConfigGui extends UnitComponent
 	}
 
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		Font font = this.parent.getFont(); 
 		this.parent.renderBackground(matrixStack);
@@ -52,7 +52,7 @@ public class DebugConfigGui extends UnitComponent
 	}
 
 	@Override
-	public void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{ }
 
 	/**

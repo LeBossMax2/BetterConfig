@@ -104,10 +104,10 @@ public class NumberField<N> extends CompositeComponent
 	// Rendering
 	
 	@Override
-	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.updateIncrement();
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.onRender(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
 	// Value manipulation methods
