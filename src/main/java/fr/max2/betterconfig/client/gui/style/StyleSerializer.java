@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.google.gson.GsonBuilder;
 
+import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
@@ -17,7 +18,9 @@ public class StyleSerializer
 	public static StyleSerializer INSTANCE = new StyleSerializer(Arrays.asList(
 			Component.COMPONENT_TYPE,
 			Component.COMPONENT_CLASSES,
-			IBetterElement.FILTERED_OUT
+			Component.PARENT,
+			IBetterElement.FILTERED_OUT,
+			Foldout.FOLDED
 		), Arrays.asList(
 			ComponentLayoutConfig.SIZE_OVERRIDE,
 			ComponentLayoutConfig.OUTER_PADDING,

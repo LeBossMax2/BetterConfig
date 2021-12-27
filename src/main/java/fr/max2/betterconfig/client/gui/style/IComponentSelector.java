@@ -99,14 +99,18 @@ public interface IComponentSelector extends Predicate<IComponent>
 		@Override
 		public boolean test(IComponent component)
 		{
-			return this.subSelector.test(component.getProperty(this.property));
+			IComponent subComponent = component.getProperty(this.property);
+			if  (subComponent == null)
+				return false;
+			
+			return this.subSelector.test(subComponent);
 		}
 
 		@Override
 		public JsonElement toJson(JsonSerializationContext context)
 		{
 			JsonObject obj = new JsonObject();
-			obj.addProperty("operator", "combonator");
+			obj.addProperty("operator", "combinator");
 			obj.addProperty("property", this.property.name.toString());
 			obj.add("sub_selector", context.serialize(this.subSelector, IComponentSelector.class));
 			return obj;
@@ -148,7 +152,7 @@ public interface IComponentSelector extends Predicate<IComponent>
 				return IComponentSelector.Equals.fromJson(obj, context, this.parent);
 			case "contains":
 				return IComponentSelector.Contains.fromJson(obj, context, this.parent);
-			case "combonator":
+			case "combinator":
 				return IComponentSelector.Combinator.fromJson(obj, context, this.parent);
 			default:
 				return null;

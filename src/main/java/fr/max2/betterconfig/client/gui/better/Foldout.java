@@ -1,20 +1,22 @@
 package fr.max2.betterconfig.client.gui.better;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.EventState;
-import fr.max2.betterconfig.client.gui.component.IComponent;
+import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
+import fr.max2.betterconfig.client.gui.layout.Visibility;
+import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigNode;
@@ -24,6 +26,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.fmlclient.gui.GuiUtils;
 
@@ -35,8 +38,14 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	/** The height of the fouldout header */
 	private static final int FOLDOUT_HEADER_HEIGHT = 24;
 	
-	public static final StyleRule STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:foldout").then()
+	public static final PropertyIdentifier<Boolean> FOLDED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "folded"), Boolean.class);
+	
+	public static final StyleRule FOLDOUT_STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:foldout").then()
 			.set(CompositeLayoutConfig.INNER_PADDING, new Padding(FOLDOUT_HEADER_HEIGHT, 0, 0, 0))
+			.build();
+
+	public static final StyleRule FOLDED_STYLE = StyleRule.when().parent().equals(FOLDED, true).then()
+			.set(ComponentLayoutConfig.VISIBILITY, Visibility.COLLAPSED)
 			.build();
 	
 	/** The parent screen */
@@ -63,6 +72,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		this.extraInfo.add(FormattedText.of(node.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
 		this.extraInfo.addAll(node.getDisplayComment());
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
+		this.registerProperty(FOLDED, () -> this.folded);
 		
 		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING;
 	}
@@ -75,12 +85,6 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		boolean matchFilter = filter.matches(this.node);
 		this.filteredOut = this.content.filterElements(matchFilter ? ConfigFilter.ALL : filter);
 		return this.filteredOut;
-	}
-
-	@Override
-	public List<? extends IComponent> getChildren()
-	{
-		return this.folded ? Collections.emptyList() : super.getChildren();
 	}
 	
 	@Override
@@ -115,9 +119,6 @@ public class Foldout extends CompositeComponent implements IBetterElement
 			state.consume();
 			return;
 		}
-		
-		if (this.folded)
-			return;
 		
 		super.onMouseClicked(mouseX, mouseY, button, state);
 	}
