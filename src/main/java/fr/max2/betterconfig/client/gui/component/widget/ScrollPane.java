@@ -112,6 +112,21 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 		this.layoutManager.enqueueWork(action);
 	}
 	
+	@Override
+	protected void setRelativeRect(Rectangle rect)
+	{
+		super.setRelativeRect(rect);
+		this.applyScrollLimits();
+	}
+	
+	@Override
+	public Size updateLayout(IComponent component, Size availableSize)
+	{
+		Size size = IComponentParent.super.updateLayout(component, availableSize);
+		this.applyScrollLimits();
+		return size;
+	}
+	
 	public void checkLayout()
 	{
 		if (this.layoutDirty)
