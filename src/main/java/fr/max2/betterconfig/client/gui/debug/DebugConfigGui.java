@@ -29,7 +29,7 @@ public class DebugConfigGui extends UnitComponent
 
 	public DebugConfigGui(BetterConfigScreen parent, List<String> labels)
 	{
-		super(parent, "debug_gui");
+		super("debug_gui");
 		this.parent = parent;
 		this.labels = labels;
 	}

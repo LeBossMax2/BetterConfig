@@ -43,6 +43,7 @@ public class ComponentScreen extends Screen implements IComponentParent
 			this.content.invalidate();
 		
 		this.content = content;
+		this.content.init(this, null);
 		this.marksLayoutDirty();
 	}
 	

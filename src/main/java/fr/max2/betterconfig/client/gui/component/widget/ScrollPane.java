@@ -1,7 +1,5 @@
 package fr.max2.betterconfig.client.gui.component.widget;
 
-import java.util.function.Function;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -28,8 +26,6 @@ import net.minecraft.util.Mth;
 
 public class ScrollPane extends Component<IScrollComponent> implements IScrollComponent, IComponentParent
 {
-	protected final Minecraft minecraft;
-	
 	protected final IComponent content;
 
 	protected boolean scrolling = false;
@@ -38,13 +34,19 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	protected Size contentSize;
 	
 	/** Indicates whether the layout is dirty */
-	protected boolean layoutDirty;
+	protected boolean layoutDirty = true;;
 	
-	public ScrollPane(IComponentParent layoutManager, Minecraft minecraft, Function<IComponentParent, IComponent> content)
+	public ScrollPane(IComponent content)
 	{
-		super(layoutManager, "scroll_pane");
-		this.minecraft = minecraft;
-		this.content = content.apply(this);
+		super("scroll_pane");
+		this.content = content;
+		this.content.init(this, this);
+	}
+	
+	@Override
+	public Minecraft getMinecraft()
+	{
+		return this.layoutManager.getMinecraft();
 	}
 	
 	// Style
@@ -391,8 +393,10 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 		Vector4f size = new Vector4f(width, height, 0.0f, 0.0f);
 		size.transform(mat);
 		
-		double scale = this.minecraft.getWindow().getGuiScale();
-		int screenHeight = this.minecraft.getWindow().getHeight();
+		Minecraft mc = this.getMinecraft();
+		
+		double scale = mc.getWindow().getGuiScale();
+		int screenHeight = mc.getWindow().getHeight();
 		
 		RenderSystem.enableScissor((int)(topLeft.x() * scale), screenHeight - (int)((topLeft.y() + size.y()) * scale), (int)(size.x() * scale), (int)(size.y() * scale));
 	}

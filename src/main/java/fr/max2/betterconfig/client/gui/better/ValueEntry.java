@@ -2,7 +2,6 @@ package fr.max2.betterconfig.client.gui.better;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,7 +10,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
@@ -46,7 +44,6 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	private final IConfigPrimitive<?> property;
 	private final IComponent content;
 	private final IComponent button;
-	private final List<IComponent> children;
 	/** The title of the property */
 	private List<FormattedCharSequence> nameLines;
 	/** The extra info to show on the tooltip */
@@ -54,26 +51,26 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	/** Indicates if the property is hidden or not */
 	private boolean filteredOut = false;
 
-	public ValueEntry(BetterConfigScreen screen, IComponentParent layoutManager, IConfigPrimitive<?> property, IComponent content)
+	public ValueEntry(BetterConfigScreen screen, IConfigPrimitive<?> property, IComponent content)
 	{
-		super(layoutManager, "better:value_entry");
+		super("better:value_entry");
 		this.screen = screen;
 		this.property = property;
 		this.content = content;
 		// TODO [#2] Gray out the button when value is unchanged
 		// TODO [#2] Add reset to default button
-		this.button = new BetterButton.Icon(screen, layoutManager, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
+		this.button = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
 		{
 			property.undoChanges();
 		}, new TranslatableComponent(UNDO_TOOLTIP_KEY)).addClass("better:undo");
 		//this.button.x = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4;
-		IComponent spacing = new UnitComponent(layoutManager, "spacing")
+		IComponent spacing = new UnitComponent("spacing")
 		{
 			@Override
 			protected void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTicks)
 			{ }
 		};
-		this.children = Arrays.asList(spacing, content, this.button);
+		this.children.addAll(Arrays.asList(spacing, content, this.button));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
 		//this.config.justification = Justification.CENTER;
@@ -81,12 +78,6 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	}
 	
 	// Layout
-
-	@Override
-	public List<? extends IComponent> getChildren()
-	{
-		return this.children;
-	}
 	
 	@Override
 	public boolean filterElements(ConfigFilter filter)

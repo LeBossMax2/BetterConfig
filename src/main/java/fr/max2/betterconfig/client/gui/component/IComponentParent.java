@@ -3,6 +3,7 @@ package fr.max2.betterconfig.client.gui.component;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
+import net.minecraft.client.Minecraft;
 
 /**
  * Manages the layout of a user interface
@@ -14,6 +15,8 @@ public interface IComponentParent
 	 * @param action the action to run
 	 */
 	void enqueueWork(Runnable action);
+	
+	Minecraft getMinecraft();
 	
 	// Style
 	

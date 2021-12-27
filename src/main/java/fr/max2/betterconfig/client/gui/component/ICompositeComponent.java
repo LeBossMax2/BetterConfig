@@ -18,6 +18,15 @@ public interface ICompositeComponent extends IComponent
 	List<? extends IComponent> getChildren();
 	
 	@Override
+	default void init(IComponentParent layoutManager, IComponent parent)
+	{
+		for (IComponent elem : this.getChildren())
+		{
+			elem.init(layoutManager, this);
+		}
+	}
+	
+	@Override
 	default void invalidate()
 	{
 		for (IComponent elem : this.getChildren())

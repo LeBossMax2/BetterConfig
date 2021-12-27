@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -30,9 +29,9 @@ public class CycleOptionButton<V> extends Button
 	private int index;
 
 	@SuppressWarnings("unchecked")
-	public CycleOptionButton(IComponentParent layoutManager, List<? extends V> acceptedValues, Function<? super V, Component> valueToText, V currentValue, Consumer<CycleOptionButton<V>> handler, OnTooltip tooltip)
+	public CycleOptionButton(List<? extends V> acceptedValues, Function<? super V, Component> valueToText, V currentValue, Consumer<CycleOptionButton<V>> handler, OnTooltip tooltip)
 	{
-		super(layoutManager, getValueText(valueToText, currentValue), thiz ->
+		super(getValueText(valueToText, currentValue), thiz ->
 		{
 			CycleOptionButton<V> thisButton = ((CycleOptionButton<V>)thiz); 
 			thisButton.cycleOption();

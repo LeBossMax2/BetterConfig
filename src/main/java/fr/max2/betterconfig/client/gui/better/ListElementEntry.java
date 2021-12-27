@@ -1,14 +1,11 @@
 package fr.max2.betterconfig.client.gui.better;
 
 import java.util.Arrays;
-import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
-import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.Button.OnPress;
 import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
@@ -33,16 +30,15 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	
 	private final IBetterElement content;
 	private final BetterButton button;
-	private final List<IComponent> children;
 	private boolean filteredOut = false;
 	
-	public ListElementEntry(BetterConfigScreen screen, IComponentParent layoutManager, IBetterElement content, OnPress deleteAction)
+	public ListElementEntry(BetterConfigScreen screen, IBetterElement content, OnPress deleteAction)
 	{
-		super(layoutManager, "better:list_entry");
+		super("better:list_entry");
 		this.content = content;
-		this.button = new BetterButton.Icon(screen, layoutManager, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(REMOVE_TOOLTIP_KEY));
+		this.button = new BetterButton.Icon(screen, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(REMOVE_TOOLTIP_KEY));
 		this.button.addClass("better:list_remove");
-		this.children = Arrays.asList(this.button, content);
+		this.children.addAll(Arrays.asList(this.button, content));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 		//this.config.innerPadding = new Padding(0, RIGHT_PADDING, 0, X_PADDING);?
 	}
@@ -52,12 +48,6 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	{
 		this.filteredOut = this.content.filterElements(filter);
 		return this.filteredOut;
-	}
-
-	@Override
-	public List<? extends IComponent> getChildren()
-	{
-		return this.children;
 	}
 	
 	@Override

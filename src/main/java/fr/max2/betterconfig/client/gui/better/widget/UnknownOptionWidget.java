@@ -2,7 +2,6 @@ package fr.max2.betterconfig.client.gui.better.widget;
 
 import java.util.Objects;
 
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.Button;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Size;
@@ -23,9 +22,9 @@ public class UnknownOptionWidget extends Button
 	private final IConfigPrimitive<?> property;
 	private final IListener<Object> propertyListener;
 	
-	public UnknownOptionWidget(IComponentParent layoutManager, IConfigPrimitive<?> property)
+	public UnknownOptionWidget(IConfigPrimitive<?> property)
 	{
-		super(layoutManager, new TextComponent(Objects.toString(property.getValue())), thiz -> {}, NO_TOOLTIP);
+		super(new TextComponent(Objects.toString(property.getValue())), thiz -> {}, NO_TOOLTIP);
 		this.addClass("better:unknown");
 		this.widget.active = false;
 		

@@ -2,7 +2,6 @@ package fr.max2.betterconfig.client.gui.better;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -10,7 +9,6 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.HBox;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.Button;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
 import fr.max2.betterconfig.client.gui.layout.Axis;
@@ -50,14 +48,12 @@ public class GuiRoot extends CompositeComponent
 	private final TextField searchField;
 	/** The scroll panel */
 	private final BetterScrollPane scrollPane;
-	/** The tab buttons */
-	private final List<IComponent> components = new ArrayList<>();
 	/** The filter from the search bar */
 	private final ConfigFilter filter = new ConfigFilter();
 
-	public GuiRoot(BetterConfigScreen screen, Function<IComponentParent, IComponent> content)
+	public GuiRoot(BetterConfigScreen screen, IComponent content)
 	{
-		super(screen, "better:root");
+		super("better:root");
 		this.screen = screen;
 		
 		// Tabs
@@ -67,53 +63,47 @@ public class GuiRoot extends CompositeComponent
 		for (ModConfig config : screen.getModConfigs())
 		{
 			final int index = i;
-			Button b = new Button(screen, new TextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
+			Button b = new Button(new TextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
 			b.addClass("better:tab_button");
 			b.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(tabButtonWidth, 20));
 			b.widget.active = index != screen.getCurrentConfigIndex();
 			i++;
 			tabs.add(b);
 		}
-		HBox tabHolder = new HBox(screen, tabs);
+		HBox tabHolder = new HBox(tabs);
 		tabHolder.addClass("better:tab_bar");
-		this.components.add(tabHolder);
+		this.children.add(tabHolder);
 		
 		// Search bar
-		this.searchField = new TextField(screen, screen.getFont(), new TranslatableComponent(SEARCH_BAR_KEY));
+		this.searchField = new TextField(screen.getFont(), new TranslatableComponent(SEARCH_BAR_KEY));
 		this.searchField.addClass("better:search_field");
 		this.searchField.setResponder(this::updateFilter);
-		this.components.add(this.searchField);
+		this.children.add(this.searchField);
 		
 		// Scroll
-		this.scrollPane = new BetterScrollPane(screen, screen.getMinecraft(), content);
+		this.scrollPane = new BetterScrollPane(content);
 		this.scrollPane.filterElements(this.filter);
-		this.components.add(this.scrollPane);
+		this.children.add(this.scrollPane);
 		
 		// Cancel/Save buttons
 		List<IComponent> buttons = new ArrayList<>();
 		int buttonWidth = (this.screen.width - 2 * X_PADDING) / 2;
-		Button cancelButton = new Button(screen, new TranslatableComponent(CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_TOOLTIP);
+		Button cancelButton = new Button(new TranslatableComponent(CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_TOOLTIP);
 		cancelButton.addClass("better:cancel");
 		cancelButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(buttonWidth, 20));
 		buttons.add(cancelButton);
-		Button saveButton = new Button(screen, new TranslatableComponent(SAVE_CONFIG_KEY), thisButton -> this.screen.onClose(), Button.NO_TOOLTIP);
+		Button saveButton = new Button(new TranslatableComponent(SAVE_CONFIG_KEY), thisButton -> this.screen.onClose(), Button.NO_TOOLTIP);
 		saveButton.addClass("better:save");
 		saveButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(buttonWidth, 20));
 		buttons.add(saveButton);
-		HBox buttonBar = new HBox(screen, buttons);
+		HBox buttonBar = new HBox(buttons);
 		buttonBar.addClass("better:bottom_bar");
-		this.components.add(buttonBar);
+		this.children.add(buttonBar);
 		
 		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(this.screen.width, this.screen.height));
 	}
 	
 	// Layout
-
-	@Override
-	public List<? extends IComponent> getChildren()
-	{
-		return this.components;
-	}
 	
 	/** Updates the content using the given filter string */
 	private void updateFilter(String filterStr)

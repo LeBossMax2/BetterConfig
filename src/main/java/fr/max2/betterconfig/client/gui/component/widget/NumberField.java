@@ -1,15 +1,12 @@
 package fr.max2.betterconfig.client.gui.component.widget;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import com.google.common.base.Strings;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
-import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
@@ -42,8 +39,6 @@ public class NumberField<N> extends CompositeComponent
 	public static final StyleRule MINUS_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "number_field:minus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
 	public static final StyleRule PLUS_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "number_field:plus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
 	
-	/** The list of children ui components */
-	protected final List<IComponent> elements;
 	/** The text field to directly enter the number */
 	protected final TextField inputField;
 	/** The minus button to decrement the number */
@@ -55,11 +50,11 @@ public class NumberField<N> extends CompositeComponent
 	/** The current increment for each button click */
 	protected Increment currentIncrement = Increment.NORMAL;
 
-	public NumberField(IComponentParent layout, Font fontRenderer, Component title, int width, int height, INumberType<N> numberType, N value)
+	public NumberField(Font fontRenderer, Component title, int width, int height, INumberType<N> numberType, N value)
 	{
-		super(layout, "number_field");
+		super("number_field");
 		this.numberType = numberType;
-		this.inputField = new TextField(layout, fontRenderer, title)
+		this.inputField = new TextField(fontRenderer, title)
 		{
 			@Override
 			protected void onValidate(String text)
@@ -76,29 +71,21 @@ public class NumberField<N> extends CompositeComponent
 			}
 		};
 		this.inputField.addClass("number_field:text");
-		this.minusButton = new Button(layout,
+		this.minusButton = new Button(
 			Increment.NORMAL.getMinusText(),
 			thisButton -> applyOperator(Operator.MINUS));
 		this.minusButton.addClass("number_field:minus_button");
-		this.plusButton = new Button(layout,
+		this.plusButton = new Button(
 			Increment.NORMAL.getPlusText(),
 			thisButton -> applyOperator(Operator.PLUS));
 		this.plusButton.addClass("number_field:plus_button");
-		this.elements = Arrays.asList(this.minusButton, this.inputField, this.plusButton);
+		this.children.addAll(Arrays.asList(this.minusButton, this.inputField, this.plusButton));
 		this.inputField.widget.setFilter(this::isValid);
 		this.setValue(value);
 		
 		this.plusButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, height));
 		this.minusButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, height));
 		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, height));
-	}
-	
-	// Layout
-	
-	@Override
-	public List<? extends IComponent> getChildren()
-	{
-		return this.elements;
 	}
 	
 	// Rendering

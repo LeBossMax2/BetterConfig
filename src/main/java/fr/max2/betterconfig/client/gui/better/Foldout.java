@@ -1,7 +1,6 @@
 package fr.max2.betterconfig.client.gui.better;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,10 +8,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
+import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
@@ -54,12 +53,13 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private boolean folded = false; // TODO [#2] Use style class to tag folded sections
 	private boolean filteredOut = false;
 
-	public Foldout(BetterConfigScreen screen, IComponentParent layoutManager, IConfigNode<?> node, IBetterElement content)
+	public Foldout(BetterConfigScreen screen, IConfigNode<?> node, IBetterElement content)
 	{
-		super(layoutManager, "better:foldout");
+		super("better:foldout");
 		this.screen = screen;
 		this.node = node;
 		this.content = content;
+		this.children.add((Component<?>)this.content);
 		this.extraInfo.add(FormattedText.of(node.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
 		this.extraInfo.addAll(node.getDisplayComment());
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
@@ -80,7 +80,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	@Override
 	public List<? extends IComponent> getChildren()
 	{
-		return this.folded ? Collections.emptyList() : Arrays.asList(this.content);
+		return this.folded ? Collections.emptyList() : super.getChildren();
 	}
 	
 	@Override
@@ -110,7 +110,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	{
 		if (this.isOverHeader(mouseX, mouseY))
 		{
-			this.screen.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+			this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			this.toggleFolding();
 			state.consume();
 			return;

@@ -1,7 +1,6 @@
 package fr.max2.betterconfig.client.gui.better.widget;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Size;
@@ -24,9 +23,9 @@ public class StringInputField extends TextField
 	private final IConfigPrimitive<String> property;
 	private final IListener<String> propertyListener;
 	
-	private StringInputField(IComponentParent layoutManager, Font fontRenderer, IConfigPrimitive<String> property, Component title)
+	private StringInputField(Font fontRenderer, IConfigPrimitive<String> property, Component title)
 	{
-		super(layoutManager, fontRenderer, title);
+		super(fontRenderer, title);
 		this.addClass("better:string_input");
 		this.property = property;
 		this.setValue(property.getValue());
@@ -58,8 +57,8 @@ public class StringInputField extends TextField
 	}
 
 	/** Creates a widget for string values */
-	public static StringInputField stringOption(BetterConfigScreen screen, IComponentParent layoutManager, IConfigPrimitive<String> property)
+	public static StringInputField stringOption(BetterConfigScreen screen, IConfigPrimitive<String> property)
 	{
-		return new StringInputField(layoutManager, screen.getFont(), property, property.getDisplayName());
+		return new StringInputField(screen.getFont(), property, property.getDisplayName());
 	}
 }

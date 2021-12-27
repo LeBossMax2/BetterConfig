@@ -1,7 +1,6 @@
 package fr.max2.betterconfig.client.gui.better.widget;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.NumberField;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
@@ -19,9 +18,9 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 	private final IConfigPrimitive<N> property;
 	private final IListener<N> propertyListener;
 
-	public NumberInputField(IComponentParent layout, Font fontRenderer, INumberType<N> numberType, IConfigPrimitive<N> property, Component title)
+	public NumberInputField(Font fontRenderer, INumberType<N> numberType, IConfigPrimitive<N> property, Component title)
 	{
-		super(layout, fontRenderer, title, VALUE_WIDTH, VALUE_HEIGHT, numberType, property.getValue());
+		super(fontRenderer, title, VALUE_WIDTH, VALUE_HEIGHT, numberType, property.getValue());
 		this.property = property;
 		this.inputField.setResponder(this::updateTextColor);
 		
@@ -61,8 +60,8 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 
 	/** Creates a widget for number values */
 	@SuppressWarnings("unchecked")
-	public static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, IComponentParent layoutManager, IConfigPrimitive<N> property)
+	public static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, IConfigPrimitive<N> property)
 	{
-		return new NumberInputField<>(layoutManager, screen.getFont(), NumberTypes.getType((Class<N>)property.getSpec().getValueClass()), property, property.getDisplayName());
+		return new NumberInputField<>(screen.getFont(), NumberTypes.getType((Class<N>)property.getSpec().getValueClass()), property, property.getDisplayName());
 	}
 }

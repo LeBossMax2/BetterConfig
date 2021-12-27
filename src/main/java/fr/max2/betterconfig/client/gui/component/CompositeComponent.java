@@ -1,14 +1,66 @@
 package fr.max2.betterconfig.client.gui.component;
 
+import java.util.List;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
+import fr.max2.betterconfig.util.property.list.IListListener;
+import fr.max2.betterconfig.util.property.list.IReadableList;
+import fr.max2.betterconfig.util.property.list.ObservableList;
 
 public abstract class CompositeComponent extends Component<ICompositeComponent> implements ICompositeComponent
 {
-	public CompositeComponent(IComponentParent layoutManager, String type)
+	protected IReadableList<IComponent> children;
+	
+	public CompositeComponent(String type, IReadableList<IComponent> children)
 	{
-		super(layoutManager, type);
+		super(type);
+		this.children = children;
+		this.children.onChanged(new IListListener<IComponent>()
+		{
+			@Override
+			public void onElementAdded(int index, IComponent newValue)
+			{
+				if (CompositeComponent.this.layoutManager != null)
+					newValue.init(CompositeComponent.this.layoutManager, CompositeComponent.this);
+			}
+
+			@Override
+			public void onElementRemoved(int index, IComponent oldValue)
+			{
+				oldValue.invalidate();
+			}
+		});
+	}
+	
+	public CompositeComponent(String type)
+	{
+		this(type, new ObservableList<>());
+	}
+
+	public CompositeComponent(String type, List<? extends IComponent> initialChildren)
+	{
+		this(type, toReadable(initialChildren));
+	}
+
+	@SuppressWarnings("unchecked")
+	private static IReadableList<IComponent> toReadable(List<? extends IComponent> list)
+	{
+		if (list instanceof IReadableList<?> rl)
+		{
+			return (IReadableList<IComponent>)rl;
+		}
+		else
+		{
+			return new ObservableList<>(list);
+		}
+	}
+	
+	@Override
+	public List<? extends IComponent> getChildren()
+	{
+		return this.children;
 	}
 	
 	@Override
@@ -21,6 +73,13 @@ public abstract class CompositeComponent extends Component<ICompositeComponent> 
 	protected ICompositeComponent getLayoutParam()
 	{
 		return this;
+	}
+	
+	@Override
+	public void init(IComponentParent layoutManager, IComponent parent)
+	{
+		super.init(layoutManager, parent);
+		ICompositeComponent.super.init(layoutManager, parent);
 	}
 	
 	// Rendering

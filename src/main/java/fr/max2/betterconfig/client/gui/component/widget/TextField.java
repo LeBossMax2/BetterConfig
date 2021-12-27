@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import org.lwjgl.glfw.GLFW;
 
 import fr.max2.betterconfig.client.gui.component.EventState;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.style.StyleRule;
@@ -20,9 +19,9 @@ public class TextField extends WidgetComponent<EditBox>
 {
 	public static final StyleRule STYLE = StyleRule.when().equals(COMPONENT_TYPE, "text_field").then().set(ComponentLayoutConfig.OUTER_PADDING, new Padding(1, 1, 1, 1)).build();
 	
-	public TextField(IComponentParent layoutManager, Font fontRenderer, Component title)
+	public TextField(Font fontRenderer, Component title)
 	{
-		super(layoutManager, "text_field", new InnerField(fontRenderer, title));
+		super("text_field", new InnerField(fontRenderer, title));
 		((InnerField)this.widget).parent = this;
 		this.widget.setMaxLength(Integer.MAX_VALUE);
 	}

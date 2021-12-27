@@ -13,34 +13,42 @@ import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.ILayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
-import fr.max2.betterconfig.client.gui.style.IStylableComponent;
 import fr.max2.betterconfig.client.gui.style.ListPropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.StyleProperty;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.resources.ResourceLocation;
 
-public abstract class Component<LP> extends GuiComponent implements IStylableComponent
+public abstract class Component<LP> extends GuiComponent implements IComponent
 {
 	public static final PropertyIdentifier<String> COMPONENT_TYPE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_type"), String.class);
 	public static final ListPropertyIdentifier<String> COMPONENT_CLASSES = new ListPropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"), String.class);
+	public static final PropertyIdentifier<IComponent> PARENT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "parent"), IComponent.class);
 	
 	protected final Map<PropertyIdentifier<?>, Supplier<?>> propertyMap = new HashMap<>();
 	protected final Map<StyleProperty<?>, Object> styleOverride = new HashMap<>();
 	protected final String type;
 	protected final List<String> classes = new ArrayList<>();
-	protected final IComponentParent layoutManager;
+	protected IComponentParent layoutManager;
+	protected IComponent parent;
 	protected Size prefSize;
 	protected Rectangle relativeRect;
 	protected Rectangle absoluteRect = new Rectangle();
 	
-	public Component(IComponentParent layoutManager, String type)
+	public Component(String type)
 	{
-		this.layoutManager = layoutManager;
 		this.type = type;
 		
 		this.registerProperty(COMPONENT_TYPE, () -> this.type);
 		this.registerProperty(COMPONENT_CLASSES, () -> this.classes);
+		this.registerProperty(PARENT, () -> this.parent);
+	}
+	
+	@Override
+	public void init(IComponentParent layoutManager, IComponent parent)
+	{
+		this.layoutManager = layoutManager;
+		this.parent = parent;
 	}
 	
 	// Style

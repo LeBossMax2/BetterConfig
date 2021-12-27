@@ -7,12 +7,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.Button;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -28,9 +26,9 @@ public class BetterButton extends Button
 	
 	private final List<? extends FormattedText> tooltipInfo;
 	
-	public BetterButton(BetterConfigScreen screen, IComponentParent layoutManager, int width, Component displayString, OnPress pressedHandler, Component overlay)
+	public BetterButton(BetterConfigScreen screen, int width, Component displayString, OnPress pressedHandler, Component overlay)
 	{
-		super(layoutManager, displayString, pressedHandler);
+		super(displayString, pressedHandler);
 		this.addClass("better:button");
 		this.screen = screen;
 		this.tooltipInfo = Arrays.asList(overlay);
@@ -42,7 +40,7 @@ public class BetterButton extends Button
 	{
 		if (this.isPointInside(mouseX, mouseY))
 		{
-			Font font = Minecraft.getInstance().font;
+			Font font = this.layoutManager.getMinecraft().font;
 			GuiUtils.drawHoveringText(matrixStack, this.tooltipInfo, mouseX, mouseY, this.screen.width, this.screen.height, 200, font);
 		}
 	}
@@ -52,9 +50,9 @@ public class BetterButton extends Button
 		private final int iconU;
 		private final int iconV;
 	
-		public Icon(BetterConfigScreen screen, IComponentParent layoutManager, int iconU, int iconV, Component displayString, OnPress pressedHandler, Component overlay)
+		public Icon(BetterConfigScreen screen, int iconU, int iconV, Component displayString, OnPress pressedHandler, Component overlay)
 		{
-			super(screen, layoutManager, VALUE_HEIGHT, displayString, pressedHandler, overlay);
+			super(screen, VALUE_HEIGHT, displayString, pressedHandler, overlay);
 			this.iconU = iconU;
 			this.iconV = iconV;
 		}

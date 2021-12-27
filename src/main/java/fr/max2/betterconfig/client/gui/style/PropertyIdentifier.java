@@ -7,7 +7,7 @@ public class PropertyIdentifier<T>
 	public final ResourceLocation name;
 	public final Class<?> type;
 
-	public PropertyIdentifier(ResourceLocation name, Class<?> type)
+	public PropertyIdentifier(ResourceLocation name, Class<? super T> type)
 	{
 		this.name = name;
 		this.type = type;

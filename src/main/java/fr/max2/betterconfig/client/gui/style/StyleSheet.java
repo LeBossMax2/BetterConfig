@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import fr.max2.betterconfig.BetterConfig;
+import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.style.StyleRule.Serializer;
 import net.minecraft.client.Minecraft;
@@ -52,7 +53,7 @@ public class StyleSheet
 		this(Arrays.asList(rules));
 	}
 
-	public <T> T computePropertyValue(IStylableComponent component, StyleProperty<T> property)
+	public <T> T computePropertyValue(IComponent component, StyleProperty<T> property)
 	{
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<ProcessedStyleRule<T>> rules = (List)this.rules.get(property);

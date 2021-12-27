@@ -7,12 +7,9 @@ public class ObservableList<T> extends ListBase<T, ListBase.PropertyBase<T>>
 	public ObservableList()
 	{ }
 	
-	public ObservableList(List<T> initialValues)
+	public ObservableList(List<? extends T> initialValues)
 	{
-		for (T value : initialValues)
-		{
-			this.parent.add(new ListBase.PropertyBase<>(value));
-		}
+		this.addAll(initialValues);
 	}
 	
 	@Override

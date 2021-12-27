@@ -3,7 +3,6 @@ package fr.max2.betterconfig.client.gui.component.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -18,16 +17,16 @@ public class Button extends WidgetComponent<Button.InnerButton>
 	/** The overlay to show when the mouse is over the button */
 	private final OnTooltip overlay;
 
-	public Button(IComponentParent layoutManager, Component displayString, OnPress pressedHandler, OnTooltip overlay)
+	public Button(Component displayString, OnPress pressedHandler, OnTooltip overlay)
 	{
-		super(layoutManager, "button", new InnerButton(0, 0, 0, 0, displayString, pressedHandler));
+		super("button", new InnerButton(0, 0, 0, 0, displayString, pressedHandler));
 		this.overlay = overlay;
 		this.widget.parent = this;
 	}
 
-	public Button(IComponentParent layoutManager, Component displayString, OnPress pressedHandler)
+	public Button(Component displayString, OnPress pressedHandler)
 	{
-		this(layoutManager, displayString, pressedHandler, NO_TOOLTIP);
+		this(displayString, pressedHandler, NO_TOOLTIP);
 	}
 	
 	public void setMessage(Component message)

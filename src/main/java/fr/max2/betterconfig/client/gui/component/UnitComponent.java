@@ -6,9 +6,9 @@ import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
 
 public abstract class UnitComponent extends Component<IComponent>
 {
-	public UnitComponent(IComponentParent layoutManager, String type)
+	public UnitComponent(String type)
 	{
-		super(layoutManager, type);
+		super(type);
 	}
 
 	// Layout

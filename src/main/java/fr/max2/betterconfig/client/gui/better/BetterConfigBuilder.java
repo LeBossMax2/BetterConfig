@@ -11,7 +11,6 @@ import fr.max2.betterconfig.client.gui.better.widget.StringInputField;
 import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
 import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Size;
@@ -24,6 +23,7 @@ import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
+import fr.max2.betterconfig.util.property.list.ObservableList;
 import net.minecraft.network.chat.TranslatableComponent;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
@@ -49,31 +49,27 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	 */
 	public static IComponent build(BetterConfigScreen screen, IConfigTable config)
 	{
-		return new GuiRoot(screen, lm ->
-		{
-			GuiGroup tableGroup = new BetterConfigBuilder(screen, lm).buildTable(config);
-			tableGroup.addClass("better:table_group");
-			tableGroup.addClass("better:root_group");
-			return tableGroup;
-		});
+		GuiGroup tableGroup = new BetterConfigBuilder(screen).buildTable(config);
+		tableGroup.addClass("better:table_group");
+		tableGroup.addClass("better:root_group");
+		
+		return new GuiRoot(screen, tableGroup);
 	}
 	
 	// private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4 + VALUE_HEIGHT;
 	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
-	private final IComponentParent layoutManager;
 
-	private BetterConfigBuilder(BetterConfigScreen screen, IComponentParent layoutManager)
+	private BetterConfigBuilder(BetterConfigScreen screen)
 	{
 		this.screen = screen;
-		this.layoutManager = layoutManager;
 	}
 	
 	private GuiGroup buildTable(IConfigTable table)
 	{
 		List<IBetterElement> content = table.exploreEntries(value -> value.exploreNode(this)).collect(Collectors.toList());
-		return new GuiGroup(this.layoutManager, content);
+		return new GuiGroup(content);
 		// config.width = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset
 	}
 	
@@ -84,18 +80,18 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	{
 		GuiGroup tableGroup = this.buildTable(table);
 		tableGroup.addClass("better:table_group");
-		return new Foldout(this.screen, this.layoutManager, table, tableGroup);
+		return new Foldout(this.screen, table, tableGroup);
 	}
 	
 	@Override
 	public <T> IBetterElement visitList(IConfigList<T> list, Void entry)
 	{
-		List<IComponent> mainElements = new ArrayList<>();
-		GuiGroup mainGroup = new GuiGroup(this.layoutManager, mainElements);
+		IReadableList<IComponent> mainElements = new ObservableList<>();
+		GuiGroup mainGroup = new GuiGroup(mainElements);
 		mainGroup.addClass("better:list_group");
 		
 		IReadableList<IConfigNode<T>> values = list.getValueList();
-		mainElements.add(new BetterButton(this.screen, this.layoutManager, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
+		mainElements.add(new BetterButton(this.screen, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(0);
 		}, new TranslatableComponent(ADD_FIRST_TOOLTIP_KEY)));
@@ -133,7 +129,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 				mainGroup.updateLayout();
 			}
 		};
-		mainElements.add(1, new GuiGroup(this.layoutManager, content)
+		mainElements.add(1, new GuiGroup(content)
 		{
 			@Override
 			public void invalidate()
@@ -150,14 +146,12 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		if (entries.size() >= 1)
 			mainElements.add(buildAddLastButton(list));
 		
-		mainGroup.updateLayout();
-		
-		return new Foldout(this.screen, this.layoutManager, list, mainGroup);
+		return new Foldout(this.screen, list, mainGroup);
 	}
 
 	private <T> BetterButton buildAddLastButton(IConfigList<T> list)
 	{
-		return new BetterButton(this.screen, this.layoutManager, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
+		return new BetterButton(this.screen, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(list.getValueList().size());
 		}, new TranslatableComponent(ADD_LAST_TOOLTIP_KEY));
@@ -169,7 +163,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		entries.add(index, info);
 		IBetterElement child = elem.exploreNode(this);
 		
-		return new ListElementEntry(this.screen, this.layoutManager, child, deleteButton ->
+		return new ListElementEntry(this.screen, child, deleteButton ->
 		{
 			int myIndex = info.getIndex();
 			entries.remove(myIndex);
@@ -183,7 +177,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	public <T> IBetterElement visitPrimitive(IConfigPrimitive<T> primitive, Void entry)
 	{
 		IComponent widget = primitive.exploreType(this, entry);
-		return new ValueEntry(this.screen, this.layoutManager, primitive, widget);
+		return new ValueEntry(this.screen, primitive, widget);
 	}
 	
 	// Property visitor
@@ -191,31 +185,31 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	@Override
 	public IComponent visitBoolean(IConfigPrimitive<Boolean> property, Void entry)
 	{
-		return OptionButton.booleanOption(this.layoutManager, property);
+		return OptionButton.booleanOption(property);
 	}
 	
 	@Override
 	public IComponent visitNumber(IConfigPrimitive<? extends Number> property, Void entry)
 	{
-		return NumberInputField.numberOption(this.screen, this.layoutManager, property);
+		return NumberInputField.numberOption(this.screen, property);
 	}
 	
 	@Override
 	public IComponent visitString(IConfigPrimitive<String> property, Void entry)
 	{
-		return StringInputField.stringOption(this.screen, this.layoutManager, property);
+		return StringInputField.stringOption(this.screen, property);
 	}
 	
 	@Override
 	public <E extends Enum<E>> IComponent visitEnum(IConfigPrimitive<E> property, Void entry)
 	{
-		return OptionButton.enumOption(this.layoutManager, property);
+		return OptionButton.enumOption(property);
 	}
 	
 	@Override
 	public IComponent visitUnknown(IConfigPrimitive<?> property, Void entry)
 	{
-		return new UnknownOptionWidget(this.layoutManager, property);
+		return new UnknownOptionWidget(property);
 	}
 	
 	private static class ListElemInfo

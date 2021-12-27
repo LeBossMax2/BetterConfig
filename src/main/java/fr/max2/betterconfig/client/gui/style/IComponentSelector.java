@@ -7,7 +7,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
-public interface IComponentSelector extends Predicate<IStylableComponent>
+import fr.max2.betterconfig.client.gui.component.IComponent;
+
+public interface IComponentSelector extends Predicate<IComponent>
 {
 	JsonElement toJson(JsonSerializationContext context);
 	
@@ -23,7 +25,7 @@ public interface IComponentSelector extends Predicate<IStylableComponent>
 		}
 
 		@Override
-		public boolean test(IStylableComponent component)
+		public boolean test(IComponent component)
 		{
 			return this.value.equals(component.getProperty(this.property));
 		}
@@ -57,7 +59,7 @@ public interface IComponentSelector extends Predicate<IStylableComponent>
 		}
 
 		@Override
-		public boolean test(IStylableComponent component)
+		public boolean test(IComponent component)
 		{
 			return component.getProperty(this.property).contains(this.value);
 		}

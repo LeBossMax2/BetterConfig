@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.component.CycleFocusState;
 import fr.max2.betterconfig.client.gui.component.EventState;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -13,9 +12,9 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 {
 	public final W widget;
 
-	public WidgetComponent(IComponentParent layoutManager, String type, W widget)
+	public WidgetComponent(String type, W widget)
 	{
-		super(layoutManager, type);
+		super(type);
 		this.widget = widget;
 	}
 	
