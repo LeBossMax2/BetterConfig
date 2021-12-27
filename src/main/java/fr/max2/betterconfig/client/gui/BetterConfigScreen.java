@@ -13,6 +13,7 @@ import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.client.gui.component.ComponentScreen;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
+import fr.max2.betterconfig.client.gui.style.StyleSheetManager;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;
 import fr.max2.betterconfig.config.value.IConfigTable;
@@ -225,7 +226,7 @@ public class BetterConfigScreen extends ComponentScreen
 		StyleSheet styleSheet;
 		try
 		{
-			styleSheet = StyleSheet.findSheet(styleSheetLoc);
+			styleSheet = StyleSheetManager.INSTANCE.getStyleSheet(styleSheetLoc);
 		}
 		catch (IOException e)
 		{

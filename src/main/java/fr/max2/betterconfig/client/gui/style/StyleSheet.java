@@ -1,29 +1,17 @@
 package fr.max2.betterconfig.client.gui.style;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.layout.Padding;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.util.GsonHelper;
 
 public class StyleSheet
 {
-	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE).create();
 	public static final String STYLESHEET_DIR = "stylesheets";
 	public static final ResourceLocation DEFAULT_STYLESHEET = new ResourceLocation(BetterConfig.MODID, "default_stylesheet");
 	
@@ -91,15 +79,5 @@ public class StyleSheet
 			return new StyleSheet(this.rules);
 		}
 	}
-
-	public static StyleSheet findSheet(ResourceLocation sheetLocation) throws IOException
-	{
-		// TODO use a ResourceManager
-		ResourceLocation resourceLocation = new ResourceLocation(sheetLocation.getNamespace(), STYLESHEET_DIR + "/" + sheetLocation.getPath() + ".json");
-		Resource res = Minecraft.getInstance().getResourceManager().getResource(resourceLocation);
-		try (InputStream is = res.getInputStream())
-		{
-			return GsonHelper.fromJson(GSON, new InputStreamReader(is, StandardCharsets.UTF_8), StyleSheet.Builder.class).build();
-		}
-	}
+	
 }
