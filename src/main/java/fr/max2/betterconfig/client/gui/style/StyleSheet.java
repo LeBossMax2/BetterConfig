@@ -94,7 +94,8 @@ public class StyleSheet
 
 	public static StyleSheet findSheet(ResourceLocation sheetLocation) throws IOException
 	{
-        ResourceLocation resourceLocation = new ResourceLocation(sheetLocation.getNamespace(), STYLESHEET_DIR + "/" + sheetLocation.getPath() + ".json");
+		// TODO use a ResourceManager
+		ResourceLocation resourceLocation = new ResourceLocation(sheetLocation.getNamespace(), STYLESHEET_DIR + "/" + sheetLocation.getPath() + ".json");
 		Resource res = Minecraft.getInstance().getResourceManager().getResource(resourceLocation);
 		try (InputStream is = res.getInputStream())
 		{

@@ -59,7 +59,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private final List<FormattedText> extraInfo = new ArrayList<>();
 	
 	/** {@code true} when the content is collapsed, {@code false} otherwise */
-	private boolean folded = false; // TODO [#2] Use style class to tag folded sections
+	private boolean folded = false;
 	private boolean filteredOut = false;
 
 	public Foldout(BetterConfigScreen screen, IConfigNode<?> node, IBetterElement content)

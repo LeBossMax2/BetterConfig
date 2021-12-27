@@ -1,10 +1,11 @@
 package fr.max2.betterconfig.client.gui.style;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.GsonBuilder;
 
 import fr.max2.betterconfig.client.gui.better.Foldout;
@@ -37,18 +38,8 @@ public class StyleSerializer
 	
 	private StyleSerializer(List<PropertyIdentifier<?>> componentProperties, List<StyleProperty<?>> styleProperties)
 	{
-		//TODO immutable hashmap
-		this.componentProperties = new HashMap<>();
-		for (PropertyIdentifier<?> prop : componentProperties)
-		{
-			this.componentProperties.put(prop.name.toString(), prop);
-		}
-
-		this.styleProperties = new HashMap<>();
-		for (StyleProperty<?> prop : styleProperties)
-		{
-			this.styleProperties.put(prop.name.toString(), prop);
-		}
+		this.componentProperties = componentProperties.stream().collect(ImmutableMap.toImmutableMap(prop -> prop.name.toString(), Function.identity()));
+		this.styleProperties = styleProperties.stream().collect(ImmutableMap.toImmutableMap(prop -> prop.name.toString(), Function.identity()));
 	}
 	
 	public PropertyIdentifier<?> getComponentProperty(String propertyIdentifier)
