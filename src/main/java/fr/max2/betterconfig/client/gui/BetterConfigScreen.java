@@ -11,9 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
-import fr.max2.betterconfig.client.gui.better.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.ComponentScreen;
-import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;
@@ -22,14 +20,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 public class BetterConfigScreen extends ComponentScreen
 {
-   private static final Logger LOGGER = LogManager.getLogger();
-   
+	private static final Logger LOGGER = LogManager.getLogger();
+	
 	/** The config user interface builder */
 	private final IConfigUIBuilder uiBuilder;
 	/** The mod this configuration is from */
@@ -195,28 +195,47 @@ public class BetterConfigScreen extends ComponentScreen
 	{
 		return (mc, prevScreen) ->
 		{
-			// TODO [#2] Get ui builder and style sheet from mod properties
-			IConfigUIBuilder uiBuilder = BetterConfigBuilder::build;
-			StyleSheet styleSheet;
-			try
-			{
-				styleSheet = StyleSheet.findSheet(StyleSheet.DEFAULT_STYLESHEET);
-			}
-			catch (IOException e)
-			{
-                LOGGER.warn("Exception loading stylesheet: {}: {}", StyleSheet.DEFAULT_STYLESHEET, e);
-				e.printStackTrace();
-				return prevScreen;
-			}
-			BetterConfigScreen screen = new BetterConfigScreen(uiBuilder, styleSheet, mod, configs, 0);
+			BetterConfigScreen screen = buildScreen(mod, configs);
 			screen.setPrevScreen(prevScreen);
 			return screen;
 		};
 	}
-	
-	@FunctionalInterface
-	public static interface IConfigUIBuilder
+
+	private static BetterConfigScreen buildScreen(ModContainer mod, List<ModConfig> configs)
 	{
-		IComponent build(BetterConfigScreen screen, IConfigTable config);
+		IModInfo modInfo = mod.getModInfo();
+		
+		Object styleSheetLocation = modInfo.getModProperties().get("betterconfig_stylesheet");
+		if (styleSheetLocation == null)
+			styleSheetLocation = modInfo.getConfig().getConfigElement("betterconfig_stylesheet").orElse(null);
+		
+		ResourceLocation styleSheetLoc;
+		if (styleSheetLocation instanceof String loc)
+		{
+			styleSheetLoc = new ResourceLocation(loc);
+		}
+		else
+		{
+			if (styleSheetLocation != null)
+				LOGGER.warn("Mod parameter 'betterconfig_stylesheet' of wrong type (Expected string) for mod: {}: {}", mod.getModId(), styleSheetLocation.getClass().getTypeName());
+			
+			styleSheetLoc = StyleSheet.DEFAULT_STYLESHEET;
+		}
+		
+		StyleSheet styleSheet;
+		try
+		{
+			styleSheet = StyleSheet.findSheet(styleSheetLoc);
+		}
+		catch (IOException e)
+		{
+			LOGGER.error("Exception loading stylesheet: {}: {}", styleSheetLoc, e);
+			throw new RuntimeException("Exception loading stylesheet: " + styleSheetLoc, e);
+		}
+
+		// TODO [#2] Get ui builder from mod properties
+		IConfigUIBuilder uiBuilder = IConfigUIBuilder.DEFAULT;
+		
+		return new BetterConfigScreen(uiBuilder, styleSheet, mod, configs, 0);
 	}
 }
