@@ -16,7 +16,6 @@ import com.google.gson.GsonBuilder;
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.layout.Padding;
-import fr.max2.betterconfig.client.gui.style.StyleRule.Serializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -24,7 +23,7 @@ import net.minecraft.util.GsonHelper;
 
 public class StyleSheet
 {
-	public static Gson GSON = new GsonBuilder().registerTypeAdapter(StyleRule.class, Serializer.INSTANCE).registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE).create();
+	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE).create();
 	public static final String STYLESHEET_DIR = "stylesheets";
 	public static final ResourceLocation DEFAULT_STYLESHEET = new ResourceLocation(BetterConfig.MODID, "default_stylesheet");
 	

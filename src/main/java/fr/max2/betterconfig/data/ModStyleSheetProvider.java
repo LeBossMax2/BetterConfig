@@ -17,9 +17,9 @@ import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
 import fr.max2.betterconfig.client.gui.component.HBox;
 import fr.max2.betterconfig.client.gui.component.widget.NumberField;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
+import fr.max2.betterconfig.client.gui.layout.Padding;
+import fr.max2.betterconfig.client.gui.style.StyleSerializer;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
-import fr.max2.betterconfig.client.gui.style.StyleRule.Serializer;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
@@ -28,7 +28,7 @@ import net.minecraft.server.packs.PackType;
 
 public class ModStyleSheetProvider implements DataProvider
 {
-	public static Gson GSON = new GsonBuilder().registerTypeAdapter(StyleRule.class, Serializer.INSTANCE).setPrettyPrinting().disableHtmlEscaping().create();
+	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE).setPrettyPrinting().disableHtmlEscaping().create();
 
 	private final DataGenerator generator;
 	

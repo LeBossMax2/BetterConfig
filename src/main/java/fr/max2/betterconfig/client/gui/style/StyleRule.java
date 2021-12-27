@@ -2,10 +2,7 @@ package fr.max2.betterconfig.client.gui.style;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.common.collect.ImmutableList;
@@ -18,10 +15,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.Component;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 
 public class StyleRule
 {
@@ -44,32 +38,22 @@ public class StyleRule
 		return this.values;
 	}
 	
-	public static ConditionBuilder when()
+	public static ConditionsBuilder when()
 	{
-		return new ConditionBuilder();
+		return new ConditionsBuilder();
 	}
 	
-	public static class ConditionBuilder
+	public static class ConditionsBuilder implements IConditionBuilder<ConditionsBuilder>
 	{
 		private final List<IComponentSelector> conditions = new ArrayList<>();
 		
-		private ConditionBuilder()
+		private ConditionsBuilder()
 		{ }
 		
-		public <T> ConditionBuilder condition(IComponentSelector selection)
+		public <T> ConditionsBuilder condition(IComponentSelector selection)
 		{
 			this.conditions.add(selection);
 			return this;
-		}
-		
-		public <T> ConditionBuilder equals(PropertyIdentifier<T> property, T value)
-		{
-			return this.condition(new IComponentSelector.Equals<>(property, value));
-		}
-		
-		public <T> ConditionBuilder contains(ListPropertyIdentifier<T> property, T value)
-		{
-			return this.condition(new IComponentSelector.Contains<>(property, value));
 		}
 		
 		public ValueBuilder then()
@@ -78,12 +62,39 @@ public class StyleRule
 		}
 	}
 	
+	public static interface IConditionBuilder<Res>
+	{
+		<T> Res condition(IComponentSelector selection);
+		
+		default <T> Res equals(PropertyIdentifier<T> property, T value)
+		{
+			return this.condition(new IComponentSelector.Equals<>(property, value));
+		}
+		
+		default <T> Res contains(ListPropertyIdentifier<T> property, T value)
+		{
+			return this.condition(new IComponentSelector.Contains<>(property, value));
+		}
+		
+		default IConditionBuilder<Res> parent()
+		{
+			return new IConditionBuilder<Res>()
+			{
+				@Override
+				public <T> Res condition(IComponentSelector selection)
+				{
+					return IConditionBuilder.this.condition(new IComponentSelector.Combinator(Component.PARENT, selection));
+				}
+			};
+		}
+	}
+	
 	public static class ValueBuilder
 	{
-		private final ConditionBuilder parent;
+		private final ConditionsBuilder parent;
 		private final List<StyleValue<?>> values = new ArrayList<>();
 		
-		private ValueBuilder(ConditionBuilder parent)
+		private ValueBuilder(ConditionsBuilder parent)
 		{
 			this.parent = parent;
 		}
@@ -102,37 +113,11 @@ public class StyleRule
 	
 	public static class Serializer implements JsonSerializer<StyleRule>, JsonDeserializer<StyleRule>
 	{
-		public static Serializer INSTANCE = new Serializer(Arrays.asList(
-				Component.COMPONENT_TYPE,
-				Component.COMPONENT_CLASSES,
-				IBetterElement.FILTERED_OUT
-			), Arrays.asList(
-				ComponentLayoutConfig.SIZE_OVERRIDE,
-				ComponentLayoutConfig.OUTER_PADDING,
-				ComponentLayoutConfig.VISIBILITY,
-				CompositeLayoutConfig.DIR,
-				CompositeLayoutConfig.SPACING,
-				CompositeLayoutConfig.INNER_PADDING,
-				CompositeLayoutConfig.JUSTIFICATION,
-				CompositeLayoutConfig.ALIGNMENT
-			));
+		private final StyleSerializer parent;
 		
-		private final Map<String, PropertyIdentifier<?>> componentProperties;
-		private final Map<String, StyleProperty<?>> styleProperties;
-		
-		
-		private Serializer(List<PropertyIdentifier<?>> componentProperties, List<StyleProperty<?>> styleProperties)
+		public Serializer(StyleSerializer parent)
 		{
-			this.componentProperties = new HashMap<>();
-			this.styleProperties = new HashMap<>();
-			for (PropertyIdentifier<?> prop : componentProperties)
-			{
-				this.componentProperties.put(prop.name.toString(), prop);
-			}
-			for (StyleProperty<?> prop : styleProperties)
-			{
-				this.styleProperties.put(prop.name.toString(), prop);
-			}
+			this.parent = parent;
 		}
 
 		@Override
@@ -143,7 +128,7 @@ public class StyleRule
 			JsonArray conds = new JsonArray();
 			for (IComponentSelector cond : src.conditions)
 			{
-				conds.add(cond.toJson(context));
+				conds.add(context.serialize(cond, IComponentSelector.class));
 			}
 			obj.add("conditions", conds);
 
@@ -165,37 +150,17 @@ public class StyleRule
 			List<IComponentSelector> conditions = new ArrayList<>();
 			for (JsonElement cond : obj.getAsJsonArray("conditions"))
 			{
-				conditions.add(deserializeSelector(cond, context));
+				conditions.add(context.deserialize(cond, IComponentSelector.class));
 			}
 			
 			List<StyleValue<?>> values = new ArrayList<>();			
 			for (Entry<String, JsonElement> cond : obj.getAsJsonObject("values").entrySet())
 			{
-				StyleProperty<?> prop = this.styleProperties.get(cond.getKey());
+				StyleProperty<?> prop = this.parent.styleProperties.get(cond.getKey());
 				values.add(new StyleValue<>(prop, context.deserialize(cond.getValue(), prop.type)));
 			}
 			
 			return new StyleRule(conditions, values);
-		}
-		
-		private IComponentSelector deserializeSelector(JsonElement json, JsonDeserializationContext context) throws JsonParseException
-		{
-			JsonObject obj = json.getAsJsonObject();
-			
-			switch (obj.get("operator").getAsString())
-			{
-			case "equals":
-				return IComponentSelector.Equals.fromJson(obj, context, this);
-			case "contains":
-				return IComponentSelector.Contains.fromJson(obj, context, this);
-			default:
-				return null;
-			}
-		}
-		
-		public PropertyIdentifier<?> getComponentProperty(String propertyIdentifier)
-		{
-			return this.componentProperties.get(propertyIdentifier);
 		}
 	}
 }
