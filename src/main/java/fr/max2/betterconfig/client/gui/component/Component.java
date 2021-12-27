@@ -24,6 +24,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	public static final PropertyIdentifier<String> COMPONENT_TYPE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_type"), String.class);
 	public static final ListPropertyIdentifier<String> COMPONENT_CLASSES = new ListPropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"), String.class);
 	public static final PropertyIdentifier<IComponent> PARENT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "parent"), IComponent.class);
+	public static final PropertyIdentifier<Boolean> HOVERED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "hovered"), Boolean.class);
 	
 	protected final Map<PropertyIdentifier<?>, Supplier<?>> propertyMap = new HashMap<>();
 	protected final Map<StyleProperty<?>, Object> styleOverride = new HashMap<>();
@@ -34,6 +35,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	protected Size prefSize;
 	protected Rectangle relativeRect;
 	protected Rectangle absoluteRect = new Rectangle();
+	protected boolean hovered;
 	
 	public Component(String type)
 	{
@@ -42,6 +44,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 		this.registerProperty(COMPONENT_TYPE, () -> this.type);
 		this.registerProperty(COMPONENT_CLASSES, () -> this.classes);
 		this.registerProperty(PARENT, () -> this.parent);
+		this.registerProperty(HOVERED, () -> this.hovered);
 	}
 	
 	@Override
@@ -172,6 +175,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	@Override
 	public final void mouseMoved(double mouseX, double mouseY)
 	{
+		this.hovered = this.isPointInside(mouseX, mouseY);
 		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
 			return;
 		
