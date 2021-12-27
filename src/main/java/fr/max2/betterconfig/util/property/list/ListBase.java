@@ -53,7 +53,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 	protected P removeElement(int index)
 	{
 		P property = ListBase.this.parent.remove(index);
-		this.listeners.forEach(l -> l.onElementRemoved(index));
+		this.listeners.forEach(l -> l.onElementRemoved(index, property.getValue()));
 		return property;
 	}
 	

@@ -119,8 +119,9 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 			}
 
 			@Override
-			public void onElementRemoved(int index)
+			public void onElementRemoved(int index, IBetterElement oldValue)
 			{
+				oldValue.invalidate();
 				for (int i = index; i < entries.size(); i++)
 				{
 					entries.get(i).updateIndex(i);

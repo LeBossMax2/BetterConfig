@@ -26,7 +26,7 @@ public class DerivedList<T, R> extends ListBase<R, IReadableProperty<R>>
 			}
 
 			@Override
-			public void onElementRemoved(int index)
+			public void onElementRemoved(int index, T oldValue)
 			{
 				DerivedList.this.removeElement(index);
 			}
