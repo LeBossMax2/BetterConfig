@@ -15,6 +15,7 @@ public class StyleSheet
 	public static final String STYLESHEET_DIR = "stylesheets";
 	public static final ResourceLocation DEFAULT_STYLESHEET = new ResourceLocation(BetterConfig.MODID, "default_stylesheet");
 	
+	// TODO [#2] Add optional parent style sheet
 	private Map<StyleProperty<?>, List<ProcessedStyleRule<?>>> rules;
 	
 	public StyleSheet(List<StyleRule> rules)

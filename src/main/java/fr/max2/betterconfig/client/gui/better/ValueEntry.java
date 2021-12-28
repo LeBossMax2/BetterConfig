@@ -16,6 +16,7 @@ import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.layout.Visibility;
 import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
@@ -39,12 +40,30 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_CONTAINER_HEIGHT))// Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
 			.build();
 	
+	public static final StyleRule UNDO_STYLE = StyleRule.when().hasClass("better:undo").then()
+			.set(ComponentLayoutConfig.VISIBILITY, Visibility.HIDDEN)
+			.build();
+	
+	public static final StyleRule UNDO_HOVERED_STYLE = StyleRule.when().hasClass("better:undo").parent().is(HOVERED).then()
+			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
+			.build();
+	
+	public static final StyleRule UNDO_FOCUSED_STYLE = StyleRule.when().hasClass("better:undo").parent().is(FOCUSED).then()
+			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
+			.build();
+	
+	public static final StyleRule UNDO_LIST_HOVERED_STYLE = StyleRule.when().hasClass("better:undo").parent().parent().type("better:list_entry").parent().parent().is(HOVERED).then()
+			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
+			.build();
+	
+	public static final StyleRule UNDO_LIST_FOCUSED_STYLE = StyleRule.when().hasClass("better:undo").parent().parent().type("better:list_entry").parent().parent().is(FOCUSED).then()
+			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
+			.build();
+	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	/** The edited property */
 	private final IConfigPrimitive<?> property;
-	private final IComponent content;
-	private final IComponent button;
 	/** The title of the property */
 	private List<FormattedCharSequence> nameLines;
 	/** The extra info to show on the tooltip */
@@ -57,10 +76,9 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		super("better:value_entry");
 		this.screen = screen;
 		this.property = property;
-		this.content = content;
 		// TODO [#2] Gray out the button when value is unchanged
 		// TODO [#2] Add reset to default button
-		this.button = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
+		IComponent button = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
 		{
 			property.undoChanges();
 		}, new TranslatableComponent(UNDO_TOOLTIP_KEY)).addClass("better:undo");
@@ -88,7 +106,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 			public void updateNarration(NarrationElementOutput narrationOutput)
 			{ }
 		};
-		this.children.addAll(Arrays.asList(spacing, content, this.button));
+		this.children.addAll(Arrays.asList(spacing, content, button));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
 		//this.config.justification = Justification.CENTER;
@@ -128,9 +146,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	{
 		Rectangle rect = this.getRect();
 		
-		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
-		if (this.isPointInside(mouseX, mouseY))
-			this.button.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.onRender(matrixStack, mouseX, mouseY, partialTicks);
 		Font font = this.screen.getFont();
 		int y = rect.y + (rect.size.height - this.nameLines.size() * this.screen.getFont().lineHeight) / 2 + 1;
 		for(FormattedCharSequence line : this.nameLines)
@@ -153,6 +169,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 			if (mouseX >= this.screen.width - X_PADDING - VALUE_WIDTH - RIGHT_PADDING - VALUE_HEIGHT)
 				yOffset = 24; // Fixes the overlay text covering the text on the content
 			
+			// TODO [#2] add to narration
 			GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY + yOffset, this.screen.width, this.screen.height, 200, font);
 		}
 	}
