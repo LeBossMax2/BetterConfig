@@ -2,16 +2,23 @@ package fr.max2.betterconfig.client.gui.component;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public abstract class CompositeComponent extends Component<ICompositeComponent> implements ICompositeComponent
 {
-	protected IReadableList<IComponent> children;
+	protected final IReadableList<IComponent> children;
+	protected NarratableEntry lastNarratable;
 	
 	public CompositeComponent(String type, IReadableList<IComponent> children)
 	{
@@ -102,54 +109,93 @@ public abstract class CompositeComponent extends Component<ICompositeComponent> 
 	protected void onMouseMoved(double mouseX, double mouseY)
 	{
 		ICompositeComponent.super.mouseMoved(mouseX, mouseY);
+		this.updateFocus();
 	}
 	
 	@Override
 	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
 		ICompositeComponent.super.mouseClicked(mouseX, mouseY, button, state);
+		this.updateFocus();
 	}
 	
 	@Override
 	protected void onMouseReleased(double mouseX, double mouseY, int button, EventState state)
 	{
 		ICompositeComponent.super.mouseReleased(mouseX, mouseY, button, state);
+		this.updateFocus();
 	}
 	
 	@Override
 	protected void onMouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
 	{
 		ICompositeComponent.super.mouseDragged(mouseX, mouseY, button, dragX, dragY, state);
+		this.updateFocus();
 	}
 	
 	@Override
 	protected void onMouseScrolled(double mouseX, double mouseY, double delta, EventState state)
 	{
 		ICompositeComponent.super.mouseScrolled(mouseX, mouseY, delta, state);
+		this.updateFocus();
 	}
 	
 	@Override
 	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		ICompositeComponent.super.keyPressed(keyCode, scanCode, modifiers, state);
+		this.updateFocus();
 	}
 	
 	@Override
 	protected void onKeyReleased(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		ICompositeComponent.super.keyReleased(keyCode, scanCode, modifiers, state);
+		this.updateFocus();
 	}
 	
 	@Override
 	protected void onCharTyped(char codePoint, int modifiers, EventState state)
 	{
 		ICompositeComponent.super.charTyped(codePoint, modifiers, state);
+		this.updateFocus();
 	}
 	
 	@Override
 	protected void onCycleFocus(boolean forward, CycleFocusState state)
 	{
 		ICompositeComponent.super.cycleFocus(forward, state);
+		this.updateFocus();
+	}
+	
+	protected void updateFocus()
+	{
+		this.hasFocus = this.getChildren().stream().anyMatch(IComponent::hasFocus);
+	}
+	
+	// Narration
+	
+	@Override
+	public void updateNarration(NarrationElementOutput narrationOutput)
+	{
+		narrationOutput = narrationOutput.nest();
+		ImmutableList<NarratableEntry> immutablelist = this.getChildren().stream().filter(NarratableEntry::isActive).collect(ImmutableList.toImmutableList());
+		Screen.NarratableSearchResult res = Screen.findNarratableWidget(immutablelist, this.lastNarratable);
+		if (res != null)
+		{
+			if (res.priority.isTerminal())
+				this.lastNarratable = res.entry;
+
+			if (immutablelist.size() > 1)
+			{
+				narrationOutput.add(NarratedElementType.POSITION, new TranslatableComponent("narrator.position.list", res.index + 1, immutablelist.size()));
+
+				if (res.priority == NarratableEntry.NarrationPriority.FOCUSED)
+					narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.component_list.usage"));
+			}
+
+			res.entry.updateNarration(narrationOutput);
+		}
 	}
 	
 }

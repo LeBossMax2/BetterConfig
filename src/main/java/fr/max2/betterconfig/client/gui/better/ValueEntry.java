@@ -21,6 +21,7 @@ import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
@@ -66,8 +67,25 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		//this.button.x = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4;
 		IComponent spacing = new UnitComponent("spacing")
 		{
+			// TODO use alignment instead of spacing component
 			@Override
 			protected void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTicks)
+			{ }
+			
+			@Override
+			public boolean isActive()
+			{
+				return false;
+			}
+			
+			@Override
+			public boolean hasFocus()
+			{
+				return false;
+			}
+			
+			@Override
+			public void updateNarration(NarrationElementOutput narrationOutput)
 			{ }
 		};
 		this.children.addAll(Arrays.asList(spacing, content, this.button));

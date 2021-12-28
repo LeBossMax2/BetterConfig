@@ -16,6 +16,8 @@ import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 
 /**
  * A user interface builder that only shows the available configuration properties but doesn't allow edition
@@ -33,6 +35,8 @@ public class DebugConfigGui extends UnitComponent
 		this.parent = parent;
 		this.labels = labels;
 	}
+	
+	// Rendering
 
 	@Override
 	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
@@ -54,6 +58,14 @@ public class DebugConfigGui extends UnitComponent
 	@Override
 	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{ }
+	
+	// Narration
+	
+	@Override
+	public void updateNarration(NarrationElementOutput narrationOutput)
+	{
+		this.labels.forEach(txt -> narrationOutput.add(NarratedElementType.TITLE, txt));
+	}
 
 	/**
 	 * Builds the debug user interface

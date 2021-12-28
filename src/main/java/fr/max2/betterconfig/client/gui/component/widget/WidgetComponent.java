@@ -7,6 +7,7 @@ import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 
 public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComponent
 {
@@ -17,6 +18,8 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 		super(type);
 		this.widget = widget;
 	}
+
+	// Layout
 	
 	private void updatePosition()
 	{
@@ -32,12 +35,16 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 		this.widget.setHeight(rect.size.height);
 	}
 	
+	// Rendering
+	
 	@Override
 	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		updatePosition();
 		this.widget.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
+
+	// Mouse Handling
 	
 	@Override
 	protected void onMouseMoved(double mouseX, double mouseY)
@@ -77,12 +84,14 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 		if (!state.isConsumed() && this.widget.mouseScrolled(mouseX, mouseY, delta))
 			state.consume();
 	}
+
+	// Input handling
 	
 	@Override
 	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		updatePosition();
-		if (!state.isConsumed() && this.widget.isFocused() && this.widget.keyPressed(keyCode, scanCode, modifiers))
+		if (!state.isConsumed() && this.hasFocus() && this.widget.keyPressed(keyCode, scanCode, modifiers))
 			state.consume();
 	}
 	
@@ -90,7 +99,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	protected void onKeyReleased(int keyCode, int scanCode, int modifiers, EventState state)
 	{
 		updatePosition();
-		if (!state.isConsumed() && this.widget.isFocused() && this.widget.keyReleased(keyCode, scanCode, modifiers))
+		if (!state.isConsumed() && this.hasFocus() && this.widget.keyReleased(keyCode, scanCode, modifiers))
 			state.consume();
 	}
 	
@@ -98,7 +107,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	protected void onCharTyped(char codePoint, int modifiers, EventState state)
 	{
 		updatePosition();
-		if (!state.isConsumed() && this.widget.isFocused() && this.widget.charTyped(codePoint, modifiers))
+		if (!state.isConsumed() && this.hasFocus() && this.widget.charTyped(codePoint, modifiers))
 			state.consume();
 	}
 	
@@ -139,6 +148,32 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 				state.propagate();
 			}
 		}
+	}
+	
+	// Narration
+	
+	@Override
+	public NarrationPriority narrationPriority()
+	{
+		return this.widget.narrationPriority();
+	}
+	
+	@Override
+	public boolean isActive()
+	{
+		return super.isActive() && this.widget.isActive();
+	}
+	
+	@Override
+	public boolean hasFocus()
+	{
+		return this.widget.isFocused();
+	}
+	
+	@Override
+	public void updateNarration(NarrationElementOutput narrationOutput)
+	{
+		this.widget.updateNarration(narrationOutput);
 	}
 	
 }

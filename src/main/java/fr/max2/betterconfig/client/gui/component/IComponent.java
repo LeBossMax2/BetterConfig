@@ -7,12 +7,14 @@ import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.StyleProperty;
 import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 
 /**
  * Represents a component of user interface
  */
 // TODO [#2] Handle narration
-public interface IComponent extends Widget
+public interface IComponent extends Widget, NarratableEntry
 {
 	void init(IComponentParent layoutManager, IComponent parent);
 	
@@ -62,4 +64,11 @@ public interface IComponent extends Widget
 	void charTyped(char codePoint, int modifiers, EventState state);
 	
 	void cycleFocus(boolean forward, CycleFocusState state);
+	
+	boolean hasFocus();
+	
+	// Narration
+	
+	@Override
+	void updateNarration(NarrationElementOutput narrationOutput);
 }

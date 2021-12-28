@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -183,6 +184,8 @@ public class ComponentScreen extends Screen implements IComponentParent
 		return res;
 	}
 	
+	// Input handling
+	
 	@Override
 	public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers)
 	{
@@ -305,6 +308,15 @@ public class ComponentScreen extends Screen implements IComponentParent
 		this.content.cycleFocus(forward, state);
 		
 		return state.isConsumed();
+	}
+	
+	// Narration
+	
+	@Override
+	protected void updateNarratedWidget(NarrationElementOutput narrationOutput)
+	{
+		super.updateNarratedWidget(narrationOutput);
+		this.content.updateNarration(narrationOutput);
 	}
 	
 }

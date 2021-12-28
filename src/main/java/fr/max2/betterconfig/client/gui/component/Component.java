@@ -35,7 +35,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	protected Size prefSize;
 	protected Rectangle relativeRect;
 	protected Rectangle absoluteRect = new Rectangle();
-	protected boolean hovered;
+	protected boolean hovered = false;
+	protected boolean hasFocus = false;
 	
 	public Component(String type)
 	{
@@ -44,7 +45,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 		this.registerProperty(COMPONENT_TYPE, () -> this.type);
 		this.registerProperty(COMPONENT_CLASSES, () -> this.classes);
 		this.registerProperty(PARENT, () -> this.parent);
-		this.registerProperty(HOVERED, () -> this.hovered);
+		this.registerProperty(HOVERED, () -> this.isHovered());
 	}
 	
 	@Override
@@ -228,6 +229,11 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 
 	protected abstract void onMouseScrolled(double mouseX, double mouseY, double delta, EventState state);
 	
+	public boolean isHovered()
+	{
+		return this.hovered;
+	}
+	
 	// Input handling
 
 	@Override
@@ -273,5 +279,35 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	}
 	
 	protected abstract void onCycleFocus(boolean forward, CycleFocusState state);
+	
+	@Override
+	public boolean hasFocus()
+	{
+		return this.hasFocus;
+	}
+	
+	// Narration
+	
+	@Override
+	public NarrationPriority narrationPriority()
+	{
+		if (this.hasFocus())
+			return NarrationPriority.FOCUSED;
+		
+		if (this.isHovered())
+			return NarrationPriority.HOVERED;
+		
+		return NarrationPriority.NONE;
+	}
+	
+	@Override
+	public boolean isActive()
+	{
+		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
+			return false;
+		
+		return IComponent.super.isActive();
+	}
+	
 	
 }

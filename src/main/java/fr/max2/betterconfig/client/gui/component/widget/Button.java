@@ -4,6 +4,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.components.Button.OnTooltip;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.fmlclient.gui.widget.ExtendedButton;
@@ -47,6 +49,17 @@ public class Button extends WidgetComponent<Button.InnerButton>
 		this.widget.superRenderButton(mStack, mouseX, mouseY, partial);
 	}
 	
+	// Narration
+	
+	@Override
+	public void updateNarration(NarrationElementOutput narrationOutput)
+	{
+		super.updateNarration(narrationOutput);
+	      this.overlay.narrateTooltip((text) -> {
+	    	  narrationOutput.add(NarratedElementType.HINT, text);
+	       });
+	}
+	
 	@FunctionalInterface
 	public static interface OnPress
 	{
@@ -63,6 +76,8 @@ public class Button extends WidgetComponent<Button.InnerButton>
 			super(xPos, yPos, width, height, displayString, null);
 			this.handler = handler;
 		}
+		
+		// Rendering
 		
 		@Override
 		public void renderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
@@ -83,10 +98,20 @@ public class Button extends WidgetComponent<Button.InnerButton>
 			// Disable default tooltip overlay
 		}
 		
+		// Input handling
+		
 		@Override
 		public void onPress()
 		{
 			this.parent.layoutManager.enqueueWork(() -> this.handler.onPress(this.parent));
+		}
+		
+		@Override
+		public boolean mouseClicked(double pMouseX, double pMouseY, int pButton)
+		{
+			if (!this.clicked(pMouseX, pMouseY))
+				this.setFocused(false);
+			return super.mouseClicked(pMouseX, pMouseY, pButton);
 		}
 		
 		@Override

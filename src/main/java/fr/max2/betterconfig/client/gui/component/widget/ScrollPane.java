@@ -21,6 +21,7 @@ import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 
@@ -295,10 +296,16 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	@Override
 	protected void onCycleFocus(boolean forward, CycleFocusState state)
 	{
+		// TODO [#2] scroll to focused element
 		this.checkLayout();
 		IScrollComponent.super.cycleFocus(forward, state);
 	}
 	
+	@Override
+	public boolean hasFocus()
+	{
+		return this.content.hasFocus();
+	}
 	
 	// Rendering
 	
@@ -414,6 +421,14 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 		int screenHeight = mc.getWindow().getHeight();
 		
 		RenderSystem.enableScissor((int)(topLeft.x() * scale), screenHeight - (int)((topLeft.y() + size.y()) * scale), (int)(size.x() * scale), (int)(size.y() * scale));
+	}
+	
+	// Narration
+	
+	@Override
+	public void updateNarration(NarrationElementOutput narrationOutput)
+	{
+		this.content.updateNarration(narrationOutput);
 	}
 	
 }
