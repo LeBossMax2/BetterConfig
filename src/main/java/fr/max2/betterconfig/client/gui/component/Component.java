@@ -25,6 +25,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	public static final ListPropertyIdentifier<String> COMPONENT_CLASSES = new ListPropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"), String.class);
 	public static final PropertyIdentifier<IComponent> PARENT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "parent"), IComponent.class);
 	public static final PropertyIdentifier<Boolean> HOVERED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "hovered"), Boolean.class);
+	public static final PropertyIdentifier<Boolean> FOCUSED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "focused"), Boolean.class);
 	
 	protected final Map<PropertyIdentifier<?>, Supplier<?>> propertyMap = new HashMap<>();
 	protected final Map<StyleProperty<?>, Object> styleOverride = new HashMap<>();
@@ -46,6 +47,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 		this.registerProperty(COMPONENT_CLASSES, () -> this.classes);
 		this.registerProperty(PARENT, () -> this.parent);
 		this.registerProperty(HOVERED, () -> this.isHovered());
+		this.registerProperty(FOCUSED, () -> this.hasFocus());
 	}
 	
 	@Override

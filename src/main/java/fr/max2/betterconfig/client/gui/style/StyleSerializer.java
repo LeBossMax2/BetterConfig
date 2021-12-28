@@ -21,6 +21,7 @@ public class StyleSerializer
 			Component.COMPONENT_CLASSES,
 			Component.PARENT,
 			Component.HOVERED,
+			Component.FOCUSED,
 			IBetterElement.FILTERED_OUT,
 			Foldout.FOLDED
 		), Arrays.asList(
