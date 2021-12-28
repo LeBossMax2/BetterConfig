@@ -16,6 +16,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import fr.max2.betterconfig.client.gui.component.Component;
+import fr.max2.betterconfig.client.gui.component.IComponent;
 
 public class StyleRule
 {
@@ -76,16 +77,36 @@ public class StyleRule
 			return this.condition(new IComponentSelector.Contains<>(property, value));
 		}
 		
-		default IConditionBuilder<Res> parent()
+		default IConditionBuilder<Res> subProperty(PropertyIdentifier<? extends IComponent> property)
 		{
 			return new IConditionBuilder<Res>()
 			{
 				@Override
 				public <T> Res condition(IComponentSelector selection)
 				{
-					return IConditionBuilder.this.condition(new IComponentSelector.Combinator(Component.PARENT, selection));
+					return IConditionBuilder.this.condition(new IComponentSelector.Combinator(property, selection));
 				}
 			};
+		}
+		
+		default Res is(PropertyIdentifier<Boolean> property)
+		{
+			return this.equals(property, true);
+		}
+		
+		default IConditionBuilder<Res> parent()
+		{
+			return this.subProperty(Component.PARENT);
+		}
+		
+		default Res type(String type)
+		{
+			return this.equals(Component.COMPONENT_TYPE, type);
+		}
+		
+		default Res hasClass(String className)
+		{
+			return this.contains(Component.COMPONENT_CLASSES, className);
 		}
 	}
 	

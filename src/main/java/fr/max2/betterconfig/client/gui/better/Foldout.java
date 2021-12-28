@@ -40,11 +40,11 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	
 	public static final PropertyIdentifier<Boolean> FOLDED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "folded"), Boolean.class);
 	
-	public static final StyleRule FOLDOUT_STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:foldout").then()
+	public static final StyleRule FOLDOUT_STYLE = StyleRule.when().type("better:foldout").then()
 			.set(CompositeLayoutConfig.INNER_PADDING, new Padding(FOLDOUT_HEADER_HEIGHT, 0, 0, 0))
 			.build();
 
-	public static final StyleRule FOLDED_STYLE = StyleRule.when().parent().equals(FOLDED, true).then()
+	public static final StyleRule FOLDED_STYLE = StyleRule.when().parent().is(FOLDED).then()
 			.set(ComponentLayoutConfig.VISIBILITY, Visibility.COLLAPSED)
 			.build();
 	

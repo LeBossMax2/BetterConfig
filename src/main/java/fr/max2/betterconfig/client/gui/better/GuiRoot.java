@@ -31,13 +31,13 @@ public class GuiRoot extends CompositeComponent
 	/** The x position of the input field of the search bar */
 	private static final int SEARCH_LABEL_WIDTH = 80;
 	
-	public static final StyleRule ROOT_STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:root").then()
+	public static final StyleRule ROOT_STYLE = StyleRule.when().type("better:root").then()
 			.set(CompositeLayoutConfig.DIR, Axis.VERTICAL)
 			.set(CompositeLayoutConfig.SPACING, Y_PADDING)
 			.set(CompositeLayoutConfig.INNER_PADDING, new Padding(Y_PADDING, X_PADDING, Y_PADDING, X_PADDING))
 			.build();
 	
-	public static final StyleRule SEARCH_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "better:search_field").then()
+	public static final StyleRule SEARCH_STYLE = StyleRule.when().hasClass("better:search_field").then()
 			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(1, 1, 1, SEARCH_LABEL_WIDTH + 1))
 			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, 18))
 			.build();

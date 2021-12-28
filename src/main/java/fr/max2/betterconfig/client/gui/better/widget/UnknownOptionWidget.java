@@ -15,7 +15,7 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 /** The widget for properties of unknown type */
 public class UnknownOptionWidget extends Button
 {
-	public static final StyleRule STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "better:unknown").then()
+	public static final StyleRule STYLE = StyleRule.when().hasClass("better:unknown").then()
 			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(VALUE_WIDTH, VALUE_HEIGHT))
 			.build();
 	

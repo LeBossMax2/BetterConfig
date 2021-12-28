@@ -14,7 +14,7 @@ public interface IBetterElement extends IComponent
 {
 	public static final PropertyIdentifier<Boolean> FILTERED_OUT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "filtered_out"), Boolean.class);
 
-	public static final StyleRule FILTERED_OUT_STYLE = StyleRule.when().equals(FILTERED_OUT, true).then()
+	public static final StyleRule FILTERED_OUT_STYLE = StyleRule.when().is(FILTERED_OUT).then()
 			.set(ComponentLayoutConfig.VISIBILITY, Visibility.COLLAPSED)
 			.build();
 	

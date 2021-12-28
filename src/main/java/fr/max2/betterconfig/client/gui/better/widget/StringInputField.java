@@ -15,7 +15,7 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 /** The widget for string properties */
 public class StringInputField extends TextField
 {
-	public static final StyleRule STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "better:string_input").then()
+	public static final StyleRule STYLE = StyleRule.when().hasClass("better:string_input").then()
 			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(VALUE_WIDTH - 2, VALUE_HEIGHT - 2))
 			.build();
 	

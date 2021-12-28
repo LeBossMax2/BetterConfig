@@ -34,7 +34,7 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 /** The container for table entries */
 public class ValueEntry extends CompositeComponent implements IBetterElement
 {
-	public static final StyleRule STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:value_entry").then()
+	public static final StyleRule STYLE = StyleRule.when().type("better:value_entry").then()
 			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
 			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_CONTAINER_HEIGHT))// Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
 			.build();

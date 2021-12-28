@@ -8,7 +8,7 @@ import fr.max2.betterconfig.client.gui.style.StyleRule;
 
 public class HBox extends CompositeComponent
 {
-	public static final StyleRule STYLE = StyleRule.when().equals(COMPONENT_TYPE, "hbox").then().set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL).build();
+	public static final StyleRule STYLE = StyleRule.when().type("hbox").then().set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL).build();
 
 	public HBox(List<IComponent> children)
 	{

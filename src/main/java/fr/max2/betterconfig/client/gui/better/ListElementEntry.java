@@ -20,11 +20,11 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 public class ListElementEntry extends CompositeComponent implements IBetterElement
 {
-	public static final StyleRule STYLE = StyleRule.when().equals(COMPONENT_TYPE, "better:list_entry").then()
+	public static final StyleRule STYLE = StyleRule.when().type("better:list_entry").then()
 			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
 			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, -VALUE_HEIGHT))
 			.build();
-	public static final StyleRule REMOVE_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "better:list_remove").then()
+	public static final StyleRule REMOVE_STYLE = StyleRule.when().hasClass("better:list_remove").then()
 			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding((VALUE_CONTAINER_HEIGHT - VALUE_HEIGHT) / 2, 0, 0, 0))
 			.build();
 	

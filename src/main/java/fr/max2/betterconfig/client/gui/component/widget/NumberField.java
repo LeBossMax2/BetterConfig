@@ -30,14 +30,14 @@ public class NumberField<N> extends CompositeComponent
 	/** The spacing between the buttons and the text field */
 	protected static final int SPACING = 2;
 	
-	public static final StyleRule FIELD_STYLE = StyleRule.when().equals(COMPONENT_TYPE, "number_field").then()
+	public static final StyleRule FIELD_STYLE = StyleRule.when().type("number_field").then()
 			//.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, height))
 			.set(CompositeLayoutConfig.SPACING, SPACING)
 			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
 			.build();
 
-	public static final StyleRule MINUS_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "number_field:minus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
-	public static final StyleRule PLUS_STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "number_field:plus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
+	public static final StyleRule MINUS_STYLE = StyleRule.when().hasClass("number_field:minus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
+	public static final StyleRule PLUS_STYLE = StyleRule.when().hasClass("number_field:plus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
 	
 	/** The text field to directly enter the number */
 	protected final TextField inputField;

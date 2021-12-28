@@ -17,7 +17,7 @@ import net.minecraft.network.chat.Component;
  */
 public class TextField extends WidgetComponent<EditBox>
 {
-	public static final StyleRule STYLE = StyleRule.when().equals(COMPONENT_TYPE, "text_field").then().set(ComponentLayoutConfig.OUTER_PADDING, new Padding(1, 1, 1, 1)).build();
+	public static final StyleRule STYLE = StyleRule.when().type("text_field").then().set(ComponentLayoutConfig.OUTER_PADDING, new Padding(1, 1, 1, 1)).build();
 	
 	public TextField(Font fontRenderer, Component title)
 	{

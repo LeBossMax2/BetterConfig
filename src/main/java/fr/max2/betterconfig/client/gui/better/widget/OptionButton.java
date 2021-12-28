@@ -20,7 +20,7 @@ import static fr.max2.betterconfig.client.gui.better.Constants.*;
 /** The widget for option buttons */
 public class OptionButton<V> extends CycleOptionButton<V> 
 {
-	public static final StyleRule STYLE = StyleRule.when().contains(COMPONENT_CLASSES, "better:option_button").then()
+	public static final StyleRule STYLE = StyleRule.when().hasClass("better:option_button").then()
 			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(VALUE_WIDTH, VALUE_HEIGHT))
 			.build();
 	
