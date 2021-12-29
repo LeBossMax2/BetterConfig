@@ -11,6 +11,7 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
+import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
 import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
@@ -22,13 +23,12 @@ import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraftforge.fmlclient.gui.GuiUtils;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
@@ -67,7 +67,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	/** The title of the property */
 	private List<FormattedCharSequence> nameLines;
 	/** The extra info to show on the tooltip */
-	private final List<FormattedText> extraInfo = new ArrayList<>();
+	private final List<Component> extraInfo = new ArrayList<>();
 	/** Indicates if the property is hidden or not */
 	private boolean filteredOut = false;
 
@@ -111,6 +111,19 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
 		//this.config.justification = Justification.CENTER;
 		//this.config.alignment = Alignment.END;
+		
+		this.overlay = new TextOverlay(screen, this.extraInfo)
+		{
+			@Override
+			public void onTooltip(Button button, PoseStack matrixStack, int mouseX, int mouseY)
+			{
+				int yOffset = 0;
+				if (mouseX >= this.screen.width - X_PADDING - VALUE_WIDTH - RIGHT_PADDING - VALUE_HEIGHT)
+					yOffset = 24; // Fixes the overlay text covering the text on the content
+				
+				super.onTooltip(button, matrixStack, mouseX, mouseY + yOffset);
+			}
+		};
 	}
 	
 	// Layout
@@ -134,7 +147,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		Font font = this.screen.getFont();
 		this.nameLines = font.split(this.property.getDisplayName(), this.screen.width /*- this.getRect().x*/ - VALUE_WIDTH - X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4);
 		this.extraInfo.clear();
-		this.extraInfo.add(FormattedText.of(this.property.getName(), Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
+		this.extraInfo.add(new TextComponent(this.property.getName()).withStyle(ChatFormatting.YELLOW));
 		this.extraInfo.addAll(this.property.getDisplayComment());
 		this.extraInfo.add((new TranslatableComponent(DEFAULT_VALUE_KEY, new TextComponent(Objects.toString(this.property.getSpec().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
 	}
@@ -153,24 +166,6 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		{
 			font.draw(matrixStack, line, rect.x + 1, y, 0xFF_FF_FF_FF);
 			y += 9;
-		}
-	}
-	
-	@Override
-	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
-	{
-		Rectangle rect = this.getRect();
-		
-		super.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks);
-		if ( mouseX >= rect.x && mouseY >= rect.y && mouseX < this.screen.width - X_PADDING - RIGHT_PADDING - VALUE_HEIGHT && mouseY < rect.getBottom())
-		{
-			Font font = this.screen.getFont();
-			int yOffset = 0;
-			if (mouseX >= this.screen.width - X_PADDING - VALUE_WIDTH - RIGHT_PADDING - VALUE_HEIGHT)
-				yOffset = 24; // Fixes the overlay text covering the text on the content
-			
-			// TODO [#2] add to narration
-			GuiUtils.drawHoveringText(matrixStack, this.extraInfo, mouseX, mouseY + yOffset, this.screen.width, this.screen.height, 200, font);
 		}
 	}
 	

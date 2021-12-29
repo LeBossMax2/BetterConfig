@@ -1,21 +1,16 @@
 package fr.max2.betterconfig.client.gui.better;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.widget.Button;
+import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraftforge.fmlclient.gui.GuiUtils;
 
 import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
@@ -24,25 +19,12 @@ public class BetterButton extends Button
 	/** The parent screen */
 	protected final BetterConfigScreen screen;
 	
-	private final List<? extends FormattedText> tooltipInfo;
-	
 	public BetterButton(BetterConfigScreen screen, int width, Component displayString, OnPress pressedHandler, Component overlay)
 	{
-		super(displayString, pressedHandler);
+		super(displayString, pressedHandler, new TextOverlay(screen, overlay));
 		this.addClass("better:button");
 		this.screen = screen;
-		this.tooltipInfo = Arrays.asList(overlay);
 		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, VALUE_HEIGHT));
-	}
-	
-	@Override
-	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
-	{
-		if (this.isPointInside(mouseX, mouseY))
-		{
-			Font font = this.layoutManager.getMinecraft().font;
-			GuiUtils.drawHoveringText(matrixStack, this.tooltipInfo, mouseX, mouseY, this.screen.width, this.screen.height, 200, font);
-		}
 	}
 
 	public static class Icon extends BetterButton

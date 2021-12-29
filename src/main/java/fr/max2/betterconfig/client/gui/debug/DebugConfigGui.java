@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
+import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
@@ -56,7 +57,7 @@ public class DebugConfigGui extends UnitComponent
 	}
 
 	@Override
-	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state)
 	{ }
 	
 	// Narration

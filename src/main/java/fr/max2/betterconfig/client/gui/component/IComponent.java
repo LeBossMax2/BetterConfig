@@ -43,7 +43,7 @@ public interface IComponent extends Widget, NarratableEntry
 	 * @param mouseY the y coordinate of the mouse on the screen
 	 * @param partialTicks
 	 */
-	void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks);
+	void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state);
 	
 	// Input handling
 	

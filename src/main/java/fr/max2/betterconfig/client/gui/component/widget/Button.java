@@ -4,8 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.components.Button.OnTooltip;
-import net.minecraft.client.gui.narration.NarratedElementType;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.fmlclient.gui.widget.ExtendedButton;
@@ -15,9 +13,6 @@ import net.minecraftforge.fmlclient.gui.widget.ExtendedButton;
  */
 public class Button extends WidgetComponent<Button.InnerButton>
 {
-	public static final OnTooltip NO_TOOLTIP = net.minecraft.client.gui.components.Button.NO_TOOLTIP;
-	/** The overlay to show when the mouse is over the button */
-	private final OnTooltip overlay;
 
 	public Button(Component displayString, OnPress pressedHandler, OnTooltip overlay)
 	{
@@ -28,7 +23,7 @@ public class Button extends WidgetComponent<Button.InnerButton>
 
 	public Button(Component displayString, OnPress pressedHandler)
 	{
-		this(displayString, pressedHandler, NO_TOOLTIP);
+		this(displayString, pressedHandler, NO_OVERLAY);
 	}
 	
 	public void setMessage(Component message)
@@ -38,26 +33,9 @@ public class Button extends WidgetComponent<Button.InnerButton>
 	
 	// Rendering
 	
-	@Override
-	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
-	{
-		this.overlay.onTooltip(this.widget, matrixStack, mouseX, mouseY);
-	}
-	
 	protected void renderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
 	{
 		this.widget.superRenderButton(mStack, mouseX, mouseY, partial);
-	}
-	
-	// Narration
-	
-	@Override
-	public void updateNarration(NarrationElementOutput narrationOutput)
-	{
-		super.updateNarration(narrationOutput);
-	      this.overlay.narrateTooltip((text) -> {
-	    	  narrationOutput.add(NarratedElementType.HINT, text);
-	       });
 	}
 	
 	@FunctionalInterface

@@ -161,9 +161,9 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	}
 	
 	@Override
-	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state)
 	{
-		super.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		super.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks, state);
 		if (this.isOverHeader(mouseX, mouseY))
 		{
 			Font font = this.screen.getFont();

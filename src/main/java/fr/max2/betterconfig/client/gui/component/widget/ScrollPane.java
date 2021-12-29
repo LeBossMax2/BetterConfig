@@ -400,10 +400,10 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	}
 	
 	@Override
-	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state)
 	{
 		if (this.isPointInside(mouseX, mouseY))
-			IScrollComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+			IScrollComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks, state);
 	}
 
 	protected void enableScissor(PoseStack matrixStack, int x, int y, int width, int height)
@@ -429,6 +429,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	public void updateNarration(NarrationElementOutput narrationOutput)
 	{
 		this.content.updateNarration(narrationOutput);
+		super.updateNarration(narrationOutput);
 	}
 	
 }

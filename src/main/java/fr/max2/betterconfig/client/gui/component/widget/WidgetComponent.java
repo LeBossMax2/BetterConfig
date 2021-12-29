@@ -174,6 +174,7 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	public void updateNarration(NarrationElementOutput narrationOutput)
 	{
 		this.widget.updateNarration(narrationOutput);
+		super.updateNarration(narrationOutput);
 	}
 	
 }

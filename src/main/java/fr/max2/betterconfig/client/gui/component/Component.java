@@ -17,6 +17,11 @@ import fr.max2.betterconfig.client.gui.style.ListPropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.StyleProperty;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Button.OnTooltip;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarrationThunk;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class Component<LP> extends GuiComponent implements IComponent
@@ -26,6 +31,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	public static final PropertyIdentifier<IComponent> PARENT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "parent"), IComponent.class);
 	public static final PropertyIdentifier<Boolean> HOVERED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "hovered"), Boolean.class);
 	public static final PropertyIdentifier<Boolean> FOCUSED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "focused"), Boolean.class);
+
+	public static final OnTooltip NO_OVERLAY = Button.NO_TOOLTIP;
 	
 	protected final Map<PropertyIdentifier<?>, Supplier<?>> propertyMap = new HashMap<>();
 	protected final Map<StyleProperty<?>, Object> styleOverride = new HashMap<>();
@@ -38,6 +45,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	protected Rectangle absoluteRect = new Rectangle();
 	protected boolean hovered = false;
 	protected boolean hasFocus = false;
+	/** The overlay to show when the mouse is over the component */
+	protected OnTooltip overlay = NO_OVERLAY;
 	
 	public Component(String type)
 	{
@@ -158,15 +167,22 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	protected abstract void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick);
 
 	@Override
-	public final void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public final void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state)
 	{
 		if (!this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isVisible())
 			return;
 		
-		this.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		this.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks, state);
 	}
 
-	protected abstract void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks);
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state)
+	{
+		if (this.isHovered() && !state.isConsumed() && this.overlay != NO_OVERLAY)
+		{
+			state.consume();
+			this.overlay.onTooltip(null, matrixStack, mouseX, mouseY);
+		}
+	}
 	
 	// Mouse Handling
 	
@@ -311,5 +327,16 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 		return IComponent.super.isActive();
 	}
 	
+	@Override
+	public void updateNarration(NarrationElementOutput narrationOutput)
+	{
+		if (this.overlay == NO_OVERLAY)
+			return;
+		
+		List<net.minecraft.network.chat.Component> hints = new ArrayList<>();
+		this.overlay.narrateTooltip(hints::add);
+		if (!hints.isEmpty())
+			narrationOutput.add(NarratedElementType.HINT, NarrationThunk.from(hints));
+	}
 	
 }

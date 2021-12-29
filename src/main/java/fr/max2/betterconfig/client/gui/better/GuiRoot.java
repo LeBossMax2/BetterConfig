@@ -63,7 +63,8 @@ public class GuiRoot extends CompositeComponent
 		for (ModConfig config : screen.getModConfigs())
 		{
 			final int index = i;
-			Button b = new Button(new TextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_TOOLTIP);
+			// TODO [#2] add meaningful tooltip
+			Button b = new Button(new TextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_OVERLAY);
 			b.addClass("better:tab_button");
 			b.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(tabButtonWidth, 20));
 			b.widget.active = index != screen.getCurrentConfigIndex();
@@ -88,11 +89,11 @@ public class GuiRoot extends CompositeComponent
 		// Cancel/Save buttons
 		List<IComponent> buttons = new ArrayList<>();
 		int buttonWidth = (this.screen.width - 2 * X_PADDING) / 2;
-		Button cancelButton = new Button(new TranslatableComponent(CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_TOOLTIP);
+		Button cancelButton = new Button(new TranslatableComponent(CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_OVERLAY);
 		cancelButton.addClass("better:cancel");
 		cancelButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(buttonWidth, 20));
 		buttons.add(cancelButton);
-		Button saveButton = new Button(new TranslatableComponent(SAVE_CONFIG_KEY), thisButton -> this.screen.onClose(), Button.NO_TOOLTIP);
+		Button saveButton = new Button(new TranslatableComponent(SAVE_CONFIG_KEY), thisButton -> this.screen.onClose(), Button.NO_OVERLAY);
 		saveButton.addClass("better:save");
 		saveButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(buttonWidth, 20));
 		buttons.add(saveButton);

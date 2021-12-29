@@ -47,11 +47,11 @@ public interface ICompositeComponent extends IComponent
 	}
 	
 	@Override
-	default void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	default void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state)
 	{
 		for (IComponent elem : this.getChildren())
 		{
-			elem.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+			elem.renderOverlay(matrixStack, mouseX, mouseY, partialTicks, state);
 		}
 	}
 	

@@ -98,9 +98,10 @@ public abstract class CompositeComponent extends Component<ICompositeComponent> 
 	}
 	
 	@Override
-	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state)
 	{
-		ICompositeComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		ICompositeComponent.super.renderOverlay(matrixStack, mouseX, mouseY, partialTicks, state);
+		super.onRenderOverlay(matrixStack, mouseX, mouseY, partialTicks, state);
 	}
 	
 	// Input handling
@@ -196,6 +197,7 @@ public abstract class CompositeComponent extends Component<ICompositeComponent> 
 
 			res.entry.updateNarration(narrationOutput);
 		}
+		super.updateNarration(narrationOutput);
 	}
 	
 }

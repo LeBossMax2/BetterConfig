@@ -108,7 +108,7 @@ public class ComponentScreen extends Screen implements IComponentParent
 		
 		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.content.renderOverlay(matrixStack, mouseX, mouseY, partialTicks);
+		this.content.renderOverlay(matrixStack, mouseX, mouseY, partialTicks, new EventState());
 		
 		this.processDelayedWork();
 	}
