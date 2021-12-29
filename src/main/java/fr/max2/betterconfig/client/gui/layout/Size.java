@@ -3,7 +3,7 @@ package fr.max2.betterconfig.client.gui.layout;
 
 public class Size
 {
-	public static int UNCONSTRAINED = -1;
+	public static final int UNCONSTRAINED = -1;
 	
 	public int width;
 	public int height;

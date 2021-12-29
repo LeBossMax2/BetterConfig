@@ -158,6 +158,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	@Override
 	public final void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick)
 	{
+		this.updateHoverState(pMouseX, pMouseY);
+		
 		if (!this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isVisible())
 			return;
 		
@@ -194,7 +196,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	@Override
 	public final void mouseMoved(double mouseX, double mouseY)
 	{
-		this.hovered = this.isPointInside(mouseX, mouseY);
+		this.updateHoverState(mouseX, mouseY);
+		
 		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
 			return;
 		
@@ -206,6 +209,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	@Override
 	public final void mouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
+		this.updateHoverState(mouseX, mouseY);
+		
 		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
 			return;
 		
@@ -217,6 +222,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	@Override
 	public final void mouseReleased(double mouseX, double mouseY, int button, EventState state)
 	{
+		this.updateHoverState(mouseX, mouseY);
+		
 		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
 			return;
 		
@@ -228,6 +235,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	@Override
 	public final void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state)
 	{
+		this.updateHoverState(mouseX, mouseY);
+		
 		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
 			return;
 		
@@ -239,6 +248,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	@Override
 	public final void mouseScrolled(double mouseX, double mouseY, double delta, EventState state)
 	{
+		this.updateHoverState(mouseX, mouseY);
+		
 		if (this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isCollapsed())
 			return;
 		
@@ -250,6 +261,11 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	public boolean isHovered()
 	{
 		return this.hovered;
+	}
+
+	private void updateHoverState(double mouseX, double mouseY)
+	{
+		this.hovered = this.isPointInside(mouseX, mouseY);
 	}
 	
 	// Input handling

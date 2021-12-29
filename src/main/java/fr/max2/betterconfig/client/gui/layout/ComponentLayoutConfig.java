@@ -10,9 +10,9 @@ public final class ComponentLayoutConfig
 	private ComponentLayoutConfig()
 	{ }
 	
-	public static StyleProperty<Size> SIZE_OVERRIDE = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "size_override"), new Size());
-	public static StyleProperty<Padding> OUTER_PADDING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "outer_padding"), new Padding());
-	public static StyleProperty<Visibility> VISIBILITY = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "visibility"), Visibility.VISIBLE);
+	public static final StyleProperty<Size> SIZE_OVERRIDE = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "size_override"), new Size());
+	public static final StyleProperty<Padding> OUTER_PADDING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "outer_padding"), new Padding());
+	public static final StyleProperty<Visibility> VISIBILITY = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "visibility"), Visibility.VISIBLE);
 	
 	public static Size getParentRequiredSize(IComponent component, Size childSize)
 	{

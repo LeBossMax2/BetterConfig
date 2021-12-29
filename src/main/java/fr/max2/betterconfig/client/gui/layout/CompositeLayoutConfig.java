@@ -12,11 +12,11 @@ public enum CompositeLayoutConfig implements ILayoutConfig<ICompositeComponent>
 {
 	INSTANCE;
 	
-	public static StyleProperty<Axis> DIR = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "dir"), Axis.VERTICAL);
-	public static StyleProperty<Integer> SPACING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "spacing"), 0);
-	public static StyleProperty<Padding> INNER_PADDING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "inner_padding"), new Padding());
-	public static StyleProperty<Alignment> JUSTIFICATION = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "justification"), Alignment.MIN);
-	public static StyleProperty<Alignment> ALIGNMENT = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "alignment"), Alignment.MIN);
+	public static final StyleProperty<Axis> DIR = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "dir"), Axis.VERTICAL);
+	public static final StyleProperty<Integer> SPACING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "spacing"), 0);
+	public static final StyleProperty<Padding> INNER_PADDING = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "inner_padding"), new Padding());
+	public static final StyleProperty<Alignment> JUSTIFICATION = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "justification"), Alignment.MIN);
+	public static final StyleProperty<Alignment> ALIGNMENT = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "alignment"), Alignment.MIN);
 	
 	private static List<? extends IComponent> getLayoutChildren(ICompositeComponent component)
 	{

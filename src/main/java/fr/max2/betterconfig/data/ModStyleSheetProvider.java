@@ -41,7 +41,7 @@ public class ModStyleSheetProvider implements DataProvider
 	public void run(HashCache pCache) throws IOException
 	{
 		StyleSheet.Builder defaultStyleSheet = new StyleSheet.Builder(
-				IBetterElement.FILTERED_OUT_STYLE, GuiRoot.ROOT_STYLE, GuiRoot.SEARCH_STYLE, Foldout.FOLDOUT_STYLE, Foldout.FOLDED_STYLE,
+				IBetterElement.FILTERED_OUT_STYLE, GuiRoot.ROOT_STYLE, GuiRoot.SEARCH_STYLE, Foldout.FOLDOUT_STYLE, Foldout.Header.STYLE, Foldout.FOLDED_STYLE,
 				ListElementEntry.STYLE, ListElementEntry.REMOVE_HOVERED_STYLE, ListElementEntry.REMOVE_FOCUSED_STYLE, ListElementEntry.REMOVE_STYLE,
 				ValueEntry.STYLE, ValueEntry.UNDO_HOVERED_STYLE, ValueEntry.UNDO_FOCUSED_STYLE, ValueEntry.UNDO_LIST_HOVERED_STYLE, ValueEntry.UNDO_LIST_FOCUSED_STYLE, ValueEntry.UNDO_STYLE,
 				OptionButton.STYLE, StringInputField.STYLE, UnknownOptionWidget.STYLE, BetterConfigBuilder.ROOT_STYLE, BetterConfigBuilder.TABLE_STYLE, BetterConfigBuilder.LIST_STYLE,
