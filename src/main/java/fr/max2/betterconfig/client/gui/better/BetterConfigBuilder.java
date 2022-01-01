@@ -10,7 +10,6 @@ import fr.max2.betterconfig.client.gui.better.widget.OptionButton;
 import fr.max2.betterconfig.client.gui.better.widget.StringInputField;
 import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
@@ -77,7 +76,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		mainGroup.addClass("better:list_group");
 		
 		IReadableList<IConfigNode<T>> values = list.getValueList();
-		mainElements.add(new BetterButton(this.screen, Size.UNCONSTRAINED, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), thiz ->
+		mainElements.add(new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(0);
 		}, new TranslatableComponent(GuiTexts.ADD_FIRST_TOOLTIP_KEY)));
@@ -137,7 +136,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 
 	private <T> BetterButton buildAddLastButton(IConfigList<T> list)
 	{
-		return new BetterButton(this.screen, Size.UNCONSTRAINED, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), thiz ->
+		return new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(list.getValueList().size());
 		}, new TranslatableComponent(GuiTexts.ADD_LAST_TOOLTIP_KEY));

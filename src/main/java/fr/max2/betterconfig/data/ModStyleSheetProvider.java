@@ -10,6 +10,7 @@ import java.io.IOException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.Component;
@@ -191,6 +192,13 @@ public class ModStyleSheetProvider implements DataProvider
 		private static final StyleRule HBOX_STYLE = when().type("hbox").then()
 				.set(DIR, Axis.HORIZONTAL)
 				.build();
+		
+		private static final StyleRule BETTER_BUTTON_STYLE = when().hasClass("better:button").then()
+				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, Constants.VALUE_HEIGHT))
+				.build();
+		private static final StyleRule BETTER_ICON_BUTTON_STYLE = when().hasClass("better:icon_button").then()
+				.set(SIZE_OVERRIDE, new Size(Constants.VALUE_HEIGHT, Constants.VALUE_HEIGHT))
+				.build();
 
 		public static StyleSheet.Builder builder()
 		{
@@ -199,7 +207,8 @@ public class ModStyleSheetProvider implements DataProvider
 					LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HOVERED_STYLE, LIST_ENTRY_REMOVE_FOCUSED_STYLE, LIST_ENTRY_REMOVE_STYLE,
 					VALUE_ENTRY_STYLE, ENTRY_UNDO_HOVERED_STYLE, ENTRY_UNDO_FOCUSED_STYLE, ENTRY_UNDO_LIST_HOVERED_STYLE, ENTRY_UNDO_LIST_FOCUSED_STYLE, ENTRY_UNDO_STYLE,
 					OPTION_BUTTON_STYLE, STRING_INPUT_FIELD_STYLE, UNKNOWN_OPTION_STYLE, ROOT_GROUP_STYLE, TABLE_STYLE, LIST_STYLE,
-					HBOX_STYLE, BETTER_NUMBER_FIELD_STYLE, BETTER_NUMBER_FIELD_PLUS_STYLE, BETTER_NUMBER_FIELD_MINUS_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE);
+					BETTER_NUMBER_FIELD_STYLE, BETTER_NUMBER_FIELD_PLUS_STYLE, BETTER_NUMBER_FIELD_MINUS_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE,
+					BETTER_ICON_BUTTON_STYLE, BETTER_BUTTON_STYLE, HBOX_STYLE);
 		}
 	}
 }

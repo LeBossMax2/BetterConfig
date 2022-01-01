@@ -6,24 +6,17 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.widget.Button;
 import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
-import fr.max2.betterconfig.client.gui.layout.Size;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 
 
 public class BetterButton extends Button
 {
-	/** The parent screen */
-	protected final BetterConfigScreen screen;
-	
-	public BetterButton(BetterConfigScreen screen, int width, Component displayString, OnPress pressedHandler, Component overlay)
+	public BetterButton(BetterConfigScreen screen, Component displayString, OnPress pressedHandler, Component overlay)
 	{
 		super(displayString, pressedHandler, new TextOverlay(screen, overlay));
 		this.addClass("better:button");
-		this.screen = screen;
-		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, Constants.VALUE_HEIGHT));
 	}
 
 	public static class Icon extends BetterButton
@@ -33,9 +26,10 @@ public class BetterButton extends Button
 	
 		public Icon(BetterConfigScreen screen, int iconU, int iconV, Component displayString, OnPress pressedHandler, Component overlay)
 		{
-			super(screen, Constants.VALUE_HEIGHT, displayString, pressedHandler, overlay);
+			super(screen, displayString, pressedHandler, overlay);
 			this.iconU = iconU;
 			this.iconV = iconV;
+			this.addClass("better:icon_button");
 		}
 		
 		@Override
