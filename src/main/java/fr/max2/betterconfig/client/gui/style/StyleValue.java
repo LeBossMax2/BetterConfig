@@ -20,4 +20,10 @@ public class StyleValue<T>
 	{
 		return this.propertyValue;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return this.property + " = " + this.propertyValue;
+	}
 }

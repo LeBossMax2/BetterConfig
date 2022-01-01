@@ -12,4 +12,10 @@ public class PropertyIdentifier<T>
 		this.name = name;
 		this.type = type;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return this.name + " (" + this.type.getName() + ")";
+	}
 }

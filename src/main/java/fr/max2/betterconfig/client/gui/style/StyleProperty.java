@@ -19,4 +19,10 @@ public class StyleProperty<T>
 	{
 		this(name, defaultValue.getClass(), defaultValue);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return this.name.toString() + " (" + this.type.getName() + ")";
+	}
 }

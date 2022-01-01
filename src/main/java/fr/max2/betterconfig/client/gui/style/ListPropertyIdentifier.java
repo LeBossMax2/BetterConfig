@@ -14,4 +14,9 @@ public class ListPropertyIdentifier<T> extends PropertyIdentifier<List<T>>
 		this.contentType = contentType;
 	}
 
+	@Override
+	public String toString()
+	{
+		return this.name + " (List<" + this.contentType.getName() + ">)";
+	}
 }

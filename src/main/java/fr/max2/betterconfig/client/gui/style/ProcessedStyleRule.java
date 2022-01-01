@@ -29,4 +29,10 @@ public class ProcessedStyleRule<T>
 	{
 		return this.propertyValue;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return this.conditions + " => " + this.propertyValue;
+	}
 }

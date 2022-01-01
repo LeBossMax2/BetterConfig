@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.data;
 
-import static fr.max2.betterconfig.client.gui.better.Constants.*;
 import static fr.max2.betterconfig.client.gui.style.StyleRule.when;
 import static fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig.*;
 import static fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig.*;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.Component;
@@ -59,10 +57,18 @@ public class ModStyleSheetProvider implements DataProvider
 	
 	private static final class DefaultStyleSheet
 	{
-		/** The width of the indentation added for each nested section */
-		private static final int SECTION_TAB_SIZE = 22;
+		/** The left and right padding around the screen */
+		public static final int X_PADDING = 10;
+		/** The top and bottom padding around the screen */
+		public static final int Y_PADDING = 10;
+		/** The height of the value widget */
+		public static final int VALUE_HEIGHT = 20;
+		/** The width of the value widget */
+		public static final int VALUE_WIDTH = 150;
 		/** The height of the value entries */
 		public static final int VALUE_CONTAINER_HEIGHT = 24;
+		/** The width of the indentation added for each nested section */
+		private static final int SECTION_TAB_SIZE = 22;
 		/** The x position of the input field of the search bar */
 		private static final int SEARCH_LABEL_WIDTH = 80;
 
@@ -203,10 +209,10 @@ public class ModStyleSheetProvider implements DataProvider
 				.build();
 		
 		private static final StyleRule BETTER_BUTTON_STYLE = when().hasClass("better:button").then()
-				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, Constants.VALUE_HEIGHT))
+				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_HEIGHT))
 				.build();
 		private static final StyleRule BETTER_ICON_BUTTON_STYLE = when().hasClass("better:icon_button").then()
-				.set(SIZE_OVERRIDE, new Size(Constants.VALUE_HEIGHT, Constants.VALUE_HEIGHT))
+				.set(SIZE_OVERRIDE, new Size(VALUE_HEIGHT, VALUE_HEIGHT))
 				.build();
 
 		public static StyleSheet.Builder builder()
