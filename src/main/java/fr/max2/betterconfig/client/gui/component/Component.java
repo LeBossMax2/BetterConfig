@@ -315,6 +315,24 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	
 	protected abstract void onCycleFocus(boolean forward, CycleFocusState state);
 	
+	protected void cycleSelfFocus(CycleFocusState state)
+	{
+		if (state.isConsumed())
+		{
+			this.hasFocus = false;
+		}
+		else if (state.isPropagated())
+		{
+			this.hasFocus = true;
+			state.consume();
+		}
+		else if (this.hasFocus)
+		{
+			this.hasFocus = false;
+			state.propagate();
+		}
+	}
+	
 	@Override
 	public boolean hasFocus()
 	{

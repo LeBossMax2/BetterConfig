@@ -3,12 +3,15 @@ package fr.max2.betterconfig.client.gui.better;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
+import fr.max2.betterconfig.client.gui.component.CycleFocusState;
 import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
@@ -24,10 +27,13 @@ import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
@@ -112,7 +118,6 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	
 	public class Header extends UnitComponent
 	{
-		// TODO [#2] Make foldout header focusable
 		public static final StyleRule STYLE = StyleRule.when().type("better:foldout_header").then()
 				.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
 				.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, FOLDOUT_HEADER_HEIGHT))
@@ -125,18 +130,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 			this.overlay = new TextOverlay(Foldout.this.screen, Foldout.this.extraInfo);
 		}
 		
-		@Override
-		protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
-		{
-			super.onMouseClicked(mouseX, mouseY, button, state);
-			
-			if (this.isHovered() && !state.isConsumed())
-			{
-				this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-				Foldout.this.toggleFolding();
-				state.consume();
-			}
-		}
+		// Rendering
 		
 		@Override
 		protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
@@ -152,7 +146,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 
 			// Draw foreground arrow icon
 			int arrowU = Foldout.this.folded ? 16 : 32;
-			int arrowV = this.isHovered() ? 16 : 0;
+			int arrowV = this.isHovered() || this.hasFocus() ? 16 : 0;
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
 	        RenderSystem.setShaderTexture(0, BETTER_ICONS);
 			blit(matrixStack, rect.x, rect.y + 4, arrowU, arrowV, 16, 16, 256, 256);
@@ -160,6 +154,67 @@ public class Foldout extends CompositeComponent implements IBetterElement
 			// Draw foreground text
 			Font font = Foldout.this.screen.getFont(); 
 			font.draw(matrixStack, Foldout.this.node.getDisplayName(), rect.x + 16, rect.y + 1 + (FOLDOUT_HEADER_HEIGHT - font.lineHeight) / 2, 0xFF_FF_FF_FF);
+		}
+		
+		// Input handling
+		
+		@Override
+		protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
+		{
+			super.onMouseClicked(mouseX, mouseY, button, state);
+			
+			if (this.isHovered() && !state.isConsumed())
+			{
+				this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+				Foldout.this.toggleFolding();
+				state.consume();
+			}
+		}
+		
+		@Override
+		protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
+		{
+			super.onKeyPressed(keyCode, scanCode, modifiers, state);
+			if (!this.hasFocus() || state.isConsumed())
+				return;
+			
+			switch (keyCode)
+			{
+			case GLFW.GLFW_KEY_ENTER:
+			case GLFW.GLFW_KEY_KP_ENTER:
+			case GLFW.GLFW_KEY_SPACE:
+				this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+				Foldout.this.toggleFolding();
+				state.consume();
+				break;
+			default:
+				break;
+			}
+		}
+		
+		@Override
+		protected void onCycleFocus(boolean forward, CycleFocusState state)
+		{
+			this.cycleSelfFocus(state);
+			super.onCycleFocus(forward, state);
+		}
+		
+		// Narration
+		
+		@Override
+		public void updateNarration(NarrationElementOutput narrationOutput)
+		{
+			// TODO [#2] Improve narration : use custom text
+			narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent("gui.narrate.button", Foldout.this.node.getDisplayName()));
+			if (this.hasFocus())
+			{
+				narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.button.usage.focused"));
+			}
+			else
+			{
+				narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.button.usage.hovered"));
+			}
+			super.updateNarration(narrationOutput);
 		}
 		
 	}
