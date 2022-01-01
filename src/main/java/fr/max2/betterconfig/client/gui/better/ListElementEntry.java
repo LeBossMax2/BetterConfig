@@ -11,21 +11,20 @@ import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Visibility;
 import fr.max2.betterconfig.client.gui.style.StyleRule;
+import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-
-import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 public class ListElementEntry extends CompositeComponent implements IBetterElement
 {
 	public static final StyleRule STYLE = StyleRule.when().type("better:list_entry").then()
 			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, -VALUE_HEIGHT))
+			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, -Constants.VALUE_HEIGHT))
 			.build();
 	public static final StyleRule REMOVE_STYLE = StyleRule.when().hasClass("better:list_remove").then()
 			.set(ComponentLayoutConfig.VISIBILITY, Visibility.HIDDEN)
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding((VALUE_CONTAINER_HEIGHT - VALUE_HEIGHT) / 2, 0, 0, 0))
+			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding((Constants.VALUE_CONTAINER_HEIGHT - Constants.VALUE_HEIGHT) / 2, 0, 0, 0))
 			.build();
 	
 	public static final StyleRule REMOVE_HOVERED_STYLE = StyleRule.when().hasClass("better:list_remove").parent().is(HOVERED).then()
@@ -43,7 +42,7 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	{
 		super("better:list_entry");
 		this.content = content;
-		BetterButton button = new BetterButton.Icon(screen, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(REMOVE_TOOLTIP_KEY));
+		BetterButton button = new BetterButton.Icon(screen, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(GuiTexts.REMOVE_TOOLTIP_KEY));
 		button.addClass("better:list_remove");
 		this.children.addAll(Arrays.asList(button, content));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);

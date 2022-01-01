@@ -20,6 +20,7 @@ import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.layout.Visibility;
 import fr.max2.betterconfig.client.gui.style.StyleRule;
+import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import net.minecraft.ChatFormatting;
@@ -31,15 +32,13 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.FormattedCharSequence;
 
-import static fr.max2.betterconfig.client.gui.better.Constants.*;
-
 /** The container for table entries */
 public class ValueEntry extends CompositeComponent implements IBetterElement
 {
 	public static final StyleRule STYLE = StyleRule.when().type("better:value_entry").then()
 			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
 			.set(CompositeLayoutConfig.JUSTIFICATION, Alignment.CENTER)
-			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_CONTAINER_HEIGHT))// Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
+			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, Constants.VALUE_CONTAINER_HEIGHT))// Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
 			.build();
 	
 	public static final StyleRule UNDO_STYLE = StyleRule.when().hasClass("better:undo").then()
@@ -80,10 +79,10 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.property = property;
 		// TODO [#2] Gray out the button when value is unchanged
 		// TODO [#2] Add reset to default button
-		IComponent undoButton = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
+		IComponent undoButton = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(GuiTexts.UNDO_TOOLTIP_KEY), thiz ->
 		{
 			property.undoChanges();
-		}, new TranslatableComponent(UNDO_TOOLTIP_KEY)).addClass("better:undo");
+		}, new TranslatableComponent(GuiTexts.UNDO_TOOLTIP_KEY)).addClass("better:undo");
 		IComponent spacing = new UnitComponent("spacing")
 		{
 			// TODO [#2] Use alignment instead of spacing component
@@ -143,11 +142,11 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	private void updateTexts()
 	{
 		Font font = this.screen.getFont();
-		this.nameLines = font.split(this.property.getDisplayName(), this.screen.width /*- this.getRect().x*/ - VALUE_WIDTH - X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4);
+		this.nameLines = font.split(this.property.getDisplayName(), this.screen.width /*- this.getRect().x*/ - Constants.VALUE_WIDTH - Constants.X_PADDING - Constants.RIGHT_PADDING - Constants.VALUE_HEIGHT - 4);
 		this.extraInfo.clear();
 		this.extraInfo.add(new TextComponent(this.property.getName()).withStyle(ChatFormatting.YELLOW));
 		this.extraInfo.addAll(this.property.getDisplayComment());
-		this.extraInfo.add((new TranslatableComponent(DEFAULT_VALUE_KEY, new TextComponent(Objects.toString(this.property.getSpec().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
+		this.extraInfo.add((new TranslatableComponent(GuiTexts.DEFAULT_VALUE_KEY, new TextComponent(Objects.toString(this.property.getSpec().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
 	}
 	
 	// Rendering

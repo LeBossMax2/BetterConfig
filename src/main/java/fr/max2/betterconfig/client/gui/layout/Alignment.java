@@ -6,6 +6,7 @@ public enum Alignment
 	MIN,
 	CENTER,
 	MAX;
+	// TODO [#2] Implement justified alignment
 	
 	public int getOffset(int availableSpace)
 	{

@@ -7,8 +7,8 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
+import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigList;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -38,16 +38,16 @@ public class ModLanguagesProvider implements DataProvider
 		add(CycleOptionButton.NO_OPTION_KEY, "NONE", "AUCUN");
 		add(CycleOptionButton.TRUE_OPTION_KEY, "ON", "Oui");
 		add(CycleOptionButton.FALSE_OPTION_KEY, "OFF", "Non");
-		add(Constants.CANCEL_CONFIG_KEY, "Cancel changes", "Annuler les modifications");
+		add(GuiTexts.CANCEL_CONFIG_KEY, "Cancel changes", "Annuler les modifications");
 		
-		add(Constants.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
-		add(Constants.SEARCH_BAR_KEY, "Search", "Rechercher");
-		add(Constants.ADD_ELEMENT_KEY, "Add", "Ajouter");
-		add(Constants.ADD_FIRST_TOOLTIP_KEY, "Add a new element at the start of the list", "Ajouter un nouvel élément au début de la liste");
-		add(Constants.ADD_LAST_TOOLTIP_KEY, "Add a new element at the end of the list", "Ajouter un nouvel élément à la fin de la liste");
-		add(Constants.REMOVE_TOOLTIP_KEY, "Remove this element from the list", "Retirer cet élément de la liste");
-		add(Constants.UNDO_TOOLTIP_KEY, "Undo", "Annuler le changement");
-		add(Constants.RESET_TOOLTIP_KEY, "Reset to default", "Réinitialiserà la valeur par défaut");
+		add(GuiTexts.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
+		add(GuiTexts.SEARCH_BAR_KEY, "Search", "Rechercher");
+		add(GuiTexts.ADD_ELEMENT_KEY, "Add", "Ajouter");
+		add(GuiTexts.ADD_FIRST_TOOLTIP_KEY, "Add a new element at the start of the list", "Ajouter un nouvel élément au début de la liste");
+		add(GuiTexts.ADD_LAST_TOOLTIP_KEY, "Add a new element at the end of the list", "Ajouter un nouvel élément à la fin de la liste");
+		add(GuiTexts.REMOVE_TOOLTIP_KEY, "Remove this element from the list", "Retirer cet élément de la liste");
+		add(GuiTexts.UNDO_TOOLTIP_KEY, "Undo", "Annuler le changement");
+		add(GuiTexts.RESET_TOOLTIP_KEY, "Reset to default", "Réinitialiserà la valeur par défaut");
 		add(ForgeConfigList.LIST_ELEMENT_LABEL_KEY, "%s[%d]", "%s[%d]");
     }
 	

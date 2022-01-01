@@ -37,8 +37,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
-import static fr.max2.betterconfig.client.gui.better.Constants.*;
-
 /** The ui for a expand/collapse subsection */
 public class Foldout extends CompositeComponent implements IBetterElement
 {
@@ -148,7 +146,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 			int arrowU = Foldout.this.folded ? 16 : 32;
 			int arrowV = this.isHovered() || this.hasFocus() ? 16 : 0;
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
-	        RenderSystem.setShaderTexture(0, BETTER_ICONS);
+	        RenderSystem.setShaderTexture(0, Constants.BETTER_ICONS);
 			blit(matrixStack, rect.x, rect.y + 4, arrowU, arrowV, 16, 16, 256, 256);
 			
 			// Draw foreground text

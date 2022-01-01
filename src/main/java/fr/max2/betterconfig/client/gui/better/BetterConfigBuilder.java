@@ -14,6 +14,7 @@ import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.style.StyleRule;
+import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
@@ -25,7 +26,6 @@ import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
 import net.minecraft.network.chat.TranslatableComponent;
 
-import static fr.max2.betterconfig.client.gui.better.Constants.*;
 
 /** A builder for better configuration screen */
 public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterElement>, IConfigPrimitiveVisitor<Void, IComponent>
@@ -34,10 +34,10 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(6, 6 + 6, 6, 6))
 			.build();
 	public static final StyleRule TABLE_STYLE = StyleRule.when().hasClass("better:table_group").then()
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, SECTION_TAB_SIZE))
+			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, Constants.SECTION_TAB_SIZE))
 			.build();
 	public static final StyleRule LIST_STYLE = StyleRule.when().hasClass("better:list_group").then()
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, SECTION_TAB_SIZE))
+			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, Constants.SECTION_TAB_SIZE))
 			.build();
 	
 	/**
@@ -90,10 +90,10 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		mainGroup.addClass("better:list_group");
 		
 		IReadableList<IConfigNode<T>> values = list.getValueList();
-		mainElements.add(new BetterButton(this.screen, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
+		mainElements.add(new BetterButton(this.screen, Size.UNCONSTRAINED, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(0);
-		}, new TranslatableComponent(ADD_FIRST_TOOLTIP_KEY)));
+		}, new TranslatableComponent(GuiTexts.ADD_FIRST_TOOLTIP_KEY)));
 		
 		List<ListElemInfo> entries = new ArrayList<>();
 		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, entries, index));
@@ -150,10 +150,10 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 
 	private <T> BetterButton buildAddLastButton(IConfigList<T> list)
 	{
-		return new BetterButton(this.screen, Size.UNCONSTRAINED, new TranslatableComponent(ADD_ELEMENT_KEY), thiz ->
+		return new BetterButton(this.screen, Size.UNCONSTRAINED, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), thiz ->
 		{
 			list.addValue(list.getValueList().size());
-		}, new TranslatableComponent(ADD_LAST_TOOLTIP_KEY));
+		}, new TranslatableComponent(GuiTexts.ADD_LAST_TOOLTIP_KEY));
 	}
 	
 	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, List<ListElemInfo> entries, int index)
