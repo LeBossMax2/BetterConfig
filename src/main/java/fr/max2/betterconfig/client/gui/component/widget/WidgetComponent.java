@@ -148,6 +148,9 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 				state.propagate();
 			}
 		}
+		
+		if (this.widget.isFocused())
+			this.layoutManager.setAreaOfInterest(this.relativeRect);
 	}
 	
 	// Narration

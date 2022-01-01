@@ -47,4 +47,7 @@ public interface IComponentParent
 		component.computeLayout(componentRect);
 		return componentRect.size;
 	}
+	
+	default void setAreaOfInterest(Rectangle area)
+	{ }
 }

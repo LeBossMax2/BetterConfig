@@ -184,6 +184,26 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 		return size;
 	}
 	
+	protected void ensureAreaVisible(Rectangle area)
+	{
+		Size viewport = this.relativeRect.size;
+		
+		float minScroll = area.getBottom() - viewport.height + 1;
+		float maxScroll = area.getTop() - 1;
+		
+		if (this.scrollDistance > maxScroll)
+			this.setScrollDistance(maxScroll);
+		else if (this.scrollDistance < minScroll)
+			this.setScrollDistance(minScroll);
+	}
+	
+	@Override
+	public void setAreaOfInterest(Rectangle area)
+	{
+		this.ensureAreaVisible(area);
+		this.layoutManager.setAreaOfInterest(this.relativeRect);
+	}
+	
 	// Mouse handling
 	
 	@Override
@@ -296,7 +316,6 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	@Override
 	protected void onCycleFocus(boolean forward, CycleFocusState state)
 	{
-		// TODO [#2] scroll to focused element
 		this.checkLayout();
 		IScrollComponent.super.cycleFocus(forward, state);
 	}

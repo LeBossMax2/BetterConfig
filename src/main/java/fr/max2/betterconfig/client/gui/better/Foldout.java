@@ -15,7 +15,6 @@ import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
 import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.layout.Visibility;
@@ -43,7 +42,6 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	public static final PropertyIdentifier<Boolean> FOLDED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "folded"), Boolean.class);
 	
 	public static final StyleRule FOLDOUT_STYLE = StyleRule.when().type("better:foldout").then()
-			.set(CompositeLayoutConfig.INNER_PADDING, new Padding(0, 0, 0, 0))
 			.set(CompositeLayoutConfig.DIR, Axis.VERTICAL)
 			.build();
 
@@ -114,6 +112,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	
 	public class Header extends UnitComponent
 	{
+		// TODO [#2] Make foldout header focusable
 		public static final StyleRule STYLE = StyleRule.when().type("better:foldout_header").then()
 				.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
 				.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, FOLDOUT_HEADER_HEIGHT))

@@ -42,7 +42,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	protected IComponent parent;
 	protected Size prefSize;
 	protected Rectangle relativeRect;
-	protected Rectangle absoluteRect = new Rectangle();
+	private Rectangle absoluteRect = new Rectangle();
 	protected boolean hovered = false;
 	protected boolean hasFocus = false;
 	/** The overlay to show when the mouse is over the component */
