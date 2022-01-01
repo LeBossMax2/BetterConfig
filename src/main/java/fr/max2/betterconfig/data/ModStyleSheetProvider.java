@@ -133,7 +133,7 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(INNER_PADDING, new Padding(Y_PADDING, X_PADDING, Y_PADDING, X_PADDING))
 				.build();
 		private static final StyleRule SEARCH_BAR_STYLE = when().hasClass("better:search_field").then()
-				.set(OUTER_PADDING, new Padding(1, 1, 1, SEARCH_LABEL_WIDTH + 1))
+				.set(OUTER_PADDING, new Padding(0, 0, 0, SEARCH_LABEL_WIDTH))
 				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, 18))
 				.build();
 
@@ -181,7 +181,7 @@ public class ModStyleSheetProvider implements DataProvider
 				.build();
 
 		private static final StyleRule STRING_INPUT_FIELD_STYLE = when().hasClass("better:string_input").then()
-				.set(SIZE_OVERRIDE, new Size(VALUE_WIDTH - 2, VALUE_HEIGHT - 2))
+				.set(SIZE_OVERRIDE, new Size(VALUE_WIDTH, VALUE_HEIGHT))
 				.build();
 
 		private static final StyleRule UNKNOWN_OPTION_STYLE = when().hasClass("better:unknown").then()
@@ -192,10 +192,6 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(DIR, Axis.HORIZONTAL)
 				.build();
 
-		private static final StyleRule TEXT_FIELD_STYLE = when().type("text_field").then()
-				.set(OUTER_PADDING, new Padding(1, 1, 1, 1))
-				.build();
-
 		public static StyleSheet.Builder builder()
 		{
 			return new StyleSheet.Builder(
@@ -203,7 +199,7 @@ public class ModStyleSheetProvider implements DataProvider
 					LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HOVERED_STYLE, LIST_ENTRY_REMOVE_FOCUSED_STYLE, LIST_ENTRY_REMOVE_STYLE,
 					VALUE_ENTRY_STYLE, ENTRY_UNDO_HOVERED_STYLE, ENTRY_UNDO_FOCUSED_STYLE, ENTRY_UNDO_LIST_HOVERED_STYLE, ENTRY_UNDO_LIST_FOCUSED_STYLE, ENTRY_UNDO_STYLE,
 					OPTION_BUTTON_STYLE, STRING_INPUT_FIELD_STYLE, UNKNOWN_OPTION_STYLE, ROOT_GROUP_STYLE, TABLE_STYLE, LIST_STYLE,
-					HBOX_STYLE, TEXT_FIELD_STYLE, BETTER_NUMBER_FIELD_STYLE, BETTER_NUMBER_FIELD_PLUS_STYLE, BETTER_NUMBER_FIELD_MINUS_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE);
+					HBOX_STYLE, BETTER_NUMBER_FIELD_STYLE, BETTER_NUMBER_FIELD_PLUS_STYLE, BETTER_NUMBER_FIELD_MINUS_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE);
 		}
 	}
 }

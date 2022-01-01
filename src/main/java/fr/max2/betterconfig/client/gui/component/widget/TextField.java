@@ -21,6 +21,18 @@ public class TextField extends WidgetComponent<EditBox>
 		this.widget.setMaxLength(Integer.MAX_VALUE);
 	}
 	
+	@Override
+	protected void setPos(int x, int y)
+	{
+		super.setPos(x + 1, y + 1);
+	}
+	
+	@Override
+	protected void setSize(int w, int h)
+	{
+		super.setSize(w - 2, h - 2);
+	}
+	
 	public Component getMessage()
 	{
 		return this.widget.getMessage();

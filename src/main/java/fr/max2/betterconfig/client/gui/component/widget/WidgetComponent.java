@@ -21,18 +21,29 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 
 	// Layout
 	
+	protected void setPos(int x, int y)
+	{
+		this.widget.x = x;
+		this.widget.y = y;
+	}
+	
+	protected void setSize(int w, int h)
+	{
+		this.widget.setWidth(w);
+		this.widget.setHeight(h);
+	}
+	
 	private void updatePosition()
 	{
-		this.widget.x = this.getRect().x;
-		this.widget.y = this.getRect().y;
+		Rectangle rect = this.getRect();
+		this.setPos(rect.x, rect.y);
 	}
 	
 	@Override
 	protected void setRelativeRect(Rectangle rect)
 	{
 		super.setRelativeRect(rect);
-		this.widget.setWidth(rect.size.width);
-		this.widget.setHeight(rect.size.height);
+		this.setSize(rect.size.width, rect.size.height);
 	}
 	
 	// Rendering
