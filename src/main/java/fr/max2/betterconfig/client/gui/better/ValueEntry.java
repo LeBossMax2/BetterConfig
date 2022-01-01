@@ -12,6 +12,7 @@ import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
+import fr.max2.betterconfig.client.gui.layout.Alignment;
 import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
@@ -37,6 +38,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 {
 	public static final StyleRule STYLE = StyleRule.when().type("better:value_entry").then()
 			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
+			.set(CompositeLayoutConfig.JUSTIFICATION, Alignment.CENTER)
 			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_CONTAINER_HEIGHT))// Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
 			.build();
 	
@@ -78,14 +80,13 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.property = property;
 		// TODO [#2] Gray out the button when value is unchanged
 		// TODO [#2] Add reset to default button
-		IComponent button = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
+		IComponent undoButton = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(UNDO_TOOLTIP_KEY), thiz ->
 		{
 			property.undoChanges();
 		}, new TranslatableComponent(UNDO_TOOLTIP_KEY)).addClass("better:undo");
-		//this.button.x = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - VALUE_HEIGHT - 4;
 		IComponent spacing = new UnitComponent("spacing")
 		{
-			// TODO use alignment instead of spacing component
+			// TODO [#2] Use alignment instead of spacing component
 			@Override
 			protected void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTicks)
 			{ }
@@ -106,11 +107,8 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 			public void updateNarration(NarrationElementOutput narrationOutput)
 			{ }
 		};
-		this.children.addAll(Arrays.asList(spacing, content, button));
+		this.children.addAll(Arrays.asList(spacing, content, undoButton));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
-		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING - this.baseX - this.layout.getLayoutX();
-		//this.config.justification = Justification.CENTER;
-		//this.config.alignment = Alignment.END;
 		
 		this.overlay = new TextOverlay(screen, this.extraInfo)
 		{
@@ -118,8 +116,8 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 			public void onTooltip(Button button, PoseStack matrixStack, int mouseX, int mouseY)
 			{
 				int yOffset = 0;
-				if (mouseX >= this.screen.width - X_PADDING - VALUE_WIDTH - RIGHT_PADDING - VALUE_HEIGHT)
-					yOffset = 24; // Fixes the overlay text covering the text on the content
+				if (content.isHovered())
+					yOffset = 24; // Fixes the overlay text covering the text of the content
 				
 				super.onTooltip(button, matrixStack, mouseX, mouseY + yOffset);
 			}

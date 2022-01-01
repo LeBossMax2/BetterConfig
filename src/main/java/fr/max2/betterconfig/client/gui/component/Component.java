@@ -258,6 +258,7 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 
 	protected abstract void onMouseScrolled(double mouseX, double mouseY, double delta, EventState state);
 	
+	@Override
 	public boolean isHovered()
 	{
 		return this.hovered;

@@ -13,7 +13,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 /**
  * Represents a component of user interface
  */
-// TODO [#2] Handle narration
 public interface IComponent extends Widget, NarratableEntry
 {
 	void init(IComponentParent layoutManager, IComponent parent);
@@ -45,7 +44,7 @@ public interface IComponent extends Widget, NarratableEntry
 	 */
 	void renderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state);
 	
-	// Input handling
+	// Mouse handling
 	
 	void mouseMoved(double mouseX, double mouseY);
 	
@@ -56,6 +55,10 @@ public interface IComponent extends Widget, NarratableEntry
 	void mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY, EventState state);
 	
 	void mouseScrolled(double mouseX, double mouseY, double delta, EventState state);
+	
+	boolean isHovered();
+	
+	// Input handling
 	
 	void keyPressed(int keyCode, int scanCode, int modifiers, EventState state);
 	
