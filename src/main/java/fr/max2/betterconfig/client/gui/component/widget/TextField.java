@@ -5,9 +5,6 @@ import java.util.function.Consumer;
 import org.lwjgl.glfw.GLFW;
 
 import fr.max2.betterconfig.client.gui.component.EventState;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.Padding;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
@@ -17,8 +14,6 @@ import net.minecraft.network.chat.Component;
  */
 public class TextField extends WidgetComponent<EditBox>
 {
-	public static final StyleRule STYLE = StyleRule.when().type("text_field").then().set(ComponentLayoutConfig.OUTER_PADDING, new Padding(1, 1, 1, 1)).build();
-	
 	public TextField(Font fontRenderer, Component title)
 	{
 		super("text_field", new InnerField(fontRenderer, title));

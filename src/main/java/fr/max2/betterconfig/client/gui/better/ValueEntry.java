@@ -12,14 +12,7 @@ import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
-import fr.max2.betterconfig.client.gui.layout.Alignment;
-import fr.max2.betterconfig.client.gui.layout.Axis;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
-import fr.max2.betterconfig.client.gui.layout.Size;
-import fr.max2.betterconfig.client.gui.layout.Visibility;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
@@ -35,32 +28,6 @@ import net.minecraft.util.FormattedCharSequence;
 /** The container for table entries */
 public class ValueEntry extends CompositeComponent implements IBetterElement
 {
-	public static final StyleRule STYLE = StyleRule.when().type("better:value_entry").then()
-			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
-			.set(CompositeLayoutConfig.JUSTIFICATION, Alignment.CENTER)
-			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, Constants.VALUE_CONTAINER_HEIGHT))// Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
-			.build();
-	
-	public static final StyleRule UNDO_STYLE = StyleRule.when().hasClass("better:undo").then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.HIDDEN)
-			.build();
-	
-	public static final StyleRule UNDO_HOVERED_STYLE = StyleRule.when().hasClass("better:undo").parent().is(HOVERED).then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
-			.build();
-	
-	public static final StyleRule UNDO_FOCUSED_STYLE = StyleRule.when().hasClass("better:undo").parent().is(FOCUSED).then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
-			.build();
-	
-	public static final StyleRule UNDO_LIST_HOVERED_STYLE = StyleRule.when().hasClass("better:undo").parent().parent().type("better:list_entry").parent().parent().is(HOVERED).then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
-			.build();
-	
-	public static final StyleRule UNDO_LIST_FOCUSED_STYLE = StyleRule.when().hasClass("better:undo").parent().parent().type("better:list_entry").parent().parent().is(FOCUSED).then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
-			.build();
-	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	/** The edited property */

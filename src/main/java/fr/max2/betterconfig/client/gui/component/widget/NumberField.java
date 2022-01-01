@@ -7,11 +7,8 @@ import com.google.common.base.Strings;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
-import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Size;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.INumberType.Increment;
 import fr.max2.betterconfig.client.util.INumberType.Operator;
@@ -26,18 +23,7 @@ import net.minecraft.network.chat.Component;
 public class NumberField<N> extends CompositeComponent
 {
 	/** The default width of the '+' and '-' buttons */
-	protected static final int BUTTON_SIZE = 20;
-	/** The spacing between the buttons and the text field */
-	protected static final int SPACING = 2;
-	
-	public static final StyleRule FIELD_STYLE = StyleRule.when().type("number_field").then()
-			//.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, height))
-			.set(CompositeLayoutConfig.SPACING, SPACING)
-			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
-			.build();
-
-	public static final StyleRule MINUS_STYLE = StyleRule.when().hasClass("number_field:minus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
-	public static final StyleRule PLUS_STYLE = StyleRule.when().hasClass("number_field:plus_button").then().set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, BUTTON_SIZE)).build();
+	public static final int BUTTON_SIZE = 20;
 	
 	/** The text field to directly enter the number */
 	protected final TextField inputField;

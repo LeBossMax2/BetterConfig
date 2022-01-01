@@ -11,12 +11,8 @@ import fr.max2.betterconfig.client.gui.component.HBox;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.gui.component.widget.Button;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
-import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Size;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.client.gui.Font;
@@ -30,20 +26,6 @@ import static fr.max2.betterconfig.client.gui.better.Constants.Y_PADDING;
 /** The container for the main section */
 public class GuiRoot extends CompositeComponent
 {
-	/** The x position of the input field of the search bar */
-	private static final int SEARCH_LABEL_WIDTH = 80;
-	
-	public static final StyleRule ROOT_STYLE = StyleRule.when().type("better:root").then()
-			.set(CompositeLayoutConfig.DIR, Axis.VERTICAL)
-			.set(CompositeLayoutConfig.SPACING, Y_PADDING)
-			.set(CompositeLayoutConfig.INNER_PADDING, new Padding(Y_PADDING, X_PADDING, Y_PADDING, X_PADDING))
-			.build();
-	
-	public static final StyleRule SEARCH_STYLE = StyleRule.when().hasClass("better:search_field").then()
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(1, 1, 1, SEARCH_LABEL_WIDTH + 1))
-			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, 18))
-			.build();
-	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	/** The text field of the search bar */

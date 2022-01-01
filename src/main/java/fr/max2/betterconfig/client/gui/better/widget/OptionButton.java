@@ -5,11 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.Size;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.network.chat.Component;
@@ -19,10 +15,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 /** The widget for option buttons */
 public class OptionButton<V> extends CycleOptionButton<V> 
 {
-	public static final StyleRule STYLE = StyleRule.when().hasClass("better:option_button").then()
-			.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Constants.VALUE_WIDTH, Constants.VALUE_HEIGHT))
-			.build();
-	
 	private final IConfigPrimitive<V> property;
 	private final IListener<V> propertyListener;
 	

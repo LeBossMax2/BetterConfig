@@ -51,6 +51,7 @@ public class StyleRule
 		private ConditionsBuilder()
 		{ }
 		
+		@Override
 		public <T> ConditionsBuilder condition(IComponentSelector selection)
 		{
 			this.conditions.add(selection);

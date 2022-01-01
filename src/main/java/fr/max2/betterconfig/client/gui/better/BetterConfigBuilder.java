@@ -10,10 +10,7 @@ import fr.max2.betterconfig.client.gui.better.widget.OptionButton;
 import fr.max2.betterconfig.client.gui.better.widget.StringInputField;
 import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Size;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
@@ -30,16 +27,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 /** A builder for better configuration screen */
 public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterElement>, IConfigPrimitiveVisitor<Void, IComponent>
 {
-	public static final StyleRule ROOT_STYLE = StyleRule.when().hasClass("better:root_group").then()
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(6, 6 + 6, 6, 6))
-			.build();
-	public static final StyleRule TABLE_STYLE = StyleRule.when().hasClass("better:table_group").then()
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, Constants.SECTION_TAB_SIZE))
-			.build();
-	public static final StyleRule LIST_STYLE = StyleRule.when().hasClass("better:list_group").then()
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, Constants.SECTION_TAB_SIZE))
-			.build();
-	
 	/**
 	 * Builds the user interface
 	 * @param screen the parent screen

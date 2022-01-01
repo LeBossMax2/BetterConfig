@@ -15,14 +15,8 @@ import fr.max2.betterconfig.client.gui.component.CycleFocusState;
 import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
-import fr.max2.betterconfig.client.gui.layout.Axis;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
-import fr.max2.betterconfig.client.gui.layout.Size;
-import fr.max2.betterconfig.client.gui.layout.Visibility;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.ChatFormatting;
@@ -41,17 +35,9 @@ import net.minecraft.sounds.SoundEvents;
 public class Foldout extends CompositeComponent implements IBetterElement
 {
 	/** The height of the fouldout header */
-	private static final int FOLDOUT_HEADER_HEIGHT = 24;
+	public static final int FOLDOUT_HEADER_HEIGHT = 24;
 	
 	public static final PropertyIdentifier<Boolean> FOLDED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "folded"), Boolean.class);
-	
-	public static final StyleRule FOLDOUT_STYLE = StyleRule.when().type("better:foldout").then()
-			.set(CompositeLayoutConfig.DIR, Axis.VERTICAL)
-			.build();
-
-	public static final StyleRule FOLDED_STYLE = StyleRule.when().parent().is(FOLDED).then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.COLLAPSED)
-			.build();
 	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
@@ -116,12 +102,6 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	
 	public class Header extends UnitComponent
 	{
-		public static final StyleRule STYLE = StyleRule.when().type("better:foldout_header").then()
-				.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
-				.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, FOLDOUT_HEADER_HEIGHT))
-				.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
-				.build();
-		
 		public Header()
 		{
 			super("better:foldout_header");

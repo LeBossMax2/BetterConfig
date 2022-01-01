@@ -7,16 +7,12 @@ public class Constants
 {
 	public static final ResourceLocation BETTER_ICONS = new ResourceLocation(BetterConfig.MODID, "textures/gui/better_icons.png");
 	
-	/** The width of the indentation added for each nested section */
-	public static final int SECTION_TAB_SIZE = 22;
 	/** The left and right padding around the screen */
 	public static final int X_PADDING = 10;
 	/** The top and bottom padding around the screen */
 	public static final int Y_PADDING = 10;
 	/** The right padding around the screen */
 	public static final int RIGHT_PADDING = 10;
-	/** The height of the value entries */
-	public static final int VALUE_CONTAINER_HEIGHT = 24;
 	/** The height of the value widget */
 	public static final int VALUE_HEIGHT = 20;
 	/** The width of the value widget */

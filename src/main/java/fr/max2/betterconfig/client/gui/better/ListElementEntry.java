@@ -5,12 +5,6 @@ import java.util.Arrays;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.widget.Button.OnPress;
-import fr.max2.betterconfig.client.gui.layout.Axis;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.Padding;
-import fr.max2.betterconfig.client.gui.layout.Visibility;
-import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.network.chat.TextComponent;
@@ -18,23 +12,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 
 public class ListElementEntry extends CompositeComponent implements IBetterElement
 {
-	public static final StyleRule STYLE = StyleRule.when().type("better:list_entry").then()
-			.set(CompositeLayoutConfig.DIR, Axis.HORIZONTAL)
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding(0, 0, 0, -Constants.VALUE_HEIGHT))
-			.build();
-	public static final StyleRule REMOVE_STYLE = StyleRule.when().hasClass("better:list_remove").then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.HIDDEN)
-			.set(ComponentLayoutConfig.OUTER_PADDING, new Padding((Constants.VALUE_CONTAINER_HEIGHT - Constants.VALUE_HEIGHT) / 2, 0, 0, 0))
-			.build();
-	
-	public static final StyleRule REMOVE_HOVERED_STYLE = StyleRule.when().hasClass("better:list_remove").parent().is(HOVERED).then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
-			.build();
-	
-	public static final StyleRule REMOVE_FOCUSED_STYLE = StyleRule.when().hasClass("better:list_remove").parent().is(FOCUSED).then()
-			.set(ComponentLayoutConfig.VISIBILITY, Visibility.VISIBLE)
-			.build();
-	
 	private final IBetterElement content;
 	private boolean filteredOut = false;
 	
