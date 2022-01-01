@@ -19,12 +19,14 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 
 	public NumberInputField(Font fontRenderer, INumberType<N> numberType, IConfigPrimitive<N> property, Component title)
 	{
-		super(fontRenderer, title, Constants.VALUE_WIDTH, Constants.VALUE_HEIGHT, numberType, property.getValue());
+		super(fontRenderer, title, numberType, property.getValue());
 		this.property = property;
 		this.inputField.setResponder(this::updateTextColor);
 		
 		this.propertyListener = this::setValue;
 		this.property.onChanged(this.propertyListener);
+		
+		this.addClass("better:number_field");
 	}
 
 	/** Updates the color of the text to indicates an error */

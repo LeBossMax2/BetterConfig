@@ -7,8 +7,6 @@ import com.google.common.base.Strings;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
-import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
-import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.INumberType.Increment;
 import fr.max2.betterconfig.client.util.INumberType.Operator;
@@ -36,7 +34,7 @@ public class NumberField<N> extends CompositeComponent
 	/** The current increment for each button click */
 	protected Increment currentIncrement = Increment.NORMAL;
 
-	public NumberField(Font fontRenderer, Component title, int width, int height, INumberType<N> numberType, N value)
+	public NumberField(Font fontRenderer, Component title, INumberType<N> numberType, N value)
 	{
 		super("number_field");
 		this.numberType = numberType;
@@ -68,10 +66,6 @@ public class NumberField<N> extends CompositeComponent
 		this.children.addAll(Arrays.asList(this.minusButton, this.inputField, this.plusButton));
 		this.inputField.widget.setFilter(this::isValid);
 		this.setValue(value);
-		
-		this.plusButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, height));
-		this.minusButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(BUTTON_SIZE, height));
-		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, height));
 	}
 	
 	// Rendering

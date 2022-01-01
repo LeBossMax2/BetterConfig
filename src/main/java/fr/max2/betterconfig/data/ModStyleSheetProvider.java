@@ -65,8 +65,17 @@ public class ModStyleSheetProvider implements DataProvider
 		/** The x position of the input field of the search bar */
 		private static final int SEARCH_LABEL_WIDTH = 80;
 
+		private static final StyleRule BETTER_NUMBER_FIELD_STYLE = when().hasClass("better:number_field").then()
+				.set(SIZE_OVERRIDE, new Size(VALUE_WIDTH, VALUE_HEIGHT))
+				.build();
+		private static final StyleRule BETTER_NUMBER_FIELD_MINUS_STYLE = when().hasClass("number_field:minus_button").parent().hasClass("better:number_field").then()
+				.set(SIZE_OVERRIDE, new Size(NumberField.BUTTON_SIZE, VALUE_HEIGHT))
+				.build();
+		private static final StyleRule BETTER_NUMBER_FIELD_PLUS_STYLE = when().hasClass("number_field:plus_button").parent().hasClass("better:number_field").then()
+				.set(SIZE_OVERRIDE, new Size(NumberField.BUTTON_SIZE, VALUE_HEIGHT))
+				.build();
+		
 		private static final StyleRule NUMBER_FIELD_STYLE = when().type("number_field").then()
-				//.set(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(width, height))
 				.set(SPACING, 2)
 				.set(DIR, Axis.HORIZONTAL)
 				.build();
@@ -194,7 +203,7 @@ public class ModStyleSheetProvider implements DataProvider
 					LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HOVERED_STYLE, LIST_ENTRY_REMOVE_FOCUSED_STYLE, LIST_ENTRY_REMOVE_STYLE,
 					VALUE_ENTRY_STYLE, ENTRY_UNDO_HOVERED_STYLE, ENTRY_UNDO_FOCUSED_STYLE, ENTRY_UNDO_LIST_HOVERED_STYLE, ENTRY_UNDO_LIST_FOCUSED_STYLE, ENTRY_UNDO_STYLE,
 					OPTION_BUTTON_STYLE, STRING_INPUT_FIELD_STYLE, UNKNOWN_OPTION_STYLE, ROOT_GROUP_STYLE, TABLE_STYLE, LIST_STYLE,
-					HBOX_STYLE, TEXT_FIELD_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE);
+					HBOX_STYLE, TEXT_FIELD_STYLE, BETTER_NUMBER_FIELD_STYLE, BETTER_NUMBER_FIELD_PLUS_STYLE, BETTER_NUMBER_FIELD_MINUS_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE);
 		}
 	}
 }
