@@ -18,6 +18,12 @@ public class BetterButton extends Button
 		super(displayString, pressedHandler, new TextOverlay(screen, overlay));
 		this.addClass("better:button");
 	}
+	
+	public BetterButton(Component displayString, OnPress pressedHandler)
+	{
+		super(displayString, pressedHandler, NO_OVERLAY);
+		this.addClass("better:button");
+	}
 
 	public static class Icon extends BetterButton
 	{

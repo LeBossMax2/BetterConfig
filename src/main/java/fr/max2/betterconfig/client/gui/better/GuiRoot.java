@@ -9,7 +9,6 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.HBox;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.widget.Button;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Size;
@@ -41,17 +40,14 @@ public class GuiRoot extends CompositeComponent
 		this.screen = screen;
 		
 		// Tabs
-		// TODO [#2] Use style for button width
-		int tabButtonWidth = (this.screen.width - 2 * X_PADDING) / ModConfig.Type.values().length;
 		int i = 0;
 		List<IComponent> tabs = new ArrayList<>();
 		for (ModConfig config : screen.getModConfigs())
 		{
 			final int index = i;
-			// TODO [#2] Add meaningful tooltip
-			Button b = new Button(new TextComponent(config.getFileName()), thisButton -> this.screen.openConfig(index), Button.NO_OVERLAY);
+			// TODO [#2] Add meaningful tooltip : explanation of config types + file path
+			BetterButton b = new BetterButton(screen, new TextComponent(config.getType().name()), thisButton -> this.screen.openConfig(index), new TextComponent(config.getFileName()));
 			b.addClass("better:tab_button");
-			b.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(tabButtonWidth, 20));
 			b.widget.active = index != screen.getCurrentConfigIndex();
 			i++;
 			tabs.add(b);
@@ -73,14 +69,11 @@ public class GuiRoot extends CompositeComponent
 		
 		// Cancel/Save buttons
 		List<IComponent> buttons = new ArrayList<>();
-		int buttonWidth = (this.screen.width - 2 * X_PADDING) / 2;
-		Button cancelButton = new Button(new TranslatableComponent(GuiTexts.CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges(), Button.NO_OVERLAY);
+		BetterButton cancelButton = new BetterButton(new TranslatableComponent(GuiTexts.CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges());
 		cancelButton.addClass("better:cancel");
-		cancelButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(buttonWidth, 20));
 		buttons.add(cancelButton);
-		Button saveButton = new Button(new TranslatableComponent(GuiTexts.SAVE_CONFIG_KEY), thisButton -> this.screen.onClose(), Button.NO_OVERLAY);
+		BetterButton saveButton = new BetterButton(new TranslatableComponent(GuiTexts.SAVE_CONFIG_KEY), thisButton -> this.screen.onClose());
 		saveButton.addClass("better:save");
-		saveButton.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(buttonWidth, 20));
 		buttons.add(saveButton);
 		HBox buttonBar = new HBox(buttons);
 		buttonBar.addClass("better:bottom_bar");
@@ -107,6 +100,7 @@ public class GuiRoot extends CompositeComponent
 		this.screen.renderBackground(matrixStack);
 		super.onRender(matrixStack, mouseX, mouseY, partialTicks);
 		Font font = this.screen.getFont();
+		// TODO [#2] Move to new search bar class 
 		font.draw(matrixStack, this.searchField.getMessage(), X_PADDING, 20 + 2 * Y_PADDING + (20 - font.lineHeight) / 2, 0xFF_FF_FF_FF);
 		this.renderHeader(matrixStack, mouseX, mouseY, partialTicks);
 	}

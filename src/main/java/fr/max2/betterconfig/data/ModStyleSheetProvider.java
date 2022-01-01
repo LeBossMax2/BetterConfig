@@ -137,6 +137,13 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(OUTER_PADDING, new Padding(0, 0, 0, SEARCH_LABEL_WIDTH))
 				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, 18))
 				.build();
+		private static final StyleRule TAB_BAR_STYLE = when().hasClass("better:tab_bar").then()
+				.set(DIR, Axis.HORIZONTAL)
+				.build();
+		private static final StyleRule BOTTOM_BAR_STYLE = when().hasClass("better:bottom_bar").then()
+				.set(DIR, Axis.HORIZONTAL)
+				.set(SPACING, X_PADDING)
+				.build();
 
 		private static final StyleRule VALUE_ENTRY_STYLE = when().type("better:value_entry").then()
 				.set(DIR, Axis.HORIZONTAL)
@@ -203,7 +210,7 @@ public class ModStyleSheetProvider implements DataProvider
 		public static StyleSheet.Builder builder()
 		{
 			return new StyleSheet.Builder(
-					FILTERED_OUT_STYLE, ROOT_STYLE, SEARCH_BAR_STYLE, FOLDOUT_STYLE, FOLDOUT_HEADER_STYLE, FOLDED_STYLE,
+					FILTERED_OUT_STYLE, ROOT_STYLE, SEARCH_BAR_STYLE, TAB_BAR_STYLE, BOTTOM_BAR_STYLE, FOLDOUT_STYLE, FOLDOUT_HEADER_STYLE, FOLDED_STYLE,
 					LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HOVERED_STYLE, LIST_ENTRY_REMOVE_FOCUSED_STYLE, LIST_ENTRY_REMOVE_STYLE,
 					VALUE_ENTRY_STYLE, ENTRY_UNDO_HOVERED_STYLE, ENTRY_UNDO_FOCUSED_STYLE, ENTRY_UNDO_LIST_HOVERED_STYLE, ENTRY_UNDO_LIST_FOCUSED_STYLE, ENTRY_UNDO_STYLE,
 					OPTION_BUTTON_STYLE, STRING_INPUT_FIELD_STYLE, UNKNOWN_OPTION_STYLE, ROOT_GROUP_STYLE, TABLE_STYLE, LIST_STYLE,
