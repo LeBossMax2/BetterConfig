@@ -134,8 +134,10 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(INNER_PADDING, new Padding(Y_PADDING, X_PADDING, Y_PADDING, X_PADDING))
 				.build();
 		private static final StyleRule SEARCH_BAR_STYLE = when().hasClass("better:search_field").then()
-				.set(OUTER_PADDING, new Padding(0, 0, 0, SEARCH_LABEL_WIDTH))
 				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, 18))
+				.build();
+		private static final StyleRule SEARCH_LABEL_STYLE = when().hasClass("better:search_label").then()
+				.set(SIZE_OVERRIDE, new Size(SEARCH_LABEL_WIDTH, 18))
 				.build();
 		private static final StyleRule TAB_BAR_STYLE = when().hasClass("better:tab_bar").then()
 				.set(DIR, Axis.HORIZONTAL)
@@ -148,7 +150,7 @@ public class ModStyleSheetProvider implements DataProvider
 		private static final StyleRule VALUE_ENTRY_STYLE = when().type("better:value_entry").then()
 				.set(DIR, Axis.HORIZONTAL)
 				.set(JUSTIFICATION, Alignment.CENTER)
-				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_CONTAINER_HEIGHT))// Math.max(VALUE_CONTAINER_HEIGHT, this.nameLines.size() * this.screen.getFont().lineHeight)
+				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_CONTAINER_HEIGHT))
 				.build();
 
 		private static final StyleRule ENTRY_UNDO_STYLE = when().hasClass("better:undo").then()
@@ -210,7 +212,7 @@ public class ModStyleSheetProvider implements DataProvider
 		public static StyleSheet.Builder builder()
 		{
 			return new StyleSheet.Builder(
-					FILTERED_OUT_STYLE, ROOT_STYLE, SEARCH_BAR_STYLE, TAB_BAR_STYLE, BOTTOM_BAR_STYLE, FOLDOUT_STYLE, FOLDOUT_HEADER_STYLE, FOLDED_STYLE,
+					FILTERED_OUT_STYLE, ROOT_STYLE, SEARCH_BAR_STYLE, SEARCH_LABEL_STYLE, TAB_BAR_STYLE, BOTTOM_BAR_STYLE, FOLDOUT_STYLE, FOLDOUT_HEADER_STYLE, FOLDED_STYLE,
 					LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HOVERED_STYLE, LIST_ENTRY_REMOVE_FOCUSED_STYLE, LIST_ENTRY_REMOVE_STYLE,
 					VALUE_ENTRY_STYLE, ENTRY_UNDO_HOVERED_STYLE, ENTRY_UNDO_FOCUSED_STYLE, ENTRY_UNDO_LIST_HOVERED_STYLE, ENTRY_UNDO_LIST_FOCUSED_STYLE, ENTRY_UNDO_STYLE,
 					OPTION_BUTTON_STYLE, STRING_INPUT_FIELD_STYLE, UNKNOWN_OPTION_STYLE, ROOT_GROUP_STYLE, TABLE_STYLE, LIST_STYLE,

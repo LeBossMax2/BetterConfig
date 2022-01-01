@@ -16,7 +16,7 @@ public enum Alignment
 		case MIN:
 			return 0;
 		case CENTER:
-			return availableSpace / 2;
+			return (availableSpace + 1) / 2;
 		case MAX:
 			return availableSpace;
 		}
