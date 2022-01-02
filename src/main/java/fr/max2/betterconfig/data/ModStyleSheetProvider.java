@@ -118,14 +118,20 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(OUTER_PADDING, new Padding(0, 0, 0, -VALUE_HEIGHT))
 				.build();
 		private static final StyleRule LIST_ENTRY_REMOVE_STYLE = when().hasClass("better:list_remove").then()
-				.set(VISIBILITY, Visibility.HIDDEN)
 				.set(OUTER_PADDING, new Padding((VALUE_CONTAINER_HEIGHT - VALUE_HEIGHT) / 2, 0, 0, 0))
 				.build();
-		private static final StyleRule LIST_ENTRY_REMOVE_HOVERED_STYLE = when().hasClass("better:list_remove").parent().is(Component.HOVERED).then()
-				.set(VISIBILITY, Visibility.VISIBLE)
-				.build();
-		private static final StyleRule LIST_ENTRY_REMOVE_FOCUSED_STYLE = when().hasClass("better:list_remove").parent().is(Component.FOCUSED).then()
-				.set(VISIBILITY, Visibility.VISIBLE)
+		private static final StyleRule LIST_ENTRY_REMOVE_HIDDEN_STYLE = when()
+			.and()
+				.hasClass("better:list_remove")
+				.not()
+					.parent()
+						.or()
+							.is(Component.HOVERED)
+							.is(Component.FOCUSED)
+							.end()
+				.end()
+			.then()
+				.set(VISIBILITY, Visibility.HIDDEN)
 				.build();
 
 		private static final StyleRule ROOT_STYLE = when().type("better:root").then()
@@ -153,37 +159,26 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_CONTAINER_HEIGHT))
 				.build();
 
-		private static final StyleRule ENTRY_UNDO_STYLE = when().hasClass("better:undo").then()
+		private static final StyleRule ENTRY_UNDO_HIDDEN_STYLE = when()
+			.and()
+				.hasClass("better:undo")
+				.not()
+					.parent()
+						.or()
+							.is(Component.HOVERED)
+							.is(Component.FOCUSED)
+							.parent()
+								.and()
+									.type("better:list_entry")
+									.or()
+										.is(Component.HOVERED)
+										.is(Component.FOCUSED)
+										.end()
+									.end()
+							.end()
+				.end()
+			.then()
 				.set(VISIBILITY, Visibility.HIDDEN)
-				.build();
-
-		private static final StyleRule ENTRY_UNDO_HOVERED_STYLE = when().hasClass("better:undo").parent().is(Component.HOVERED).then()
-				.set(VISIBILITY, Visibility.VISIBLE)
-				.build();
-		private static final StyleRule ENTRY_UNDO_FOCUSED_STYLE = when().hasClass("better:undo").parent().is(Component.FOCUSED).then()
-				.set(VISIBILITY, Visibility.VISIBLE)
-				.build();
-		private static final StyleRule ENTRY_UNDO_LIST_HOVERED_STYLE = when()
-			.hasClass("better:undo")
-			.parent()
-				.parent()
-					.type("better:list_entry")
-			.parent()
-				.parent()
-					.is(Component.HOVERED)
-			.then()
-				.set(VISIBILITY, Visibility.VISIBLE)
-				.build();
-		private static final StyleRule ENTRY_UNDO_LIST_FOCUSED_STYLE = when()
-			.hasClass("better:undo")
-			.parent()
-				.parent()
-					.type("better:list_entry")
-			.parent()
-				.parent()
-					.is(Component.FOCUSED)
-			.then()
-				.set(VISIBILITY, Visibility.VISIBLE)
 				.build();
 
 		private static final StyleRule OPTION_BUTTON_STYLE = when().hasClass("better:option_button").then()
@@ -213,8 +208,8 @@ public class ModStyleSheetProvider implements DataProvider
 		{
 			return new StyleSheet.Builder().add(
 					FILTERED_OUT_STYLE, ROOT_STYLE, SEARCH_BAR_STYLE, SEARCH_LABEL_STYLE, TAB_BAR_STYLE, BOTTOM_BAR_STYLE, FOLDOUT_STYLE, FOLDOUT_HEADER_STYLE, FOLDED_STYLE,
-					LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HOVERED_STYLE, LIST_ENTRY_REMOVE_FOCUSED_STYLE, LIST_ENTRY_REMOVE_STYLE,
-					VALUE_ENTRY_STYLE, ENTRY_UNDO_HOVERED_STYLE, ENTRY_UNDO_FOCUSED_STYLE, ENTRY_UNDO_LIST_HOVERED_STYLE, ENTRY_UNDO_LIST_FOCUSED_STYLE, ENTRY_UNDO_STYLE,
+					LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HIDDEN_STYLE, LIST_ENTRY_REMOVE_STYLE,
+					VALUE_ENTRY_STYLE, ENTRY_UNDO_HIDDEN_STYLE,
 					OPTION_BUTTON_STYLE, STRING_INPUT_FIELD_STYLE, UNKNOWN_OPTION_STYLE, ROOT_GROUP_STYLE, TABLE_STYLE, LIST_STYLE,
 					BETTER_NUMBER_FIELD_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE,
 					BETTER_ICON_BUTTON_STYLE, BETTER_BUTTON_STYLE, HBOX_STYLE);

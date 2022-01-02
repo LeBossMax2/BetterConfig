@@ -62,7 +62,7 @@ public class StyleSerializer
 				.registerTypeHierarchyAdapter(PropertyIdentifier.class, new PropertyIdentifier.Serializer(this))
 				.registerTypeHierarchyAdapter(StyleProperty.class, new StyleProperty.Serializer(this))
 				.registerTypeAdapter(StyleRule.class, new StyleRule.Serializer(this))
-				.registerTypeAdapter(IComponentSelector.class, new IComponentSelector.Serializer())
+				.registerTypeAdapter(ISelector.class, new ISelector.Serializer())
 				.registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
 				.registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE);
 	}

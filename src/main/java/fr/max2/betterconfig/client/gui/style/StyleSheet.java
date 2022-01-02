@@ -33,7 +33,7 @@ public class StyleSheet
 					r = new ArrayList<>();
 					this.rules.put(v.getProperty(), r);
 				}
-				r.add(new ProcessedStyleRule<>(rule.getConditions(), v));
+				r.add(new ProcessedStyleRule<>(rule.getCondition(), v));
 			}
 		}
 	}

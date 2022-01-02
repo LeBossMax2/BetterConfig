@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
-import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
+import fr.max2.betterconfig.client.gui.style.IPropertySource;
 import fr.max2.betterconfig.client.gui.style.StyleProperty;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -13,13 +13,11 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 /**
  * Represents a component of user interface
  */
-public interface IComponent extends Widget, NarratableEntry
+public interface IComponent extends Widget, NarratableEntry, IPropertySource
 {
 	void init(IComponentParent layoutManager, IComponent parent);
 	
 	// Style
-	
-	<T> T getProperty(PropertyIdentifier<T> property);
 
 	<T> T getStyleProperty(StyleProperty<T> property);
 	
