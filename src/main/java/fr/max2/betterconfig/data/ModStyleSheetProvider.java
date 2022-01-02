@@ -29,7 +29,7 @@ import net.minecraft.server.packs.PackType;
 
 public class ModStyleSheetProvider implements DataProvider
 {
-	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE).setPrettyPrinting().disableHtmlEscaping().create();
+	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
 	private final DataGenerator generator;
 	

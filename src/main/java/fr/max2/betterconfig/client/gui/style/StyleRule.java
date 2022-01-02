@@ -178,7 +178,7 @@ public class StyleRule
 			List<StyleValue<?>> values = new ArrayList<>();			
 			for (Entry<String, JsonElement> cond : obj.getAsJsonObject("values").entrySet())
 			{
-				StyleProperty<?> prop = this.parent.styleProperties.get(cond.getKey());
+				StyleProperty<?> prop = this.parent.getStyleProperty(cond.getKey());
 				values.add(new StyleValue<>(prop, context.deserialize(cond.getValue(), prop.type)));
 			}
 			

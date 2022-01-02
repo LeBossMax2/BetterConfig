@@ -10,7 +10,6 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.HBox;
 import fr.max2.betterconfig.client.gui.component.IComponent;
-import fr.max2.betterconfig.client.gui.component.IComponentParent;
 import fr.max2.betterconfig.client.gui.component.widget.Text;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
 import fr.max2.betterconfig.client.gui.layout.Alignment;

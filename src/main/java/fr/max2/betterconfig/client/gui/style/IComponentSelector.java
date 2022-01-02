@@ -15,7 +15,7 @@ import fr.max2.betterconfig.client.gui.component.IComponent;
 
 public interface IComponentSelector extends Predicate<IComponent>
 {
-	JsonElement toJson(JsonSerializationContext context);
+	String typeName();
 
 	public static class Equals<T> implements IComponentSelector
 	{
@@ -35,19 +35,9 @@ public interface IComponentSelector extends Predicate<IComponent>
 		}
 
 		@Override
-		public JsonElement toJson(JsonSerializationContext context)
+		public String typeName()
 		{
-			JsonObject obj = new JsonObject();
-			obj.addProperty("operator", "equals");
-			obj.addProperty("property", this.property.name.toString());
-			obj.add("value", context.serialize(this.value, this.property.type));
-			return obj;
-		}
-
-		public static Equals<?> fromJson(JsonObject json, JsonDeserializationContext context, StyleSerializer sr)
-		{
-			PropertyIdentifier<?> property = sr.getComponentProperty(json.get("property").getAsString());
-			return new Equals<>(property, context.deserialize(json.get("value"), property.type));
+			return "equals";
 		}
 
 		@Override
@@ -75,19 +65,9 @@ public interface IComponentSelector extends Predicate<IComponent>
 		}
 
 		@Override
-		public JsonElement toJson(JsonSerializationContext context)
+		public String typeName()
 		{
-			JsonObject obj = new JsonObject();
-			obj.addProperty("operator", "contains");
-			obj.addProperty("property", this.property.name.toString());
-			obj.add("value", context.serialize(this.value, this.property.contentType));
-			return obj;
-		}
-
-		public static Contains<?> fromJson(JsonObject json, JsonDeserializationContext context, StyleSerializer sr)
-		{
-			ListPropertyIdentifier<?> property = (ListPropertyIdentifier<?>)sr.getComponentProperty(json.get("property").getAsString());
-			return new Contains<>(property, context.deserialize(json.get("value"), property.contentType));
+			return "contains";
 		}
 
 		@Override
@@ -119,21 +99,9 @@ public interface IComponentSelector extends Predicate<IComponent>
 		}
 
 		@Override
-		public JsonElement toJson(JsonSerializationContext context)
+		public String typeName()
 		{
-			JsonObject obj = new JsonObject();
-			obj.addProperty("operator", "combinator");
-			obj.addProperty("property", this.property.name.toString());
-			obj.add("sub_selector", context.serialize(this.subSelector, IComponentSelector.class));
-			return obj;
-		}
-
-		@SuppressWarnings("unchecked")
-		public static Combinator fromJson(JsonObject json, JsonDeserializationContext context, StyleSerializer sr)
-		{
-			PropertyIdentifier<? extends IComponent> property = (PropertyIdentifier<? extends IComponent>)sr.getComponentProperty(json.get("property").getAsString());
-			IComponentSelector subSelector = context.deserialize(json.get("sub_selector"), IComponentSelector.class);
-			return new Combinator(property, subSelector);
+			return "combinator";
 		}
 
 		@Override
@@ -145,17 +113,12 @@ public interface IComponentSelector extends Predicate<IComponent>
 
 	public static class Serializer implements JsonSerializer<IComponentSelector>, JsonDeserializer<IComponentSelector>
 	{
-		private final StyleSerializer parent;
-
-		public Serializer(StyleSerializer parent)
-		{
-			this.parent = parent;
-		}
-
 		@Override
 		public JsonElement serialize(IComponentSelector src, Type typeOfSrc, JsonSerializationContext context)
 		{
-			return src.toJson(context);
+			JsonObject json = context.serialize(src, src.getClass()).getAsJsonObject();
+			json.addProperty("operator", src.typeName());
+			return json;
 		}
 
 		@Override
@@ -167,13 +130,13 @@ public interface IComponentSelector extends Predicate<IComponent>
 			switch (obj.get("operator").getAsString())
 			{
 			case "equals":
-				return IComponentSelector.Equals.fromJson(obj, context, this.parent);
+				return context.deserialize(obj, Equals.class);
 			case "contains":
-				return IComponentSelector.Contains.fromJson(obj, context, this.parent);
+				return context.deserialize(obj, Contains.class);
 			case "combinator":
-				return IComponentSelector.Combinator.fromJson(obj, context, this.parent);
+				return context.deserialize(obj, Combinator.class);
 			default:
-				return null;
+                throw new JsonParseException("Don't know how to turn " + json + " into a IComponentSelector");
 			}
 		}
 	}

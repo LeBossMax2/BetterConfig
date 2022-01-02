@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.client.gui.layout.Padding;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -29,7 +28,7 @@ public enum StyleSheetManager implements ResourceManagerReloadListener
 {
 	INSTANCE;
 	
-	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE).create();
+	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).create();
 	
 	private Map<ResourceLocation, StyleSheet> cache = new HashMap<>();
 

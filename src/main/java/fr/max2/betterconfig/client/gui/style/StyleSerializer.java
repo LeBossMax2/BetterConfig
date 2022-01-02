@@ -13,6 +13,8 @@ import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
+import fr.max2.betterconfig.client.gui.layout.Padding;
+import net.minecraft.resources.ResourceLocation;
 
 public class StyleSerializer
 {
@@ -35,8 +37,8 @@ public class StyleSerializer
 			CompositeLayoutConfig.ALIGNMENT
 		));
 	
-	public final Map<String, PropertyIdentifier<?>> componentProperties;
-	public final Map<String, StyleProperty<?>> styleProperties;
+	private final Map<String, PropertyIdentifier<?>> componentProperties;
+	private final Map<String, StyleProperty<?>> styleProperties;
 	
 	private StyleSerializer(List<PropertyIdentifier<?>> componentProperties, List<StyleProperty<?>> styleProperties)
 	{
@@ -49,11 +51,19 @@ public class StyleSerializer
 		return this.componentProperties.get(propertyIdentifier);
 	}
 	
+	public StyleProperty<?> getStyleProperty(String propertyIdentifier)
+	{
+		return this.styleProperties.get(propertyIdentifier);
+	}
+	
 	public GsonBuilder registerSerializers(GsonBuilder gson)
 	{
 		return gson
+				.registerTypeHierarchyAdapter(PropertyIdentifier.class, new PropertyIdentifier.Serializer(this))
+				.registerTypeHierarchyAdapter(StyleProperty.class, new StyleProperty.Serializer(this))
 				.registerTypeAdapter(StyleRule.class, new StyleRule.Serializer(this))
-				.registerTypeAdapter(IComponentSelector.class, new IComponentSelector.Serializer(this));
+				.registerTypeAdapter(IComponentSelector.class, new IComponentSelector.Serializer())
+				.registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
+				.registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE);
 	}
-	
 }
