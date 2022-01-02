@@ -1,5 +1,6 @@
 package fr.max2.betterconfig.client.gui.style;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,11 +16,12 @@ public class StyleSheet
 	public static final String STYLESHEET_DIR = "stylesheets";
 	public static final ResourceLocation DEFAULT_STYLESHEET = new ResourceLocation(BetterConfig.MODID, "default_stylesheet");
 	
-	// TODO [#2] Add optional parent style sheet
-	private Map<StyleProperty<?>, List<ProcessedStyleRule<?>>> rules;
+	private final StyleSheet parent;
+	private final Map<StyleProperty<?>, List<ProcessedStyleRule<?>>> rules;
 	
-	public StyleSheet(List<StyleRule> rules)
+	private StyleSheet(StyleSheet parent, List<StyleRule> rules)
 	{
+		this.parent = parent;
 		this.rules = new HashMap<>();
 		for (StyleRule rule : rules)
 		{
@@ -35,11 +37,6 @@ public class StyleSheet
 			}
 		}
 	}
-	
-	public StyleSheet(StyleRule... rules)
-	{
-		this(Arrays.asList(rules));
-	}
 
 	public <T> T computePropertyValue(IComponent component, StyleProperty<T> property)
 	{
@@ -53,11 +50,16 @@ public class StyleSheet
 			if (rule.matches(component))
 				return rule.getPropertyValue();
 		}
+		
+		if (this.parent != null)
+			return this.parent.computePropertyValue(component, property);
+		
 		return property.defaultValue;
 	}
 	
 	public static class Builder
 	{
+		private ResourceLocation parentSheet = null;
 		private final List<StyleRule> rules;
 
 		public Builder()
@@ -65,19 +67,29 @@ public class StyleSheet
 			this.rules = new ArrayList<>();
 		}
 
-		public Builder(List<StyleRule> rules)
+		public Builder add(List<StyleRule> rules)
 		{
-			this.rules = rules;
+			this.rules.addAll(rules);
+			return this;
 		}
 		
-		public Builder(StyleRule... rules)
+		public Builder add(StyleRule... rules)
 		{
-			this(Arrays.asList(rules));
+			return this.add(Arrays.asList(rules));
 		}
 		
-		public StyleSheet build()
+		public Builder parentSheet(ResourceLocation parentSheet)
 		{
-			return new StyleSheet(this.rules);
+			this.parentSheet = parentSheet;
+			return this;
+		}
+		
+		public StyleSheet build() throws IOException
+		{
+			StyleSheet parent = null;
+			if (this.parentSheet != null)
+				parent = StyleSheetManager.INSTANCE.getStyleSheet(this.parentSheet);
+			return new StyleSheet(parent, this.rules);
 		}
 	}
 	
