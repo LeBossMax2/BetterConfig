@@ -64,8 +64,6 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		this.updateTexts();
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 		this.registerProperty(FOLDED, () -> this.folded);
-		
-		//this.config.sizeOverride.width = this.screen.width - X_PADDING - RIGHT_PADDING;
 	}
 	
 	// Layout

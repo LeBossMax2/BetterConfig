@@ -23,7 +23,6 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 		button.addClass("better:list_remove");
 		this.children.addAll(Arrays.asList(button, content));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
-		//this.config.innerPadding = new Padding(0, RIGHT_PADDING, 0, X_PADDING);?
 	}
 	
 	@Override

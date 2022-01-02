@@ -17,7 +17,7 @@ public class BetterConfig
 		// Marks this mod as one-sided
 		ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
 		
-		// Register testing config when in dev env
+		// Register testing config when in development environment
 		if(!FMLLoader.isProduction())
 			TestConfig.registerConfigs();
 	}

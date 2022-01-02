@@ -35,13 +35,10 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	public static IComponent build(BetterConfigScreen screen, IConfigTable config)
 	{
 		GuiGroup tableGroup = new BetterConfigBuilder(screen).buildTable(config);
-		tableGroup.addClass("better:table_group");
 		tableGroup.addClass("better:root_group");
 		
 		return new GuiRoot(screen, tableGroup);
 	}
-	
-	// private static final int VALUE_OFFSET = 2 * X_PADDING + RIGHT_PADDING + VALUE_WIDTH + 4 + VALUE_HEIGHT;
 	
 	/** The parent screen */
 	private final BetterConfigScreen screen;
@@ -54,8 +51,9 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	private GuiGroup buildTable(IConfigTable table)
 	{
 		List<IBetterElement> content = table.exploreEntries(value -> value.exploreNode(this)).collect(Collectors.toList());
-		return new GuiGroup(content);
-		// config.width = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - xOffset
+		GuiGroup tableGroup = new GuiGroup(content);
+		tableGroup.addClass("better:table_group");
+		return tableGroup;
 	}
 	
 	// Table entry visitor
@@ -63,9 +61,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	@Override
 	public IBetterElement visitTable(IConfigTable table, Void entry)
 	{
-		GuiGroup tableGroup = this.buildTable(table);
-		tableGroup.addClass("better:table_group");
-		return new Foldout(this.screen, table, tableGroup);
+		return new Foldout(this.screen, table, this.buildTable(table));
 	}
 	
 	@Override
@@ -123,7 +119,6 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 				content.removeOnChangedListener(listListener);
 			}
 		});
-		// config.width = this.screen.width - 2 * X_PADDING - RIGHT_PADDING - offset
 		
 		content.onChanged(listListener);
 
@@ -154,8 +149,6 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 			entries.remove(myIndex);
 			list.removeValueAt(myIndex);
 		});
-		// x = xOffset - SECTION_TAB_SIZE;
-		// width = this.screen.width - xOffset - VALUE_OFFSET + VALUE_WIDTH + SECTION_TAB_SIZE
 	}
 	
 	@Override
