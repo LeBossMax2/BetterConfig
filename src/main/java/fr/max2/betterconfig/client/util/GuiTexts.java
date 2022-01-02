@@ -26,4 +26,10 @@ public final class GuiTexts
 	public static final String UNDO_TOOLTIP_KEY = BetterConfig.MODID + ".undo.tooltip";
 	/** The translation key for the tooltop of reset button */
 	public static final String RESET_TOOLTIP_KEY = BetterConfig.MODID + ".reset.tooltip";
+	
+	// Narration
+	
+	public static final String SECTION_TITLE = BetterConfig.MODID + ".narration.section.title";
+	public static final String SECTION_USAGE_FOCUSED = BetterConfig.MODID + ".narration.section.usage.focused";
+	public static final String SECTION_USAGE_HOVERED = BetterConfig.MODID + ".narration.section.usage.hovered";
 }

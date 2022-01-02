@@ -17,6 +17,7 @@ import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
+import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.ChatFormatting;
@@ -180,16 +181,8 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		@Override
 		public void updateNarration(NarrationElementOutput narrationOutput)
 		{
-			// TODO [#2] Improve narration : use custom text
-			narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent("gui.narrate.button", Foldout.this.node.getDisplayName()));
-			if (this.hasFocus())
-			{
-				narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.button.usage.focused"));
-			}
-			else
-			{
-				narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.button.usage.hovered"));
-			}
+			narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent(GuiTexts.SECTION_TITLE, Foldout.this.node.getDisplayName()));
+			narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent(this.hasFocus() ? GuiTexts.SECTION_USAGE_FOCUSED : GuiTexts.SECTION_USAGE_HOVERED));
 			super.updateNarration(narrationOutput);
 		}
 		

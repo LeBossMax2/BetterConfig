@@ -49,6 +49,11 @@ public class ModLanguagesProvider implements DataProvider
 		add(GuiTexts.UNDO_TOOLTIP_KEY, "Undo", "Annuler le changement");
 		add(GuiTexts.RESET_TOOLTIP_KEY, "Reset to default", "Réinitialiserà la valeur par défaut");
 		add(ForgeConfigList.LIST_ELEMENT_LABEL_KEY, "%s[%d]", "%s[%d]");
+		
+		// Narration
+		add(GuiTexts.SECTION_TITLE, "%s section", "Section %s");
+		add(GuiTexts.SECTION_USAGE_FOCUSED, "Press Enter to show or hide", "Appuyez sur Entrée pour afficher ou cacher");
+		add(GuiTexts.SECTION_USAGE_HOVERED, "Left click to show or hide", "Faites un clic gauche pour afficher ou cacher");
     }
 	
 	@Override
