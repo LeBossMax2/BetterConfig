@@ -181,7 +181,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		@Override
 		public void updateNarration(NarrationElementOutput narrationOutput)
 		{
-			narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent(GuiTexts.SECTION_TITLE, Foldout.this.node.getDisplayName()));
+			narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent(Foldout.this.folded ? GuiTexts.SECTION_TITLE_COLLAPSED : GuiTexts.SECTION_TITLE_SHOWN, Foldout.this.node.getDisplayName()));
 			narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent(this.hasFocus() ? GuiTexts.SECTION_USAGE_FOCUSED : GuiTexts.SECTION_USAGE_HOVERED));
 			super.updateNarration(narrationOutput);
 		}

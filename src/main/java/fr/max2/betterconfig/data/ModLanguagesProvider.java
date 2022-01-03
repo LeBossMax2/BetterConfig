@@ -51,7 +51,8 @@ public class ModLanguagesProvider implements DataProvider
 		add(ForgeConfigList.LIST_ELEMENT_LABEL_KEY, "%s[%d]", "%s[%d]");
 		
 		// Narration
-		add(GuiTexts.SECTION_TITLE, "%s section", "Section %s");
+		add(GuiTexts.SECTION_TITLE_SHOWN, "%s section", "Section %s");
+		add(GuiTexts.SECTION_TITLE_COLLAPSED, "%s collapsed section", "Section repliée %s");
 		add(GuiTexts.SECTION_USAGE_FOCUSED, "Press Enter to show or hide", "Appuyez sur Entrée pour afficher ou cacher");
 		add(GuiTexts.SECTION_USAGE_HOVERED, "Left click to show or hide", "Faites un clic gauche pour afficher ou cacher");
     }

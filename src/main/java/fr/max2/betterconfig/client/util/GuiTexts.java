@@ -29,7 +29,8 @@ public final class GuiTexts
 	
 	// Narration
 	
-	public static final String SECTION_TITLE = BetterConfig.MODID + ".narration.section.title";
+	public static final String SECTION_TITLE_SHOWN = BetterConfig.MODID + ".narration.section.title.shown";
+	public static final String SECTION_TITLE_COLLAPSED = BetterConfig.MODID + ".narration.section.title.collapsed";
 	public static final String SECTION_USAGE_FOCUSED = BetterConfig.MODID + ".narration.section.usage.focused";
 	public static final String SECTION_USAGE_HOVERED = BetterConfig.MODID + ".narration.section.usage.hovered";
 }
