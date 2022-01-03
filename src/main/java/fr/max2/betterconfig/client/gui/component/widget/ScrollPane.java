@@ -152,7 +152,6 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	protected void setScrollDistance(float scroll)
 	{
 		this.scrollDistance = Mth.clamp(scroll, 0.0f, this.getMaxScroll(this.getRect()));
-		this.marksLayoutDirty();
 	}
 	
 	protected int getScrollDistance()

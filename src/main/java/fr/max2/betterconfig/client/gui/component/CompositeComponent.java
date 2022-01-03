@@ -30,13 +30,18 @@ public abstract class CompositeComponent extends Component<ICompositeComponent> 
 			public void onElementAdded(int index, IComponent newValue)
 			{
 				if (CompositeComponent.this.layoutManager != null)
+				{
 					newValue.init(CompositeComponent.this.layoutManager, CompositeComponent.this);
+					CompositeComponent.this.layoutManager.marksLayoutDirty();
+				}
 			}
 
 			@Override
 			public void onElementRemoved(int index, IComponent oldValue)
 			{
 				oldValue.invalidate();
+				if (CompositeComponent.this.layoutManager != null)
+					CompositeComponent.this.layoutManager.marksLayoutDirty();
 			}
 		});
 	}

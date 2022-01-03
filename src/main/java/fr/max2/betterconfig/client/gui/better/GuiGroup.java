@@ -17,11 +17,6 @@ public class GuiGroup extends CompositeComponent implements IBetterElement
 		super("better:group", content);
 		this.betterElements = this.children.stream().filter(cmp -> cmp instanceof IBetterElement).map(cmp -> (IBetterElement)cmp).toList();
 	}
-
-	public void updateLayout()
-	{
-		this.layoutManager.marksLayoutDirty();
-	}
 	
 	@Override
 	public boolean filterElements(ConfigFilter filter)

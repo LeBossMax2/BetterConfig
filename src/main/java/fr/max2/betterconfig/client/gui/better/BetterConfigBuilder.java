@@ -84,9 +84,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 			public void onElementAdded(int index, IBetterElement newValue)
 			{
 				if (content.size() == 1)
-					mainElements.add(buildAddLastButton(list));
-				
-				mainGroup.updateLayout();
+					mainElements.add(buildAddLastButton(list)); // Add "add last" button
 			}
 
 			@Override
@@ -96,8 +94,6 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 				
 				if (content.size() == 0)
 					mainElements.remove(2); // Remove "add last" button
-				
-				mainGroup.updateLayout();
 			}
 		};
 		mainElements.add(1, new GuiGroup(content)
