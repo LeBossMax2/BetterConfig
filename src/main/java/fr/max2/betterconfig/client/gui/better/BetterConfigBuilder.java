@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.client.gui.better;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +16,7 @@ import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.IConfigValueVisitor;
+import fr.max2.betterconfig.util.property.list.IIndexedProperty;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
@@ -77,19 +77,13 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 			list.addValue(0);
 		}, new TranslatableComponent(GuiTexts.ADD_FIRST_TOOLTIP_KEY)));
 		
-		List<ListElemInfo> entries = new ArrayList<>();
-		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, entries, index));
+		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, values.getIndexedProperties().get(index)));
 		IListListener<IBetterElement> listListener = new IListListener<>()
 		{
 			@Override
 			public void onElementAdded(int index, IBetterElement newValue)
 			{
-				for (int i = index + 1; i < entries.size(); i++)
-				{
-					entries.get(i).updateIndex(i);
-				}
-				
-				if (entries.size() == 1)
+				if (content.size() == 1)
 					mainElements.add(buildAddLastButton(list));
 				
 				mainGroup.updateLayout();
@@ -99,12 +93,8 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 			public void onElementRemoved(int index, IBetterElement oldValue)
 			{
 				oldValue.invalidate();
-				for (int i = index; i < entries.size(); i++)
-				{
-					entries.get(i).updateIndex(i);
-				}
 				
-				if (entries.size() == 0)
+				if (content.size() == 0)
 					mainElements.remove(2); // Remove "add last" button
 				
 				mainGroup.updateLayout();
@@ -123,7 +113,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		content.onChanged(listListener);
 
 		
-		if (entries.size() >= 1)
+		if (content.size() >= 1)
 			mainElements.add(buildAddLastButton(list));
 		
 		return new Foldout(this.screen, list, mainGroup);
@@ -137,17 +127,13 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		}, new TranslatableComponent(GuiTexts.ADD_LAST_TOOLTIP_KEY));
 	}
 	
-	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, List<ListElemInfo> entries, int index)
+	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, IIndexedProperty<?> entry)
 	{
-		ListElemInfo info = new ListElemInfo(index);
-		entries.add(index, info);
 		IBetterElement child = elem.exploreNode(this);
 		
 		return new ListElementEntry(this.screen, child, deleteButton ->
 		{
-			int myIndex = info.getIndex();
-			entries.remove(myIndex);
-			list.removeValueAt(myIndex);
+			list.removeValueAt(entry.getIndex());
 		});
 	}
 	
@@ -188,25 +174,5 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	public IComponent visitUnknown(IConfigPrimitive<?> property, Void entry)
 	{
 		return new UnknownOptionWidget(property);
-	}
-	
-	private static class ListElemInfo
-	{
-		private int index; //TODO [#2] Find an alternative to this int holder class
-		
-		public ListElemInfo(int index)
-		{
-			this.index = index;
-		}
-		
-		public void updateIndex(int index)
-		{
-			this.index = index;
-		}
-		
-		public int getIndex()
-		{
-			return this.index;
-		}
 	}
 }

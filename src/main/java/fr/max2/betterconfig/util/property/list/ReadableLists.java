@@ -28,6 +28,12 @@ public enum ReadableLists
 		{
 			return this.parent.getElementProperties();
 		}
+		
+		@Override
+		public List<? extends IIndexedProperty<? extends T>> getIndexedProperties()
+		{
+			return this.parent.getIndexedProperties();
+		}
 
 		@Override
 		public void onChanged(IListListener<? super T> listener)
