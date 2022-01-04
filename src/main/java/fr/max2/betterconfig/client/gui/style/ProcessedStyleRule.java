@@ -5,12 +5,12 @@ import fr.max2.betterconfig.client.gui.component.IComponent;
 public class ProcessedStyleRule<T>
 {
 	private ISelector condition;
-	private T propertyValue;
+	private IStyleEffect<T> propertyEffect;
 	
 	public ProcessedStyleRule(ISelector condition, StyleValue<T> value)
 	{
 		this.condition = condition;
-		this.propertyValue = value.getPropertyValue();
+		this.propertyEffect = value.getPropertyEffect();
 	}
 
 	public boolean matches(IComponent component)
@@ -18,14 +18,14 @@ public class ProcessedStyleRule<T>
 		return this.condition.test(component);
 	}
 	
-	public T getPropertyValue()
+	public IStyleEffect<T> getPropertyEffect()
 	{
-		return this.propertyValue;
+		return this.propertyEffect;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return this.condition + " => " + this.propertyValue;
+		return this.condition + " => " + this.propertyEffect;
 	}
 }

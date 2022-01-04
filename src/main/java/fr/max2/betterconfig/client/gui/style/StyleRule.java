@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -164,7 +166,7 @@ public class StyleRule
 		
 		public <T> ValueBuilder set(StyleProperty<T> property, T propertyValue)
 		{
-			this.values.add(new StyleValue<>(property, propertyValue));
+			this.values.add(new StyleValue<>(property, new StyleSetEffect<>(propertyValue)));
 			return this;
 		}
 		
@@ -193,7 +195,7 @@ public class StyleRule
 			JsonObject values = new JsonObject();
 			for (StyleValue<?> val : src.values)
 			{
-				values.add(val.getProperty().name.toString(), context.serialize(val.getPropertyValue(), val.getProperty().type));
+				values.add(val.getProperty().name.toString(), context.serialize(val.getPropertyEffect(), TypeUtils.parameterize(IStyleEffect.class, val.getProperty().type)));
 			}
 			obj.add("values", values);
 			
@@ -211,7 +213,7 @@ public class StyleRule
 			for (Entry<String, JsonElement> cond : obj.getAsJsonObject("values").entrySet())
 			{
 				StyleProperty<?> prop = this.parent.getStyleProperty(cond.getKey());
-				values.add(new StyleValue<>(prop, context.deserialize(cond.getValue(), prop.type)));
+				values.add(new StyleValue<>(prop, context.deserialize(cond.getValue(), TypeUtils.parameterize(IStyleEffect.class, prop.type))));
 			}
 			
 			return new StyleRule(condition, values);

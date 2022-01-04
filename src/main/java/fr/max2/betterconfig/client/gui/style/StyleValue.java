@@ -3,12 +3,12 @@ package fr.max2.betterconfig.client.gui.style;
 public class StyleValue<T>
 {
 	private final StyleProperty<T> property;
-	private final T propertyValue;
+	private final IStyleEffect<T> propertyEffect;
 	
-	public StyleValue(StyleProperty<T> property, T propertyValue)
+	public StyleValue(StyleProperty<T> property, IStyleEffect<T> propertyEffect)
 	{
 		this.property = property;
-		this.propertyValue = propertyValue;
+		this.propertyEffect = propertyEffect;
 	}
 	
 	public StyleProperty<T> getProperty()
@@ -16,14 +16,14 @@ public class StyleValue<T>
 		return this.property;
 	}
 	
-	public T getPropertyValue()
+	public IStyleEffect<T> getPropertyEffect()
 	{
-		return this.propertyValue;
+		return this.propertyEffect;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return this.property + " = " + this.propertyValue;
+		return this.property.toString() + this.propertyEffect.toString();
 	}
 }

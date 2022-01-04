@@ -194,8 +194,10 @@ public interface ISelector extends Predicate<IPropertySource>
 		}
 	}
 
-	public static class Serializer implements JsonSerializer<ISelector>, JsonDeserializer<ISelector>
+	public static enum Serializer implements JsonSerializer<ISelector>, JsonDeserializer<ISelector>
 	{
+		INSTANCE;
+		
 		@Override
 		public JsonElement serialize(ISelector src, Type typeOfSrc, JsonSerializationContext context)
 		{

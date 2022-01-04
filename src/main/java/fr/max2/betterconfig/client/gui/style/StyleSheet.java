@@ -3,9 +3,11 @@ package fr.max2.betterconfig.client.gui.style;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.component.IComponent;
@@ -36,26 +38,39 @@ public class StyleSheet
 				r.add(new ProcessedStyleRule<>(rule.getCondition(), v));
 			}
 		}
-	}
-
-	public <T> T computePropertyValue(IComponent component, StyleProperty<T> property)
-	{
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		List<ProcessedStyleRule<T>> rules = (List)this.rules.get(property);
-		if (rules == null)
-			return property.defaultValue;
-			
-		for (ProcessedStyleRule<T> rule : rules)
+		
+		for (List<?> ruleList : this.rules.values())
 		{
-			if (rule.matches(component))
-				return rule.getPropertyValue();
+			Collections.reverse(ruleList);
 		}
-		
-		if (this.parent != null)
-			return this.parent.computePropertyValue(component, property);
-		
-		return property.defaultValue;
 	}
+	
+    public <I, T> T computePropertyValue(IComponent component, StyleProperty<T> property)
+    {
+            T res = this.computePropertyStram(property)
+                            .filter(rule -> rule.matches(component))
+                            .map(ProcessedStyleRule::getPropertyEffect)
+                            .reduce(null, (val, effect) -> effect.updateValue(val, property.defaultValue), (a, b) ->
+                            {
+                            	throw new UnsupportedOperationException();
+                            });
+            return res == null ? property.defaultValue : res;
+    }
+
+    private <T> Stream<ProcessedStyleRule<T>> computePropertyStram(StyleProperty<T> property)
+    {
+            Stream<ProcessedStyleRule<T>> valueStream = Stream.empty();
+            
+            if (this.parent != null)
+                valueStream = Stream.concat(valueStream, this.parent.computePropertyStram(property));
+            
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            List<ProcessedStyleRule<T>> rules = (List)this.rules.get(property);
+            if (rules != null)
+                    valueStream = rules.stream();
+
+            return valueStream;
+    }
 	
 	public static class Builder
 	{
