@@ -9,7 +9,7 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 public interface IConfigTableSpec extends IConfigSpecNode<UnmodifiableConfig>
 {
 	@Override
-	default Class<? super UnmodifiableConfig> getValueClass()
+	default Class<UnmodifiableConfig> getValueClass()
 	{
 		return UnmodifiableConfig.class;
 	}

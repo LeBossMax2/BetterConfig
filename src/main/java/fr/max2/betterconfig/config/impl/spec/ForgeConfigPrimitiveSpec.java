@@ -7,7 +7,7 @@ public class ForgeConfigPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 {
 	/** The specification */
 	private final ValueSpec spec;
-	private final Class<? super T> valueClass;
+	private final Class<T> valueClass;
 
 	public ForgeConfigPrimitiveSpec(ValueSpec spec, Class<T> valueClass)
 	{
@@ -16,7 +16,7 @@ public class ForgeConfigPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 	}
 
 	@Override
-	public Class<? super T> getValueClass()
+	public Class<T> getValueClass()
 	{
 		return this.valueClass;
 	}
@@ -27,17 +27,15 @@ public class ForgeConfigPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 		return this.spec.test(value);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public T correct(T value)
 	{
-		return (T)this.spec.correct(value);
+		return this.valueClass.cast(this.spec.correct(value));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public T getDefaultValue()
 	{
-		return (T)this.spec.getDefault();
+		return this.valueClass.cast(this.spec.getDefault());
 	}
 }

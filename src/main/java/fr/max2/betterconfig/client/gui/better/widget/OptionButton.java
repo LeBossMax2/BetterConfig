@@ -43,11 +43,10 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	}
 
 	/** Creates a widget for enum values */
-	@SuppressWarnings("unchecked")
 	public static <E extends Enum<E>> OptionButton<E> enumOption(IConfigPrimitive<E> property)
 	{
 		return new OptionButton<>(
-			Arrays.asList(((Class<E>)property.getSpec().getValueClass()).getEnumConstants()),
+			Arrays.asList(property.getSpec().getValueClass().getEnumConstants()),
 			enuw -> new TextComponent(enuw.name()),
 			property);
 	}

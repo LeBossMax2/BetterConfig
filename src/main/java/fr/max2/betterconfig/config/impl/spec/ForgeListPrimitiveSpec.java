@@ -6,7 +6,7 @@ import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpecVisitor;
 
 public class ForgeListPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 {
-	private final Class<? super T> valueClass;
+	private final Class<T> valueClass;
 
 	public ForgeListPrimitiveSpec(Class<T> valueClass)
 	{
@@ -14,7 +14,7 @@ public class ForgeListPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 	}
 
 	@Override
-	public Class<? super T> getValueClass()
+	public Class<T> getValueClass()
 	{
 		return this.valueClass;
 	}

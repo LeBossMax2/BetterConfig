@@ -60,9 +60,8 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 	}
 
 	/** Creates a widget for number values */
-	@SuppressWarnings("unchecked")
 	public static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, IConfigPrimitive<N> property)
 	{
-		return new NumberInputField<>(screen.getFont(), NumberTypes.getType((Class<N>)property.getSpec().getValueClass()), property, property.getDisplayName());
+		return new NumberInputField<>(screen.getFont(), NumberTypes.getType(property.getSpec().getValueClass()), property, property.getDisplayName());
 	}
 }

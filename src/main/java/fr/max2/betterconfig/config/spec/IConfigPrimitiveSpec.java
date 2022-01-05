@@ -4,6 +4,9 @@ import fr.max2.betterconfig.config.ValueType;
 
 public interface IConfigPrimitiveSpec<T> extends IConfigSpecNode<T>
 {
+	@Override
+	Class<T> getValueClass();
+	
 	default ValueType getType()
 	{
 		return ValueType.getType(this.getValueClass());
