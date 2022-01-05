@@ -18,6 +18,9 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import fr.max2.betterconfig.client.gui.component.Component;
+import fr.max2.betterconfig.client.gui.style.operator.IStyleOperation;
+import fr.max2.betterconfig.client.gui.style.operator.ListIndexingOperation;
+import fr.max2.betterconfig.client.gui.style.operator.AssignmentOperation;
 
 public class StyleRule
 {
@@ -164,15 +167,45 @@ public class StyleRule
 			this.parent = parent;
 		}
 		
-		public <T> ValueBuilder set(StyleProperty<T> property, T propertyValue)
+		public <T> ValueBuilder set(StyleProperty<T> property, T value)
 		{
-			this.values.add(new StyleValue<>(property, new StyleSetEffect<>(propertyValue)));
-			return this;
+			return this.assign(value).into(property);
+		}
+		
+		public <T> OperationBuilder<T, ValueBuilder> assign(T value)
+		{
+			return new OperationBuilder<>(new AssignmentOperation<T>(value), op ->
+			{
+				this.values.add(op);
+				return ValueBuilder.this;
+			});
 		}
 		
 		public StyleRule build()
 		{
 			return new StyleRule(this.parent.condition, ImmutableList.copyOf(this.values));
+		}
+	}
+	
+	public static class OperationBuilder<T, Res>
+	{
+		private final IStyleOperation<T> currentOperation;
+		private final Function<StyleValue<?>, Res> resultFunction;
+		
+		public OperationBuilder(IStyleOperation<T> currentOperation, Function<StyleValue<?>, Res> resultFunction)
+		{
+			this.currentOperation = currentOperation;
+			this.resultFunction = resultFunction;
+		}
+		
+		public OperationBuilder<List<T>, Res> atIndex(int index)
+		{
+			return new OperationBuilder<>(new ListIndexingOperation<>(index, this.currentOperation), this.resultFunction);
+		}
+		
+		public Res into(StyleProperty<T> property)
+		{
+			return this.resultFunction.apply(new StyleValue<>(property, this.currentOperation));
 		}
 	}
 	
@@ -195,7 +228,7 @@ public class StyleRule
 			JsonObject values = new JsonObject();
 			for (StyleValue<?> val : src.values)
 			{
-				values.add(val.getProperty().name.toString(), context.serialize(val.getPropertyEffect(), TypeUtils.parameterize(IStyleEffect.class, val.getProperty().type)));
+				values.add(val.getProperty().name.toString(), context.serialize(val.getPropertyEffect(), TypeUtils.parameterize(IStyleOperation.class, val.getProperty().type)));
 			}
 			obj.add("values", values);
 			
@@ -213,7 +246,7 @@ public class StyleRule
 			for (Entry<String, JsonElement> cond : obj.getAsJsonObject("values").entrySet())
 			{
 				StyleProperty<?> prop = this.parent.getStyleProperty(cond.getKey());
-				values.add(new StyleValue<>(prop, context.deserialize(cond.getValue(), TypeUtils.parameterize(IStyleEffect.class, prop.type))));
+				values.add(new StyleValue<>(prop, context.deserialize(cond.getValue(), TypeUtils.parameterize(IStyleOperation.class, prop.type))));
 			}
 			
 			return new StyleRule(condition, values);

@@ -1,12 +1,12 @@
-package fr.max2.betterconfig.client.gui.style;
+package fr.max2.betterconfig.client.gui.style.operator;
 
 import javax.annotation.Nullable;
 
-public class StyleSetEffect<T> implements IStyleEffect<T>
+public class AssignmentOperation<T> implements IStyleOperation<T>
 {
 	public final T value;
 
-	public StyleSetEffect(T value)
+	public AssignmentOperation(T value)
 	{
 		this.value = value;
 	}

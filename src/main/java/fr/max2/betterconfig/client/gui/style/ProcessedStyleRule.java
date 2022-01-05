@@ -1,11 +1,12 @@
 package fr.max2.betterconfig.client.gui.style;
 
 import fr.max2.betterconfig.client.gui.component.IComponent;
+import fr.max2.betterconfig.client.gui.style.operator.IStyleOperation;
 
 public class ProcessedStyleRule<T>
 {
 	private ISelector condition;
-	private IStyleEffect<T> propertyEffect;
+	private IStyleOperation<T> propertyEffect;
 	
 	public ProcessedStyleRule(ISelector condition, StyleValue<T> value)
 	{
@@ -18,7 +19,7 @@ public class ProcessedStyleRule<T>
 		return this.condition.test(component);
 	}
 	
-	public IStyleEffect<T> getPropertyEffect()
+	public IStyleOperation<T> getPropertyEffect()
 	{
 		return this.propertyEffect;
 	}

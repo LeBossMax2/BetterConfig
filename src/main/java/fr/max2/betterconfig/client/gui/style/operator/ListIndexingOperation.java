@@ -1,19 +1,19 @@
-package fr.max2.betterconfig.client.gui.style;
+package fr.max2.betterconfig.client.gui.style.operator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class ListIndexEffect<T> implements IStyleEffect<List<T>>
+public class ListIndexingOperation<T> implements IStyleOperation<List<T>>
 {
 	private final int index;
-	private final IStyleEffect<T> elementEffect;
+	private final IStyleOperation<T> elementOperation;
 	
-	public ListIndexEffect(int index, IStyleEffect<T> elementEffect)
+	public ListIndexingOperation(int index, IStyleOperation<T> elementOperation)
 	{
 		this.index = index;
-		this.elementEffect = elementEffect;
+		this.elementOperation = elementOperation;
 	}
 	
 	@Override
@@ -28,7 +28,7 @@ public class ListIndexEffect<T> implements IStyleEffect<List<T>>
 		while (values.size() < this.index)
 			values.add(null);
 
-		values.set(this.index, this.elementEffect.updateValue(values.get(this.index), null));
+		values.set(this.index, this.elementOperation.updateValue(values.get(this.index), null));
 		
 		return values;
 	}

@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.client.gui.style;
+package fr.max2.betterconfig.client.gui.style.operator;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -16,18 +16,18 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public interface IStyleEffect<T>
+public interface IStyleOperation<T>
 {
 	String typeName();
 	
 	T updateValue(@Nullable T prevValue, @Nullable T defaultValue);
 
-	public static enum Serializer implements JsonSerializer<IStyleEffect<?>>, JsonDeserializer<IStyleEffect<?>>
+	public static enum Serializer implements JsonSerializer<IStyleOperation<?>>, JsonDeserializer<IStyleOperation<?>>
 	{
 		INSTANCE;
 		
 		@Override
-		public JsonElement serialize(IStyleEffect<?> src, Type typeOfSrc, JsonSerializationContext context)
+		public JsonElement serialize(IStyleOperation<?> src, Type typeOfSrc, JsonSerializationContext context)
 		{
 			JsonObject json = context.serialize(src, src.getClass()).getAsJsonObject();
 			json.addProperty("operator", src.typeName());
@@ -35,7 +35,7 @@ public interface IStyleEffect<T>
 		}
 
 		@Override
-		public IStyleEffect<?> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+		public IStyleOperation<?> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
 		        throws JsonParseException
 		{
 			JsonObject obj = json.getAsJsonObject();
@@ -59,11 +59,11 @@ public interface IStyleEffect<T>
 		{
 			switch (operator)
 			{
-			case "set": return TypeUtils.parameterize(StyleSetEffect.class, valueType);
+			case "set": return TypeUtils.parameterize(AssignmentOperation.class, valueType);
 			case "item":
 				if (((ParameterizedType)valueType).getRawType() != List.class)
 					throw new JsonParseException("Type " + valueType + " cannot be indexed");
-				return TypeUtils.parameterize(ListIndexEffect.class, getValueType(valueType));
+				return TypeUtils.parameterize(ListIndexingOperation.class, getValueType(valueType));
 			default: return null;
 			}
 		}
