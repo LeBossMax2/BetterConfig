@@ -64,8 +64,8 @@ public class StyleSheet
             if (this.parent != null)
                 valueStream = Stream.concat(valueStream, this.parent.computePropertyStram(property));
             
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            List<ProcessedStyleRule<T>> rules = (List)this.rules.get(property);
+            @SuppressWarnings("unchecked")
+            List<ProcessedStyleRule<T>> rules = (List<ProcessedStyleRule<T>>)(List<?>)this.rules.get(property);
             if (rules != null)
                     valueStream = rules.stream();
 

@@ -31,11 +31,10 @@ public class ForgeListPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 		return value;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public T getDefaultValue()
 	{
-		return (T)this.getType().exploreSpec(DefaultValueVisitor.INSTANCE, this, this.getValueClass());
+		return this.valueClass.cast(this.getType().exploreSpec(DefaultValueVisitor.INSTANCE, this, this.valueClass));
 	}
 	
 	private static enum DefaultValueVisitor implements IConfigPrimitiveSpecVisitor<Class<?>, Object>
