@@ -1,6 +1,7 @@
 package fr.max2.betterconfig.client.gui.component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.ILayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
+import fr.max2.betterconfig.client.gui.rendering.IRenderLayer;
 import fr.max2.betterconfig.client.gui.style.ListPropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.StyleProperty;
@@ -31,6 +33,9 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	public static final PropertyIdentifier<IComponent> PARENT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "parent"), IComponent.class);
 	public static final PropertyIdentifier<Boolean> HOVERED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "hovered"), Boolean.class);
 	public static final PropertyIdentifier<Boolean> FOCUSED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "focused"), Boolean.class);
+
+	public static final StyleProperty<List<IRenderLayer>> BACKGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "background"), List.class, Collections.emptyList());
+	public static final StyleProperty<List<IRenderLayer>> FOREGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "foreground"), List.class, Collections.emptyList());
 
 	public static final OnTooltip NO_OVERLAY = Button.NO_TOOLTIP;
 	
@@ -163,7 +168,17 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 		if (!this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isVisible())
 			return;
 		
+		for (IRenderLayer layer : this.getStyleProperty(BACKGROUND))
+		{
+			layer.renderLayer(this.getRect(), pPoseStack, pMouseX, pMouseY, pPartialTick);
+		}
+		
 		this.onRender(pPoseStack, pMouseX, pMouseY, pPartialTick);
+
+		for (IRenderLayer layer : this.getStyleProperty(FOREGROUND))
+		{
+			layer.renderLayer(this.getRect(), pPoseStack, pMouseX, pMouseY, pPartialTick);
+		}
 	}
 	
 	protected abstract void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick);

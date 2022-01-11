@@ -14,6 +14,8 @@ import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
+import fr.max2.betterconfig.client.gui.rendering.IMaterial;
+import fr.max2.betterconfig.client.gui.rendering.IRenderLayer;
 import fr.max2.betterconfig.client.gui.style.operator.IStyleOperation;
 import net.minecraft.resources.ResourceLocation;
 
@@ -35,7 +37,9 @@ public class StyleSerializer
 			CompositeLayoutConfig.SPACING,
 			CompositeLayoutConfig.INNER_PADDING,
 			CompositeLayoutConfig.JUSTIFICATION,
-			CompositeLayoutConfig.ALIGNMENT
+			CompositeLayoutConfig.ALIGNMENT,
+			Component.BACKGROUND,
+			Component.FOREGROUND
 		));
 	
 	private final Map<String, PropertyIdentifier<?>> componentProperties;
@@ -63,8 +67,10 @@ public class StyleSerializer
 				.registerTypeHierarchyAdapter(PropertyIdentifier.class, new PropertyIdentifier.Serializer(this))
 				.registerTypeHierarchyAdapter(StyleProperty.class, new StyleProperty.Serializer(this))
 				.registerTypeAdapter(StyleRule.class, new StyleRule.Serializer(this))
-				.registerTypeAdapter(ISelector.class, ISelector.Serializer.INSTANCE)
-				.registerTypeAdapter(IStyleOperation.class, IStyleOperation.Serializer.INSTANCE)
+				.registerTypeAdapter(ISelector.class, new ISelector.Serializer())
+				.registerTypeAdapter(IStyleOperation.class, new IStyleOperation.Serializer())
+				.registerTypeAdapter(IRenderLayer.class, new IRenderLayer.Serializer())
+				.registerTypeAdapter(IMaterial.class, new IMaterial.Serializer())
 				.registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
 				.registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE);
 	}

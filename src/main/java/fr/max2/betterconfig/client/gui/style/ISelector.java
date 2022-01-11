@@ -4,18 +4,10 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import fr.max2.betterconfig.util.ISerializableInterface;
 
-public interface ISelector extends Predicate<IPropertySource>
+public interface ISelector extends Predicate<IPropertySource>, ISerializableInterface
 {
-	String typeName();
-
 	public static class Not implements ISelector
 	{
 		private final ISelector subSelector;
@@ -194,33 +186,10 @@ public interface ISelector extends Predicate<IPropertySource>
 		}
 	}
 
-	public static enum Serializer implements JsonSerializer<ISelector>, JsonDeserializer<ISelector>
+	public static class Serializer extends ISerializableInterface.Serializer
 	{
-		INSTANCE;
-		
 		@Override
-		public JsonElement serialize(ISelector src, Type typeOfSrc, JsonSerializationContext context)
-		{
-			JsonObject json = context.serialize(src, src.getClass()).getAsJsonObject();
-			json.addProperty("operator", src.typeName());
-			return json;
-		}
-
-		@Override
-		public ISelector deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-		        throws JsonParseException
-		{
-			JsonObject obj = json.getAsJsonObject();
-
-			Class<?> operatorClass = getOperatorClass(obj.get("operator").getAsString());
-
-			if (operatorClass == null)
-                throw new JsonParseException("Don't know how to turn " + json + " into a IComponentSelector");
-
-			return context.deserialize(obj, operatorClass);
-		}
-
-		private static Class<?> getOperatorClass(String operator)
+		protected Type getConcreteType(String operator, Type interfaceType)
 		{
 			switch (operator)
 			{

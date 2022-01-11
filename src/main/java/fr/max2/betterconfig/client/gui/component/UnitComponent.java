@@ -1,5 +1,7 @@
 package fr.max2.betterconfig.client.gui.component;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
 
 public abstract class UnitComponent extends Component<IComponent>
@@ -25,6 +27,10 @@ public abstract class UnitComponent extends Component<IComponent>
 
 	@Override
 	public void invalidate()
+	{ }
+	
+	@Override
+	protected void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick)
 	{ }
 	
 	// Input handling
