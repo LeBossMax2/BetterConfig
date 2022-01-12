@@ -18,6 +18,7 @@ public interface IRenderLayer extends ISerializableInterface
 		{
 			switch (operator)
 			{
+			case "none": return NoRendering.class;
 			case "box": return DrawBox.class;
 			default: return null;
 			}

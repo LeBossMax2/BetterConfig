@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.BetterConfig;
@@ -34,8 +36,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 	public static final PropertyIdentifier<Boolean> HOVERED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "hovered"), Boolean.class);
 	public static final PropertyIdentifier<Boolean> FOCUSED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "focused"), Boolean.class);
 
-	public static final StyleProperty<List<IRenderLayer>> BACKGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "background"), List.class, Collections.emptyList());
-	public static final StyleProperty<List<IRenderLayer>> FOREGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "foreground"), List.class, Collections.emptyList());
+	public static final StyleProperty<List<IRenderLayer>> BACKGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "background"), TypeUtils.parameterize(List.class, IRenderLayer.class), Collections.emptyList());
+	public static final StyleProperty<List<IRenderLayer>> FOREGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "foreground"), TypeUtils.parameterize(List.class, IRenderLayer.class), Collections.emptyList());
 
 	public static final OnTooltip NO_OVERLAY = Button.NO_TOOLTIP;
 	

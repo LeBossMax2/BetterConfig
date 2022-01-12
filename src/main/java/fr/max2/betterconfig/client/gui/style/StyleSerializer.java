@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder;
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
 import fr.max2.betterconfig.client.gui.component.Component;
+import fr.max2.betterconfig.client.gui.component.widget.WidgetComponent;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Padding;
@@ -27,6 +28,7 @@ public class StyleSerializer
 			Component.PARENT,
 			Component.HOVERED,
 			Component.FOCUSED,
+			WidgetComponent.ACTIVE,
 			IBetterElement.FILTERED_OUT,
 			Foldout.FOLDED
 		), Arrays.asList(

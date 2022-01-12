@@ -3,6 +3,7 @@ package fr.max2.betterconfig.data;
 import static fr.max2.betterconfig.client.gui.style.StyleRule.when;
 import static fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig.*;
 import static fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig.*;
+import static fr.max2.betterconfig.client.gui.component.Component.*;
 
 import java.io.IOException;
 
@@ -11,16 +12,21 @@ import com.google.gson.GsonBuilder;
 
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
-import fr.max2.betterconfig.client.gui.component.Component;
 import fr.max2.betterconfig.client.gui.component.widget.NumberField;
+import fr.max2.betterconfig.client.gui.component.widget.WidgetComponent;
 import fr.max2.betterconfig.client.gui.layout.Alignment;
 import fr.max2.betterconfig.client.gui.layout.Axis;
 import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.layout.Visibility;
+import fr.max2.betterconfig.client.gui.rendering.DrawBox;
+import fr.max2.betterconfig.client.gui.rendering.IRenderLayer;
+import fr.max2.betterconfig.client.gui.rendering.NineSliceMaterial;
+import fr.max2.betterconfig.client.gui.rendering.NoRendering;
 import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.client.gui.style.StyleSerializer;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
@@ -126,8 +132,8 @@ public class ModStyleSheetProvider implements DataProvider
 				.not()
 					.parent()
 						.or()
-							.is(Component.HOVERED)
-							.is(Component.FOCUSED)
+							.is(HOVERED)
+							.is(FOCUSED)
 							.end()
 				.end()
 			.then()
@@ -165,14 +171,14 @@ public class ModStyleSheetProvider implements DataProvider
 				.not()
 					.parent()
 						.or()
-							.is(Component.HOVERED)
-							.is(Component.FOCUSED)
+							.is(HOVERED)
+							.is(FOCUSED)
 							.parent()
 								.and()
 									.type("better:list_entry")
 									.or()
-										.is(Component.HOVERED)
-										.is(Component.FOCUSED)
+										.is(HOVERED)
+										.is(FOCUSED)
 										.end()
 									.end()
 							.end()
@@ -201,7 +207,32 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_HEIGHT))
 				.build();
 		private static final StyleRule BETTER_ICON_BUTTON_STYLE = when().hasClass("better:icon_button").then()
+				.<IRenderLayer>assign(new NoRendering()).atIndex(0).into(BACKGROUND)
 				.set(SIZE_OVERRIDE, new Size(VALUE_HEIGHT, VALUE_HEIGHT))
+				.build();
+
+		private static final StyleRule ACTIVE_BUTTON_STYLE = when()
+			.and()
+				.type("button")
+				.not().is(WidgetComponent.ACTIVE)
+				.end()
+			.then()
+				.<IRenderLayer>assign(new DrawBox(new Padding(), new NineSliceMaterial(AbstractWidget.WIDGETS_LOCATION, 0, 46, 200, 20, 2, 3, 2, 2))).atIndex(0).into(BACKGROUND)
+				.build();
+		private static final StyleRule FOCUSED_BUTTON_STYLE = when()
+			.and()
+				.type("button")
+				.or()
+					.is(HOVERED)
+					.is(FOCUSED)
+					.end()
+				.end()
+			.then()
+				.<IRenderLayer>assign(new DrawBox(new Padding(), new NineSliceMaterial(AbstractWidget.WIDGETS_LOCATION, 0, 86, 200, 20, 2, 3, 2, 2))).atIndex(0).into(BACKGROUND)
+				.build();
+		private static final StyleRule BUTTON_STYLE = when().type("button").then()
+				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, 20))
+				.<IRenderLayer>assign(new DrawBox(new Padding(), new NineSliceMaterial(AbstractWidget.WIDGETS_LOCATION, 0, 66, 200, 20, 2, 3, 2, 2))).atIndex(0).into(BACKGROUND)
 				.build();
 
 		public static StyleSheet.Builder builder()
@@ -212,7 +243,7 @@ public class ModStyleSheetProvider implements DataProvider
 					VALUE_ENTRY_STYLE, ENTRY_UNDO_HIDDEN_STYLE,
 					OPTION_BUTTON_STYLE, STRING_INPUT_FIELD_STYLE, UNKNOWN_OPTION_STYLE, ROOT_GROUP_STYLE, TABLE_STYLE, LIST_STYLE,
 					BETTER_NUMBER_FIELD_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE,
-					BETTER_ICON_BUTTON_STYLE, BETTER_BUTTON_STYLE, HBOX_STYLE);
+					BETTER_ICON_BUTTON_STYLE, BETTER_BUTTON_STYLE, HBOX_STYLE, ACTIVE_BUTTON_STYLE, FOCUSED_BUTTON_STYLE, BUTTON_STYLE);
 		}
 	}
 }

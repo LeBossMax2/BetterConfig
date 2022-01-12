@@ -25,7 +25,7 @@ public class ListIndexingOperation<T> implements IStyleOperation<List<T>>
 			if (defaultValue != null)
 				values.addAll(defaultValue);
 		}
-		while (values.size() < this.index)
+		while (values.size() <= this.index)
 			values.add(null);
 
 		values.set(this.index, this.elementOperation.updateValue(values.get(this.index), null));

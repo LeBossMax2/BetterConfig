@@ -3,6 +3,8 @@ package fr.max2.betterconfig.client.gui.component.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.max2.betterconfig.client.gui.layout.Rectangle;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -35,7 +37,11 @@ public class Button extends WidgetComponent<Button.InnerButton>
 	
 	protected void renderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
 	{
-		this.widget.superRenderButton(mStack, mouseX, mouseY, partial);
+		Font font = this.layoutManager.getMinecraft().font;
+		int j = this.widget.getFGColor();
+		Rectangle rect = this.getRect();
+		drawCenteredString(mStack, font, this.widget.getMessage(), rect.getCenterX(), rect.getCenterY() - (font.lineHeight - 1) / 2, j);
+		//this.widget.superRenderButton(mStack, mouseX, mouseY, partial);
 	}
 	
 	@FunctionalInterface

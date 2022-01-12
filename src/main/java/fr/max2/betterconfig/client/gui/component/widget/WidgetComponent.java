@@ -2,21 +2,27 @@ package fr.max2.betterconfig.client.gui.component.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.component.CycleFocusState;
 import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
+import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComponent
 {
+	public static final PropertyIdentifier<Boolean> ACTIVE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "active"), Boolean.class);
+	
 	public final W widget;
 
 	public WidgetComponent(String type, W widget)
 	{
 		super(type);
 		this.widget = widget;
+		this.registerProperty(ACTIVE, () -> this.widget.active);
 	}
 
 	// Layout

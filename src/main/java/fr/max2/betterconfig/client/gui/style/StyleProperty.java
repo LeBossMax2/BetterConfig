@@ -15,10 +15,10 @@ import net.minecraft.resources.ResourceLocation;
 public class StyleProperty<T>
 {
 	public final ResourceLocation name;
-	public final Class<?> type;
+	public final Type type;
 	public final T defaultValue;
 
-	public StyleProperty(ResourceLocation name, Class<?> type, T defaultValue)
+	public StyleProperty(ResourceLocation name, Type type, T defaultValue)
 	{
 		this.name = name;
 		this.type = type;
@@ -33,7 +33,7 @@ public class StyleProperty<T>
 	@Override
 	public String toString()
 	{
-		return this.name.toString() + " (" + this.type.getName() + ")";
+		return this.name.toString() + " (" + this.type + ")";
 	}
 	
 	public static class Serializer implements JsonSerializer<StyleProperty<?>>, JsonDeserializer<StyleProperty<?>>

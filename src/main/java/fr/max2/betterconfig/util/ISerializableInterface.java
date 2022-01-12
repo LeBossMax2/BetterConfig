@@ -11,6 +11,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import net.minecraft.util.GsonHelper;
+
 public interface ISerializableInterface
 {
 	String typeName();
@@ -20,21 +22,26 @@ public interface ISerializableInterface
 		@Override
 		public JsonElement serialize(ISerializableInterface src, Type typeOfSrc, JsonSerializationContext context)
 		{
-			JsonObject json = context.serialize(src, src.getClass()).getAsJsonObject();
-			json.addProperty("type", src.typeName());
+			String typeName = src.typeName();
+			Type operatorType = this.getConcreteType(typeName, typeOfSrc);
+
+			if (operatorType == null)
+				throw new JsonParseException("Don't know how to turn " + src + " of type " + typeOfSrc + " into json");
+
+			JsonObject json = context.serialize(src, operatorType).getAsJsonObject();
+			json.addProperty("type", typeName);
 			return json;
 		}
 
 		@Override
-		public ISerializableInterface deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-		        throws JsonParseException
+		public ISerializableInterface deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 		{
 			JsonObject obj = json.getAsJsonObject();
 
-			Type operatorType = getConcreteType(obj.get("type").getAsString(), typeOfT);
+			Type operatorType = getConcreteType(GsonHelper.getAsString(obj, "type"), typeOfT);
 
 			if (operatorType == null)
-                throw new JsonParseException("Don't know how to turn " + json + " into " + typeOfT);
+				throw new JsonParseException("Don't know how to turn " + json + " into " + typeOfT);
 
 			return context.deserialize(obj, operatorType);
 		}

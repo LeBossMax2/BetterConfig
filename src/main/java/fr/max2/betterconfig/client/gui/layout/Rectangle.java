@@ -71,6 +71,16 @@ public class Rectangle
 		return this.y + this.size.height;
 	}
 	
+	public int getCenterX()
+	{
+		return this.x + this.size.width / 2;
+	}
+	
+	public int getCenterY()
+	{
+		return this.y + this.size.height / 2;
+	}
+	
 	public boolean isPointInside(double x, double y)
 	{
 		return x >= this.getLeft()

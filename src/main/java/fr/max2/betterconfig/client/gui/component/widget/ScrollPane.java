@@ -35,7 +35,7 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 	protected Size contentSize;
 	
 	/** Indicates whether the layout is dirty */
-	protected boolean layoutDirty = true;;
+	protected boolean layoutDirty = true;
 	
 	public ScrollPane(IComponent content)
 	{
@@ -120,20 +120,13 @@ public class ScrollPane extends Component<IScrollComponent> implements IScrollCo
 		this.applyScrollLimits();
 	}
 	
-	@Override
-	public Size updateLayout(IComponent component, Size availableSize)
-	{
-		Size size = IComponentParent.super.updateLayout(component, availableSize);
-		this.applyScrollLimits();
-		return size;
-	}
-	
 	public void checkLayout()
 	{
 		if (this.layoutDirty)
 		{
 			this.layoutDirty = false;
 			this.setContentSize(this.updateLayout(this.content, this.getSize()));
+			this.applyScrollLimits();
 		}
 	}
 	
