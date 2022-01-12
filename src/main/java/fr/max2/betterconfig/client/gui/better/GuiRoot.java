@@ -44,9 +44,10 @@ public class GuiRoot extends CompositeComponent
 		{
 			final int index = i;
 			// TODO [#2] Add meaningful tooltip : explanation of config types + file path
-			BetterButton b = new BetterButton(screen, new TextComponent(config.getType().name()), thisButton -> this.screen.openConfig(index), new TextComponent(config.getFileName()));
+			BetterButton b = new BetterButton(screen, new TextComponent(config.getType().name()), new TextComponent(config.getFileName()));
+			b.addOnPressed(() -> this.screen.openConfig(index));
 			b.addClass("better:tab_button");
-			b.widget.active = index != screen.getCurrentConfigIndex();
+			b.setActive(index != screen.getCurrentConfigIndex());
 			i++;
 			tabs.add(b);
 		}
@@ -71,9 +72,11 @@ public class GuiRoot extends CompositeComponent
 		this.children.add(this.scrollPane);
 		
 		// Cancel/Save buttons
-		BetterButton cancelButton = new BetterButton(new TranslatableComponent(GuiTexts.CANCEL_CONFIG_KEY), thisButton -> this.screen.cancelChanges());
+		BetterButton cancelButton = new BetterButton(new TranslatableComponent(GuiTexts.CANCEL_CONFIG_KEY));
+		cancelButton.addOnPressed(this.screen::cancelChanges);
 		cancelButton.addClass("better:cancel");
-		BetterButton saveButton = new BetterButton(new TranslatableComponent(GuiTexts.SAVE_CONFIG_KEY), thisButton -> this.screen.onClose());
+		BetterButton saveButton = new BetterButton(new TranslatableComponent(GuiTexts.SAVE_CONFIG_KEY));
+		saveButton.addOnPressed(this.screen::onClose);
 		saveButton.addClass("better:save");
 		HBox buttonBar = new HBox(Arrays.asList(cancelButton, saveButton));
 		buttonBar.addClass("better:bottom_bar");

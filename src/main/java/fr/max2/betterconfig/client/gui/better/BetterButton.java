@@ -13,15 +13,15 @@ import net.minecraft.network.chat.Component;
 
 public class BetterButton extends Button
 {
-	public BetterButton(BetterConfigScreen screen, Component displayString, OnPress pressedHandler, Component overlay)
+	public BetterButton(BetterConfigScreen screen, Component displayString, Component overlay)
 	{
-		super(displayString, pressedHandler, new TextOverlay(screen, overlay));
+		super(displayString, new TextOverlay(screen, overlay));
 		this.addClass("better:button");
 	}
 	
-	public BetterButton(Component displayString, OnPress pressedHandler)
+	public BetterButton(Component displayString)
 	{
-		super(displayString, pressedHandler, NO_OVERLAY);
+		super(displayString, NO_OVERLAY);
 		this.addClass("better:button");
 	}
 
@@ -30,23 +30,23 @@ public class BetterButton extends Button
 		private final int iconU;
 		private final int iconV;
 	
-		public Icon(BetterConfigScreen screen, int iconU, int iconV, Component displayString, OnPress pressedHandler, Component overlay)
+		public Icon(BetterConfigScreen screen, int iconU, int iconV, Component displayString, Component overlay)
 		{
-			super(screen, displayString, pressedHandler, overlay);
+			super(screen, displayString, overlay);
 			this.iconU = iconU;
 			this.iconV = iconV;
 			this.addClass("better:icon_button");
 		}
 		
 		@Override
-		public void renderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
+		protected void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick)
 		{
 			// Draw foreground icon
-			int v = this.iconV + (this.widget.isHovered() ? 16 : 0);
+			int v = this.iconV + (this.isHovered() ? 16 : 0);
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
 	        RenderSystem.setShaderTexture(0, Constants.BETTER_ICONS);
 	        Rectangle rect = this.getRect();
-			blit(mStack, rect.x + (rect.size.width - 16) / 2, rect.y + (rect.size.height - 16) / 2, this.iconU, v, 16, 16, 256, 256);
+			blit(pPoseStack, rect.x + (rect.size.width - 16) / 2, rect.y + (rect.size.height - 16) / 2, this.iconU, v, 16, 16, 256, 256);
 		}
 		
 	}

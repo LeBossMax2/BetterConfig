@@ -15,9 +15,9 @@ public class UnknownOptionWidget extends Button
 	
 	public UnknownOptionWidget(IConfigPrimitive<?> property)
 	{
-		super(new TextComponent(Objects.toString(property.getValue())), thiz -> {}, NO_OVERLAY);
+		super(new TextComponent(Objects.toString(property.getValue())), NO_OVERLAY);
 		this.addClass("better:unknown");
-		this.widget.active = false;
+		this.setActive(false);
 		
 		this.property = property;
 		this.propertyListener = newVal -> this.setMessage(new TextComponent(Objects.toString(newVal)));

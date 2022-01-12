@@ -24,8 +24,9 @@ public class OptionButton<V> extends CycleOptionButton<V>
 		super(
 			acceptedValues.stream().filter(property.getSpec()::isAllowed).collect(Collectors.toList()),
 			valueToText,
-			property.getValue(), thiz -> property.setValue(thiz.getCurrentValue()),
+			property.getValue(),
 			NO_OVERLAY);
+		this.addOnPressed(() -> property.setValue(this.getCurrentValue()));
 		this.addClass("better:option_button");
 		
 		this.property = property;

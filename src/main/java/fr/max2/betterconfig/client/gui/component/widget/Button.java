@@ -1,115 +1,158 @@
 package fr.max2.betterconfig.client.gui.component.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import fr.max2.betterconfig.client.gui.component.CycleFocusState;
+import fr.max2.betterconfig.client.gui.component.EventState;
+import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
+import fr.max2.betterconfig.util.Event;
+import fr.max2.betterconfig.util.IEvent;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button.OnTooltip;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.fmlclient.gui.widget.ExtendedButton;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvents;
 
 /**
  * A basic button
  */
-public class Button extends WidgetComponent<Button.InnerButton>
+public class Button extends UnitComponent
 {
+	private Component message;
+	private Event<OnPress> onPressed = new Event<>();
+	private boolean isActive = true;
 
-	public Button(Component displayString, OnPress pressedHandler, OnTooltip overlay)
+	public Button(Component displayString, OnTooltip overlay)
 	{
-		super("button", new InnerButton(0, 0, 0, 0, displayString, pressedHandler));
+		super("button");
+		this.message = displayString;
 		this.overlay = overlay;
-		this.widget.parent = this;
+		this.registerProperty(WidgetComponent.ACTIVE, () -> this.active());
 	}
 
-	public Button(Component displayString, OnPress pressedHandler)
+	public Button(Component displayString)
 	{
-		this(displayString, pressedHandler, NO_OVERLAY);
+		this(displayString, NO_OVERLAY);
 	}
 	
 	public void setMessage(Component message)
 	{
-		this.widget.setMessage(message);
+		this.message = message;
+	}
+	
+	public Component getMessage()
+	{
+		return message;
+	}
+	
+	public void setActive(boolean isActive)
+	{
+		this.isActive = isActive;
+	}
+	
+	public boolean active()
+	{
+		return this.isActive;
+	}
+	
+	@Override
+	public boolean isActive()
+	{
+		return super.isActive() && this.active();
+	}
+	
+	public IEvent<OnPress> onPressed()
+	{
+		return this.onPressed;
+	}
+	
+	public Button addOnPressed(OnPress handler)
+	{
+		this.onPressed.add(handler);
+		return this;
 	}
 	
 	// Rendering
 	
-	protected void renderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
+	@Override
+	protected void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick)
 	{
 		Font font = this.layoutManager.getMinecraft().font;
-		int j = this.widget.getFGColor();
 		Rectangle rect = this.getRect();
-		drawCenteredString(mStack, font, this.widget.getMessage(), rect.getCenterX(), rect.getCenterY() - (font.lineHeight - 1) / 2, j);
-		//this.widget.superRenderButton(mStack, mouseX, mouseY, partial);
+		drawCenteredString(pPoseStack, font, this.getMessage(), rect.getCenterX(), rect.getCenterY() - (font.lineHeight - 1) / 2, this.getFontColor());
+	}
+	
+	private int getFontColor()
+	{
+		return this.active() ? 0xFFFFFFFF : 0xFFA0A0A0;
+	}
+	
+	// Input handling
+	
+	@Override
+	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
+	{
+		if (!this.isHovered() || state.isConsumed() || button != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+			return;
+
+		this.onPress();
+		state.consume();
+	}
+	
+	@Override
+	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
+	{
+		if (!this.hasFocus() || state.isConsumed())
+			return;
+
+		switch (keyCode)
+		{
+		case GLFW.GLFW_KEY_ENTER:
+		case GLFW.GLFW_KEY_KP_ENTER:
+		case GLFW.GLFW_KEY_SPACE:
+			this.onPress();
+			state.consume();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	@Override
+	protected void onCycleFocus(boolean forward, CycleFocusState state)
+	{
+		this.cycleSelfFocus(state);
+	}
+	
+	protected void onPress()
+	{
+		this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+		this.layoutManager.enqueueWork(() -> this.onPressed.call(OnPress::onPress));
+	}
+	
+	// Narration
+	
+	@Override
+	public void updateNarration(NarrationElementOutput narrationOutput)
+	{
+		narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent("gui.narrate.button", this.getMessage()));
+		if (this.active())
+		{
+			String state = this.hasFocus() ? "focused" : "hovered";
+			narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.button.usage." + state));
+		}
+		super.updateNarration(narrationOutput);
 	}
 	
 	@FunctionalInterface
 	public static interface OnPress
 	{
-		void onPress(Button button);
-	}
-
-	public static class InnerButton extends ExtendedButton
-	{
-		private final Button.OnPress handler;
-		private Button parent;
-		
-		private InnerButton(int xPos, int yPos, int width, int height, Component displayString, Button.OnPress handler)
-		{
-			super(xPos, yPos, width, height, displayString, null);
-			this.handler = handler;
-		}
-		
-		// Rendering
-		
-		@Override
-		public void renderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
-		{
-			// Fix rendering bug
-			RenderSystem.setShader(GameRenderer::getPositionTexShader);
-			this.parent.renderButton(mStack, mouseX, mouseY, partial);
-		}
-		
-		private void superRenderButton(PoseStack mStack, int mouseX, int mouseY, float partial)
-		{
-			super.renderButton(mStack, mouseX, mouseY, partial);
-		}
-		
-		@Override
-		public void renderToolTip(PoseStack matrixStack, int mouseX, int mouseY)
-		{
-			// Disable default tooltip overlay
-		}
-		
-		// Input handling
-		
-		@Override
-		public void onPress()
-		{
-			this.parent.layoutManager.enqueueWork(() -> this.handler.onPress(this.parent));
-		}
-		
-		@Override
-		public boolean mouseClicked(double pMouseX, double pMouseY, int pButton)
-		{
-			if (!this.clicked(pMouseX, pMouseY))
-				this.setFocused(false);
-			return super.mouseClicked(pMouseX, pMouseY, pButton);
-		}
-		
-		@Override
-		public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers)
-		{
-			if (!this.isFocused())
-				return false;
-			return super.keyPressed(pKeyCode, pScanCode, pModifiers);
-		}
-
-		@Override
-		public boolean isHovered()
-		{
-			return super.isHovered();
-		}
+		void onPress();
 	}
 }

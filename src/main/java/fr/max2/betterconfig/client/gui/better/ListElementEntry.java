@@ -19,7 +19,8 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	{
 		super("better:list_entry");
 		this.content = content;
-		BetterButton button = new BetterButton.Icon(screen, 0, 0, new TextComponent("X"), deleteAction, new TranslatableComponent(GuiTexts.REMOVE_TOOLTIP_KEY));
+		BetterButton button = new BetterButton.Icon(screen, 0, 0, new TextComponent("X"), new TranslatableComponent(GuiTexts.REMOVE_TOOLTIP_KEY));
+		button.addOnPressed(deleteAction);
 		button.addClass("better:list_remove");
 		this.children.addAll(Arrays.asList(button, content));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);

@@ -39,10 +39,9 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.property = property;
 		// TODO [#2] Gray out the button when value is unchanged
 		// TODO [#2] Add reset to default button
-		IComponent undoButton = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(GuiTexts.UNDO_TOOLTIP_KEY), thiz ->
-		{
-			property.undoChanges();
-		}, new TranslatableComponent(GuiTexts.UNDO_TOOLTIP_KEY)).addClass("better:undo");
+		IComponent undoButton = new BetterButton.Icon(screen, 48, 0, new TranslatableComponent(GuiTexts.UNDO_TOOLTIP_KEY), new TranslatableComponent(GuiTexts.UNDO_TOOLTIP_KEY))
+				.addOnPressed(property::undoChanges)
+				.addClass("better:undo");
 		IComponent title = new Text(() -> Arrays.asList(this.property.getDisplayName()), Alignment.CENTER, Alignment.MIN);
 		this.children.addAll(Arrays.asList(title, content, undoButton));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);

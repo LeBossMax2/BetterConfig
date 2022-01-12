@@ -1,7 +1,6 @@
 package fr.max2.betterconfig.client.gui.component.widget;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import fr.max2.betterconfig.BetterConfig;
@@ -28,15 +27,9 @@ public class CycleOptionButton<V> extends Button
 	/** The index of the selected option in the list */
 	private int index;
 
-	@SuppressWarnings("unchecked")
-	public CycleOptionButton(List<? extends V> acceptedValues, Function<? super V, Component> valueToText, V currentValue, Consumer<CycleOptionButton<V>> handler, OnTooltip tooltip)
+	public CycleOptionButton(List<? extends V> acceptedValues, Function<? super V, Component> valueToText, V currentValue, OnTooltip tooltip)
 	{
-		super(getValueText(valueToText, currentValue), thiz ->
-		{
-			CycleOptionButton<V> thisButton = ((CycleOptionButton<V>)thiz); 
-			thisButton.cycleOption();
-			handler.accept(thisButton);
-		}, tooltip);
+		super(getValueText(valueToText, currentValue), tooltip);
 		this.acceptedValues = acceptedValues;
 		this.valueToText = valueToText;
 		this.index = acceptedValues.indexOf(currentValue);
@@ -51,7 +44,7 @@ public class CycleOptionButton<V> extends Button
 	protected void setCurrentValue(V newValue)
 	{
 		this.index = this.acceptedValues.indexOf(newValue);
-		this.widget.setMessage(getValueText(this.valueToText, newValue));
+		this.setMessage(getValueText(this.valueToText, newValue));
 	}
 	
 	/** Selects the next available option */
@@ -62,7 +55,14 @@ public class CycleOptionButton<V> extends Button
 		{
 			this.index = 0;
 		}
-		this.widget.setMessage(getValueText(this.valueToText, this.getCurrentValue()));
+		this.setMessage(getValueText(this.valueToText, this.getCurrentValue()));
+	}
+	
+	@Override
+	protected void onPress()
+	{
+		this.cycleOption();
+		super.onPress();
 	}
 	
 	/** Gets the text corresponding to the given option value using the given translation function */

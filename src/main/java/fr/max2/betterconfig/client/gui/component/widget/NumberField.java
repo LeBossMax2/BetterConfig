@@ -55,13 +55,11 @@ public class NumberField<N> extends CompositeComponent
 			}
 		};
 		this.inputField.addClass("number_field:text");
-		this.minusButton = new Button(
-			Increment.NORMAL.getMinusText(),
-			thisButton -> applyOperator(Operator.MINUS));
+		this.minusButton = new Button(Increment.NORMAL.getMinusText())
+				.addOnPressed(() -> applyOperator(Operator.MINUS));
 		this.minusButton.addClass("number_field:minus_button");
-		this.plusButton = new Button(
-			Increment.NORMAL.getPlusText(),
-			thisButton -> applyOperator(Operator.PLUS));
+		this.plusButton = new Button(Increment.NORMAL.getPlusText())
+				.addOnPressed(() -> applyOperator(Operator.PLUS));
 		this.plusButton.addClass("number_field:plus_button");
 		this.children.addAll(Arrays.asList(this.minusButton, this.inputField, this.plusButton));
 		this.inputField.widget.setFilter(this::isValid);

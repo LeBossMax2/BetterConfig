@@ -15,6 +15,7 @@ public class GuiGroup extends CompositeComponent implements IBetterElement
 	public GuiGroup(List<? extends IComponent> content)
 	{
 		super("better:group", content);
+		// TODO [#2] Create custom filter readable list
 		this.betterElements = this.children.stream().filter(cmp -> cmp instanceof IBetterElement).map(cmp -> (IBetterElement)cmp).toList();
 	}
 	

@@ -72,10 +72,8 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		mainGroup.addClass("better:list_group");
 		
 		IReadableList<IConfigNode<T>> values = list.getValueList();
-		mainElements.add(new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), thiz ->
-		{
-			list.addValue(0);
-		}, new TranslatableComponent(GuiTexts.ADD_FIRST_TOOLTIP_KEY)));
+		mainElements.add(new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), new TranslatableComponent(GuiTexts.ADD_FIRST_TOOLTIP_KEY))
+				.addOnPressed(() -> list.addValue(0)));
 		
 		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem, values.getIndexedProperties().get(index)));
 		IListListener<IBetterElement> listListener = new IListListener<>()
@@ -117,20 +115,16 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 
 	private <T> BetterButton buildAddLastButton(IConfigList<T> list)
 	{
-		return new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), thiz ->
-		{
-			list.addValue(list.getValueList().size());
-		}, new TranslatableComponent(GuiTexts.ADD_LAST_TOOLTIP_KEY));
+		BetterButton button = new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), new TranslatableComponent(GuiTexts.ADD_LAST_TOOLTIP_KEY));
+		button.addOnPressed(() -> list.addValue(list.getValueList().size()));
+		return button;
 	}
 	
 	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, IIndexedProperty<?> entry)
 	{
 		IBetterElement child = elem.exploreNode(this);
 		
-		return new ListElementEntry(this.screen, child, deleteButton ->
-		{
-			list.removeValueAt(entry.getIndex());
-		});
+		return new ListElementEntry(this.screen, child, () -> list.removeValueAt(entry.getIndex()));
 	}
 	
 	@Override
