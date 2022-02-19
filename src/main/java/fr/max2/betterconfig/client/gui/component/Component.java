@@ -26,6 +26,7 @@ import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.narration.NarrationThunk;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class Component<LP> extends GuiComponent implements IComponent
@@ -38,6 +39,8 @@ public abstract class Component<LP> extends GuiComponent implements IComponent
 
 	public static final StyleProperty<List<IRenderLayer>> BACKGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "background"), TypeUtils.parameterize(List.class, IRenderLayer.class), Collections.emptyList());
 	public static final StyleProperty<List<IRenderLayer>> FOREGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "foreground"), TypeUtils.parameterize(List.class, IRenderLayer.class), Collections.emptyList());
+	public static final StyleProperty<Integer> TEXT_COLOR = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "text_color"), 0xFF_FF_FF_FF);
+	public static final StyleProperty<Style> TEXT_STYLE = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "text_style"), Style.EMPTY);
 
 	public static final OnTooltip NO_OVERLAY = Button.NO_TOOLTIP;
 	

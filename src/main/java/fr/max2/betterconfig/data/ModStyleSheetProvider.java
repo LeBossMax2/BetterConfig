@@ -217,6 +217,7 @@ public class ModStyleSheetProvider implements DataProvider
 				.not().is(WidgetComponent.ACTIVE)
 				.end()
 			.then()
+				.set(TEXT_COLOR, 0xFF_A0_A0_A0)
 				.<IRenderLayer>assign(new DrawBox(new Padding(), new NineSliceMaterial(AbstractWidget.WIDGETS_LOCATION, 0, 46, 200, 20, 2, 3, 2, 2))).atIndex(0).into(BACKGROUND)
 				.build();
 		private static final StyleRule FOCUSED_BUTTON_STYLE = when()

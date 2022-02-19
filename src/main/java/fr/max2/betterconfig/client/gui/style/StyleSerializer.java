@@ -18,6 +18,7 @@ import fr.max2.betterconfig.client.gui.layout.Padding;
 import fr.max2.betterconfig.client.gui.rendering.IMaterial;
 import fr.max2.betterconfig.client.gui.rendering.IRenderLayer;
 import fr.max2.betterconfig.client.gui.style.operator.IStyleOperation;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 
 public class StyleSerializer
@@ -41,7 +42,9 @@ public class StyleSerializer
 			CompositeLayoutConfig.JUSTIFICATION,
 			CompositeLayoutConfig.ALIGNMENT,
 			Component.BACKGROUND,
-			Component.FOREGROUND
+			Component.FOREGROUND,
+			Component.TEXT_COLOR,
+			Component.TEXT_STYLE
 		));
 	
 	private final Map<String, PropertyIdentifier<?>> componentProperties;
@@ -74,6 +77,7 @@ public class StyleSerializer
 				.registerTypeAdapter(IRenderLayer.class, new IRenderLayer.Serializer())
 				.registerTypeAdapter(IMaterial.class, new IMaterial.Serializer())
 				.registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
+				.registerTypeHierarchyAdapter(Style.class, new Style.Serializer())
 				.registerTypeAdapter(Padding.class, Padding.Serializer.INSTANCE);
 	}
 }

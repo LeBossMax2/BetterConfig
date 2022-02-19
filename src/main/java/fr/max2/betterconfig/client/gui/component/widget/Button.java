@@ -16,6 +16,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 
@@ -85,12 +86,11 @@ public class Button extends UnitComponent
 	{
 		Font font = this.layoutManager.getMinecraft().font;
 		Rectangle rect = this.getRect();
-		drawCenteredString(pPoseStack, font, this.getMessage(), rect.getCenterX(), rect.getCenterY() - (font.lineHeight - 1) / 2, this.getFontColor());
-	}
-	
-	private int getFontColor()
-	{
-		return this.active() ? 0xFFFFFFFF : 0xFFA0A0A0;
+		Component text = this.getMessage();
+		Style style = this.getStyleProperty(TEXT_STYLE);
+		if (!style.equals(Style.EMPTY))
+			text = text.copy().withStyle(style);
+		drawCenteredString(pPoseStack, font, text, rect.getCenterX(), rect.getCenterY() - (font.lineHeight - 1) / 2, this.getStyleProperty(TEXT_COLOR));
 	}
 	
 	// Input handling
