@@ -67,9 +67,11 @@ public class Text extends UnitComponent
 		
 		int x = rect.x + this.horizontalAlignment.getOffset(rect.size.width - maxWidth);
 		int y = rect.y + this.verticalAlignment.getOffset(rect.size.height - textHeight);
+
+		int textColor = this.getStyleProperty(TEXT_COLOR);
 		for(FormattedCharSequence line : this.splitText)
 		{
-			font.draw(matrixStack, line, x, y, 0xFF_FF_FF_FF);
+			font.draw(matrixStack, line, x, y, textColor);
 			y += font.lineHeight;
 		}
 	}

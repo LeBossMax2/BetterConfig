@@ -45,13 +45,14 @@ public class DebugConfigGui extends UnitComponent
 		Font font = this.parent.getFont(); 
 		this.parent.renderBackground(matrixStack);
 		int y = 1;
-		font.draw(matrixStack, "Better Config Debug", 1, y, 0xFFFFFFFF);
+		int color = this.getStyleProperty(TEXT_COLOR);
+		font.draw(matrixStack, "Better Config Debug", 1, y, color);
 		y += font.lineHeight + 2;
-		font.draw(matrixStack, "Configs : " + this.parent.getModConfigs().stream().map(config -> "'" + config.getFileName() + "'").collect(Collectors.joining(", ")), 1, y, 0xFFFFFFFF);
+		font.draw(matrixStack, "Configs : " + this.parent.getModConfigs().stream().map(config -> "'" + config.getFileName() + "'").collect(Collectors.joining(", ")), 1, y, color);
 		y += font.lineHeight + 2;
 		for (String txt : this.labels)
 		{
-			font.draw(matrixStack, txt, 1, y, 0xFFFFFFFF);
+			font.draw(matrixStack, txt, 1, y, color);
 			y += font.lineHeight + 2;
 		}
 	}
