@@ -11,13 +11,11 @@ import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.util.Event;
 import fr.max2.betterconfig.util.IEvent;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 
 /**
@@ -41,46 +39,46 @@ public class Button extends UnitComponent
 	{
 		this(displayString, NO_OVERLAY);
 	}
-	
+
 	public void setMessage(Component message)
 	{
 		this.message = message;
 	}
-	
+
 	public Component getMessage()
 	{
-		return message;
+		return this.message;
 	}
-	
+
 	public void setActive(boolean isActive)
 	{
 		this.isActive = isActive;
 	}
-	
+
 	public boolean active()
 	{
 		return this.isActive;
 	}
-	
+
 	@Override
 	public boolean isActive()
 	{
 		return super.isActive() && this.active();
 	}
-	
+
 	public IEvent<OnPress> onPressed()
 	{
 		return this.onPressed;
 	}
-	
+
 	public Button addOnPressed(OnPress handler)
 	{
 		this.onPressed.add(handler);
 		return this;
 	}
-	
+
 	// Rendering
-	
+
 	@Override
 	protected void onRender(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick)
 	{
@@ -92,9 +90,9 @@ public class Button extends UnitComponent
 			text = text.copy().withStyle(style);
 		drawCenteredString(pPoseStack, font, text, rect.getCenterX(), rect.getCenterY() - (font.lineHeight - 1) / 2, this.getStyleProperty(TEXT_COLOR));
 	}
-	
+
 	// Input handling
-	
+
 	@Override
 	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
@@ -104,7 +102,7 @@ public class Button extends UnitComponent
 		this.onPress();
 		state.consume();
 	}
-	
+
 	@Override
 	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{
@@ -123,33 +121,33 @@ public class Button extends UnitComponent
 			break;
 		}
 	}
-	
+
 	@Override
 	protected void onCycleFocus(boolean forward, CycleFocusState state)
 	{
 		this.cycleSelfFocus(state);
 	}
-	
+
 	protected void onPress()
 	{
 		this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 		this.layoutManager.enqueueWork(() -> this.onPressed.call(OnPress::onPress));
 	}
-	
+
 	// Narration
-	
+
 	@Override
 	public void updateNarration(NarrationElementOutput narrationOutput)
 	{
-		narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent("gui.narrate.button", this.getMessage()));
+		narrationOutput.add(NarratedElementType.TITLE, Component.translatable("gui.narrate.button", this.getMessage()));
 		if (this.active())
 		{
 			String state = this.hasFocus() ? "focused" : "hovered";
-			narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent("narration.button.usage." + state));
+			narrationOutput.add(NarratedElementType.USAGE, Component.translatable("narration.button.usage." + state));
 		}
 		super.updateNarration(narrationOutput);
 	}
-	
+
 	@FunctionalInterface
 	public static interface OnPress
 	{

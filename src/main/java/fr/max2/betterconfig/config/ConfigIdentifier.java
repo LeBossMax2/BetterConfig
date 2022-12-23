@@ -9,7 +9,6 @@ import com.google.common.base.Strings;
 
 import fr.max2.betterconfig.config.spec.ConfigLocation;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 public class ConfigIdentifier implements IConfigName
 {
@@ -60,7 +59,7 @@ public class ConfigIdentifier implements IConfigName
 	{
 		return this.commentString;
 	}
-	
+
 	/**
 	 * Gets the comment associated with the config node for display
 	 * @return an unmodifiable list containing the comments
@@ -77,7 +76,7 @@ public class ConfigIdentifier implements IConfigName
 			}
 			else
 			{
-				this.commentLines = Stream.of(comment.split("\n")).map(TextComponent::new).collect(Collectors.toList());
+				this.commentLines = Stream.of(comment.split("\n")).map(Component::literal).collect(Collectors.toList());
 			}
 		}
 		return this.commentLines;

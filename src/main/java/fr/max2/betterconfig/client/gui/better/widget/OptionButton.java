@@ -9,15 +9,13 @@ import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 /** The widget for option buttons */
-public class OptionButton<V> extends CycleOptionButton<V> 
+public class OptionButton<V> extends CycleOptionButton<V>
 {
 	private final ConfigPrimitive<V> property;
 	private final IListener<V> propertyListener;
-	
+
 	private OptionButton(List<? extends V> acceptedValues,
 		Function<? super V, Component> valueToText, ConfigPrimitive<V> property)
 	{
@@ -28,18 +26,18 @@ public class OptionButton<V> extends CycleOptionButton<V>
 			NO_OVERLAY);
 		this.addOnPressed(() -> property.setValue(this.getCurrentValue()));
 		this.addClass("better:option_button");
-		
+
 		this.property = property;
 		this.propertyListener = this::setCurrentValue;
 		this.property.onChanged(this.propertyListener);
 	}
-	
+
 	/** Creates a widget for boolean values */
 	public static OptionButton<Boolean> booleanOption(ConfigPrimitive<Boolean> property)
 	{
 		return new OptionButton<>(
 			Arrays.asList(false, true),
-			bool -> new TranslatableComponent(bool ? TRUE_OPTION_KEY : FALSE_OPTION_KEY),
+			bool -> Component.translatable(bool ? TRUE_OPTION_KEY : FALSE_OPTION_KEY),
 			property);
 	}
 
@@ -48,10 +46,10 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	{
 		return new OptionButton<>(
 			Arrays.asList(property.getSpec().getValueClass().getEnumConstants()),
-			enuw -> new TextComponent(enuw.name()),
+			enuw -> Component.literal(enuw.name()),
 			property);
 	}
-	
+
 	@Override
 	public void invalidate()
 	{

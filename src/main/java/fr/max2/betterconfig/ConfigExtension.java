@@ -18,19 +18,19 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.client.ConfigGuiHandler;
+import net.minecraftforge.client.ConfigScreenHandler;
 
 @EventBusSubscriber(modid = BetterConfig.MODID, bus = Bus.MOD, value = Dist.CLIENT)
 public class ConfigExtension
 {
 	private static final Logger LOGGER = LogManager.getLogger(BetterConfig.MODID);
-	
+
 	@SubscribeEvent
 	public static void registerExtensions(FMLClientSetupEvent event)
 	{
 		ModList.get().forEachModContainer(ConfigExtension::setupConfigExtensionPoint);
 	}
-	
+
 	/**
 	 * Configures the CONFIGGUIFACTORY extension point of the given mod to the custom config screen
 	 * @param modId the id of the mod
@@ -38,28 +38,28 @@ public class ConfigExtension
 	 */
 	private static void setupConfigExtensionPoint(String modId, ModContainer mod)
 	{
-		if (mod.getCustomExtension(ConfigGuiHandler.ConfigGuiFactory.class).isPresent())
+		if (mod.getCustomExtension(ConfigScreenHandler.ConfigScreenFactory.class).isPresent())
 			return; // No custom config screen if one already registered
 
 		List<ModConfig> configs = getModConfigs(mod);
 		if (configs.isEmpty())
 			return; // No config screen if the mod has no config
-		
+
 		LOGGER.debug("Registering extension point for " + modId);
-		mod.registerExtensionPoint(ConfigGuiHandler.ConfigGuiFactory.class, () -> new ConfigGuiHandler.ConfigGuiFactory(BetterConfigScreen.factory(mod, configs)));
+		mod.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory(BetterConfigScreen.factory(mod, configs)));
 	}
 
 	/** Gets the list of modifiable configurations for the fiven mod */
 	private static List<ModConfig> getModConfigs(ModContainer mod)
 	{
 		Map<ModConfig.Type, ModConfig> configMap = ObfuscationReflectionHelper.getPrivateValue(ModContainer.class, mod, "configs");
-		
+
 		if (configMap == null)
 			return Collections.emptyList();
-		
+
 		return configMap.values().stream().filter(ConfigExtension::isConfigEditable).collect(Collectors.toList());
 	}
-	
+
 	/** Checks if the given config can be edited */
 	private static boolean isConfigEditable(ModConfig config)
 	{

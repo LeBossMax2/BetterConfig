@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.UnitLayoutConfig;
 
-public abstract class UnitComponent extends Component<IComponent>
+public abstract class UnitComponent extends BCComponent<IComponent>
 {
 	public UnitComponent(String type)
 	{

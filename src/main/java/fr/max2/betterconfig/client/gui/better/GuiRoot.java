@@ -18,8 +18,6 @@ import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.config.ModConfig;
 
 /** The container for the main section */
@@ -36,7 +34,7 @@ public class GuiRoot extends CompositeComponent
 	{
 		super("better:root");
 		this.screen = screen;
-		
+
 		// Tabs
 		int i = 0;
 		List<IComponent> tabs = new ArrayList<>();
@@ -44,7 +42,7 @@ public class GuiRoot extends CompositeComponent
 		{
 			final int index = i;
 			// TODO [#2] Add meaningful tooltip : explanation of config types + file path
-			BetterButton b = new BetterButton(screen, new TextComponent(config.getType().name()), new TextComponent(config.getFileName()));
+			BetterButton b = new BetterButton(screen, Component.literal(config.getType().name()), Component.literal(config.getFileName()));
 			b.addOnPressed(() -> this.screen.openConfig(index));
 			b.addClass("better:tab_button");
 			b.setActive(index != screen.getCurrentConfigIndex());
@@ -54,9 +52,9 @@ public class GuiRoot extends CompositeComponent
 		HBox tabHolder = new HBox(tabs);
 		tabHolder.addClass("better:tab_bar");
 		this.children.add(tabHolder);
-		
+
 		// Search bar
-		Component searchText = new TranslatableComponent(GuiTexts.SEARCH_BAR_KEY);
+		Component searchText = Component.translatable(GuiTexts.SEARCH_BAR_KEY);
 		Text searchLabel = new Text(searchText, Alignment.CENTER, Alignment.MIN);
 		searchLabel.addClass("better:search_label");
 		TextField searchField = new TextField(screen.getFont(), searchText);
@@ -65,28 +63,30 @@ public class GuiRoot extends CompositeComponent
 		HBox searchBar = new HBox(Arrays.asList(searchLabel, searchField));
 		searchBar.addClass("better:search_bar");
 		this.children.add(searchBar);
-		
+
 		// Scroll
 		this.scrollPane = new BetterScrollPane(content);
 		this.scrollPane.filterElements(this.filter);
 		this.children.add(this.scrollPane);
-		
+
 		// Cancel/Save buttons
-		BetterButton cancelButton = new BetterButton(new TranslatableComponent(GuiTexts.CANCEL_CONFIG_KEY));
+		BetterButton cancelButton = new BetterButton(Component.translatable(GuiTexts.CANCEL_CONFIG_KEY));
 		cancelButton.addOnPressed(this.screen::cancelChanges);
 		cancelButton.addClass("better:cancel");
-		BetterButton saveButton = new BetterButton(new TranslatableComponent(GuiTexts.SAVE_CONFIG_KEY));
+		BetterButton saveButton = new BetterButton(Component.translatable(GuiTexts.SAVE_CONFIG_KEY));
 		saveButton.addOnPressed(this.screen::onClose);
 		saveButton.addClass("better:save");
 		HBox buttonBar = new HBox(Arrays.asList(cancelButton, saveButton));
 		buttonBar.addClass("better:bottom_bar");
 		this.children.add(buttonBar);
-		
+
 		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(this.screen.width, this.screen.height));
+
+		// TODO add a open config file button
 	}
-	
+
 	// Layout
-	
+
 	/** Updates the content using the given filter string */
 	private void updateFilter(String filterStr)
 	{
@@ -94,14 +94,14 @@ public class GuiRoot extends CompositeComponent
 		this.scrollPane.filterElements(this.filter);
 		this.scrollPane.marksLayoutDirty();
 	}
-	
+
 	// Rendering
-	
+
 	@Override
 	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		this.screen.renderBackground(matrixStack);
 		super.onRender(matrixStack, mouseX, mouseY, partialTicks);
 	}
-	
+
 }

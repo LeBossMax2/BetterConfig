@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder;
 
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
-import fr.max2.betterconfig.client.gui.component.Component;
+import fr.max2.betterconfig.client.gui.component.BCComponent;
 import fr.max2.betterconfig.client.gui.component.widget.WidgetComponent;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
@@ -24,11 +24,11 @@ import net.minecraft.resources.ResourceLocation;
 public class StyleSerializer
 {
 	public static StyleSerializer INSTANCE = new StyleSerializer(Arrays.asList(
-			Component.COMPONENT_TYPE,
-			Component.COMPONENT_CLASSES,
-			Component.PARENT,
-			Component.HOVERED,
-			Component.FOCUSED,
+			BCComponent.COMPONENT_TYPE,
+			BCComponent.COMPONENT_CLASSES,
+			BCComponent.PARENT,
+			BCComponent.HOVERED,
+			BCComponent.FOCUSED,
 			WidgetComponent.ACTIVE,
 			IBetterElement.FILTERED_OUT,
 			Foldout.FOLDED
@@ -41,10 +41,10 @@ public class StyleSerializer
 			CompositeLayoutConfig.INNER_PADDING,
 			CompositeLayoutConfig.JUSTIFICATION,
 			CompositeLayoutConfig.ALIGNMENT,
-			Component.BACKGROUND,
-			Component.FOREGROUND,
-			Component.TEXT_COLOR,
-			Component.TEXT_STYLE
+			BCComponent.BACKGROUND,
+			BCComponent.FOREGROUND,
+			BCComponent.TEXT_COLOR,
+			BCComponent.TEXT_STYLE
 		));
 	
 	private final Map<String, PropertyIdentifier<?>> componentProperties;

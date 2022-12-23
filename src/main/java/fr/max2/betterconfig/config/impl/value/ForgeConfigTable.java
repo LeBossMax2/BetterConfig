@@ -14,7 +14,6 @@ import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
@@ -70,7 +69,7 @@ public class ForgeConfigTable
 		ForgeConfigProperty<T> property = new ForgeConfigProperty<>(configVal, changeListener, node::getValue);
 		node.onChanged(newVal -> property.onValueChanged());
 	}
-	
+
 	/** Gets the comments from the spec */
 	private static Function<ConfigLocation, String> getSpecComments(ForgeConfigSpec spec)
 	{
@@ -80,7 +79,7 @@ public class ForgeConfigTable
 	private static enum RootInfo implements IConfigName
 	{
 		INSTANCE;
-		
+
 		@Override
 		public String getName()
 		{
@@ -90,9 +89,9 @@ public class ForgeConfigTable
 		@Override
 		public Component getDisplayName()
 		{
-			return new TextComponent("");
+			return Component.empty();
 		}
-		
+
 		@Override
 		public List<String> getPath()
 		{
@@ -108,7 +107,7 @@ public class ForgeConfigTable
 		@Override
 		public List<? extends Component> getDisplayComment()
 		{
-			return List.of(new TextComponent(""));
+			return List.of(Component.literal(""));
 		}
 	}
 }

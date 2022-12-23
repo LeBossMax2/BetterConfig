@@ -16,12 +16,12 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 	protected final List<IReadableProperty<T>> elementProperties;
 	protected List<IndexedPropertyBase<T>> indexedPropertiesMut;
 	protected List<IIndexedProperty<T>> indexedProperties;
-	
+
 	protected ListBase()
 	{
 		this(new ArrayList<>());
 	}
-	
+
 	protected ListBase(List<P> properties)
 	{
 		super(properties, IReadableProperty::getValue);
@@ -37,7 +37,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 	@Override
 	public List<IIndexedProperty<T>> getIndexedProperties()
 	{
-		if (indexedProperties == null)
+		if (this.indexedProperties == null)
 		{
 			this.indexedPropertiesMut = new ArrayList<>();
 			for (int i = 0; i < this.size(); i++)
@@ -48,19 +48,19 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		}
 		return this.indexedProperties;
 	}
-	
+
 	@Override
 	public void onChanged(IListListener<? super T> listener)
 	{
 		this.listeners.add(listener);
 	}
-	
+
 	@Override
 	public void removeOnChangedListener(IListListener<? super T> listener)
 	{
 		this.listeners.remove(listener);
 	}
-	
+
 	protected void addElement(int index, P newProperty)
 	{
 		ListBase.this.parent.add(index, newProperty);
@@ -68,13 +68,13 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		if (this.indexedPropertiesMut != null)
 		{
 			this.indexedPropertiesMut.add(index, new IndexedPropertyBase<>(index, ListBase.this.getElementProperties().get(index)));
-			
+
 			for (int i = index + 1; i < this.indexedPropertiesMut.size(); i++)
 			{
 				this.indexedPropertiesMut.get(i).updateIndex(i);
 			}
 		}
-		
+
 		this.listeners.forEach(l -> l.onElementAdded(index, newProperty.getValue()));
 	}
 
@@ -85,17 +85,17 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		if (this.indexedPropertiesMut != null)
 		{
 			this.indexedPropertiesMut.remove(index);
-			
+
 			for (int i = index; i < this.indexedPropertiesMut.size(); i++)
 			{
 				this.indexedPropertiesMut.get(i).updateIndex(i);
 			}
 		}
-		
+
 		this.listeners.forEach(l -> l.onElementRemoved(index, property.getValue()));
 		return property;
 	}
-	
+
 	protected static class PropertyBase<T> implements IReadableProperty<T>
 	{
 		protected final Set<IListener<? super T>> listeners = new HashSet<>();
@@ -117,13 +117,13 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		{
 			this.listeners.add(listener);
 		}
-		
+
 		@Override
 		public void removeOnChangedListener(IListener<? super T> listener)
 		{
 			this.listeners.remove(listener);
 		}
-		
+
 		protected T setValue(T newValue)
 		{
 			T oldValue = this.currentValue;
@@ -132,12 +132,12 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 			return oldValue;
 		}
 	}
-	
+
 	protected static class IndexedPropertyBase<T> implements IIndexedProperty<T>
 	{
 		private int index;
 		private final IReadableProperty<T> parent;
-		
+
 		public IndexedPropertyBase(int index, IReadableProperty<T> parent)
 		{
 			this.index = index;
@@ -147,7 +147,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		@Override
 		public T getValue()
 		{
-			return parent.getValue();
+			return this.parent.getValue();
 		}
 
 		@Override
@@ -161,7 +161,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		{
 			this.parent.removeOnChangedListener(listener);
 		}
-		
+
 		public void updateIndex(int index)
 		{
 			this.index = index;

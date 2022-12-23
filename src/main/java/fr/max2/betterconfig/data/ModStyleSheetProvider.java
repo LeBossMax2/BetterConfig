@@ -3,9 +3,9 @@ package fr.max2.betterconfig.data;
 import static fr.max2.betterconfig.client.gui.style.StyleRule.when;
 import static fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig.*;
 import static fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig.*;
-import static fr.max2.betterconfig.client.gui.component.Component.*;
+import static fr.max2.betterconfig.client.gui.component.BCComponent.*;
 
-import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,9 +27,9 @@ import fr.max2.betterconfig.client.gui.style.StyleRule;
 import fr.max2.betterconfig.client.gui.style.StyleSerializer;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 
@@ -37,22 +37,22 @@ public class ModStyleSheetProvider implements DataProvider
 {
 	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
-	private final DataGenerator generator;
-	
-	public ModStyleSheetProvider(DataGenerator generator)
+	private final PackOutput output;
+
+	public ModStyleSheetProvider(PackOutput output)
 	{
-		this.generator = generator;
+		this.output = output;
 	}
 
 	@Override
-	public void run(HashCache pCache) throws IOException
+	public CompletableFuture<?> run(CachedOutput pOutput)
 	{
-		extracted(pCache, DefaultStyleSheet.builder(), StyleSheet.DEFAULT_STYLESHEET);
+		return this.extracted(pOutput, DefaultStyleSheet.builder(), StyleSheet.DEFAULT_STYLESHEET);
 	}
 
-	private void extracted(HashCache pCache, StyleSheet.Builder styleSheet, ResourceLocation styleSheetId) throws IOException
+	private CompletableFuture<?> extracted(CachedOutput pOutput, StyleSheet.Builder styleSheet, ResourceLocation styleSheetId)
 	{
-		DataProvider.save(GSON, pCache, GSON.toJsonTree(styleSheet), this.generator.getOutputFolder().resolve(PackType.CLIENT_RESOURCES.getDirectory() + "/" + styleSheetId.getNamespace() + "/" + StyleSheet.STYLESHEET_DIR + "/" + styleSheetId.getPath() + ".json"));
+		return DataProvider.saveStable(pOutput, GSON.toJsonTree(styleSheet), this.output.getOutputFolder().resolve(PackType.CLIENT_RESOURCES.getDirectory() + "/" + styleSheetId.getNamespace() + "/" + StyleSheet.STYLESHEET_DIR + "/" + styleSheetId.getPath() + ".json"));
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class ModStyleSheetProvider implements DataProvider
 	{
 		return "StyleSheets: BetterConfig";
 	}
-	
+
 	private static final class DefaultStyleSheet
 	{
 		/** The left and right padding around the screen */
@@ -81,7 +81,7 @@ public class ModStyleSheetProvider implements DataProvider
 		private static final StyleRule BETTER_NUMBER_FIELD_STYLE = when().hasClass("better:number_field").then()
 				.set(SIZE_OVERRIDE, new Size(VALUE_WIDTH, VALUE_HEIGHT))
 				.build();
-		
+
 		private static final StyleRule NUMBER_FIELD_STYLE = when().type("number_field").then()
 				.set(SPACING, 2)
 				.set(DIR, Axis.HORIZONTAL)
@@ -202,7 +202,7 @@ public class ModStyleSheetProvider implements DataProvider
 		private static final StyleRule HBOX_STYLE = when().type("hbox").then()
 				.set(DIR, Axis.HORIZONTAL)
 				.build();
-		
+
 		private static final StyleRule BETTER_BUTTON_STYLE = when().hasClass("better:button").then()
 				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, VALUE_HEIGHT))
 				.build();

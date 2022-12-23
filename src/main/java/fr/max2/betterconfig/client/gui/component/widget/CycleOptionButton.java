@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import fr.max2.betterconfig.BetterConfig;
-import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * A button for cycling between several options
@@ -34,19 +32,19 @@ public class CycleOptionButton<V> extends Button
 		this.valueToText = valueToText;
 		this.index = acceptedValues.indexOf(currentValue);
 	}
-	
+
 	/** Gets the currently selected option value */
 	public V getCurrentValue()
 	{
 		return this.acceptedValues.size() == 0 ? null : this.acceptedValues.get(this.index % this.acceptedValues.size());
 	}
-	
+
 	protected void setCurrentValue(V newValue)
 	{
 		this.index = this.acceptedValues.indexOf(newValue);
 		this.setMessage(getValueText(this.valueToText, newValue));
 	}
-	
+
 	/** Selects the next available option */
 	public void cycleOption()
 	{
@@ -57,18 +55,18 @@ public class CycleOptionButton<V> extends Button
 		}
 		this.setMessage(getValueText(this.valueToText, this.getCurrentValue()));
 	}
-	
+
 	@Override
 	protected void onPress()
 	{
 		this.cycleOption();
 		super.onPress();
 	}
-	
+
 	/** Gets the text corresponding to the given option value using the given translation function */
 	private static <V> Component getValueText(Function<? super V, Component> valueToText, V value)
 	{
-		return value == null ? new TranslatableComponent(NO_OPTION_KEY) : valueToText.apply(value);
+		return value == null ? Component.translatable(NO_OPTION_KEY) : valueToText.apply(value);
 	}
-	
+
 }

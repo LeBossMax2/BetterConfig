@@ -27,9 +27,9 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 public enum StyleSheetManager implements ResourceManagerReloadListener
 {
 	INSTANCE;
-	
+
 	public static Gson GSON = StyleSerializer.INSTANCE.registerSerializers(new GsonBuilder()).create();
-	
+
 	private Map<ResourceLocation, StyleSheet> cache = new HashMap<>();
 
 	public StyleSheet getStyleSheet(ResourceLocation sheetLocation) throws IOException
@@ -37,14 +37,16 @@ public enum StyleSheetManager implements ResourceManagerReloadListener
 		StyleSheet sheet = this.cache.get(sheetLocation);
 		if (sheet != null)
 			return sheet;
-		
+
 		ResourceLocation resourceLocation = new ResourceLocation(sheetLocation.getNamespace(), StyleSheet.STYLESHEET_DIR + "/" + sheetLocation.getPath() + ".json");
-		try (Resource res = Minecraft.getInstance().getResourceManager().getResource(resourceLocation);
-			InputStream is = res.getInputStream())
+		Resource res = Minecraft.getInstance().getResourceManager().getResource(resourceLocation).orElse(null);
+		if (res == null)
+			return null;
+		try (InputStream is = res.open())
 		{
 			sheet = GsonHelper.fromJson(GSON, new InputStreamReader(is, StandardCharsets.UTF_8), StyleSheet.Builder.class).build();
 		}
-		
+
 		this.cache.put(sheetLocation, sheet);
 		return sheet;
 	}
@@ -54,7 +56,7 @@ public enum StyleSheetManager implements ResourceManagerReloadListener
 	{
 		this.cache.clear();
 	}
-	
+
 	@SubscribeEvent
 	public static void registerReloadListener(RegisterClientReloadListenersEvent event)
 	{

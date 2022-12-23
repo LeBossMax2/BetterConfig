@@ -27,8 +27,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 
@@ -37,9 +35,9 @@ public class Foldout extends CompositeComponent implements IBetterElement
 {
 	/** The height of the fouldout header */
 	public static final int FOLDOUT_HEADER_HEIGHT = 24;
-	
+
 	public static final PropertyIdentifier<Boolean> FOLDED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "folded"), Boolean.class);
-	
+
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	
@@ -48,7 +46,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private final IBetterElement content;
 	/** The extra info to show on the tooltip */
 	private final List<Component> extraInfo = new ArrayList<>();
-	
+
 	/** {@code true} when the content is collapsed, {@code false} otherwise */
 	private boolean folded = false;
 	private boolean filteredOut = false;
@@ -65,9 +63,9 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 		this.registerProperty(FOLDED, () -> this.folded);
 	}
-	
+
 	// Layout
-	
+
 	@Override
 	public boolean filterElements(ConfigFilter filter)
 	{
@@ -75,29 +73,29 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		this.filteredOut = this.content.filterElements(matchFilter ? ConfigFilter.ALL : filter);
 		return this.filteredOut;
 	}
-	
+
 	@Override
 	public void computeLayout(Rectangle availableRect)
 	{
 		super.computeLayout(availableRect);
 		this.updateTexts();
 	}
-	
+
 	private void updateTexts()
 	{
 		this.extraInfo.clear();
-		this.extraInfo.add(new TextComponent(this.identifier.getName()).withStyle(ChatFormatting.YELLOW));
+		this.extraInfo.add(Component.literal(this.identifier.getName()).withStyle(ChatFormatting.YELLOW));
 		this.extraInfo.addAll(this.identifier.getDisplayComment());
 	}
-	
+
 	// Mouse interaction
-	
+
 	public void toggleFolding()
 	{
 		this.folded = !this.folded;
 		this.layoutManager.marksLayoutDirty();
 	}
-	
+
 	public class Header extends UnitComponent
 	{
 		public Header()
@@ -105,15 +103,15 @@ public class Foldout extends CompositeComponent implements IBetterElement
 			super("better:foldout_header");
 			this.overlay = new TextOverlay(Foldout.this.screen, Foldout.this.extraInfo);
 		}
-		
+
 		// Rendering
-		
+
 		@Override
 		protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
 			this.renderFoldoutHeader(matrixStack, mouseX, mouseY, partialTicks);
 		}
-		
+
 		protected void renderFoldoutHeader(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 		{
 			Rectangle rect = this.getRect();
@@ -126,19 +124,19 @@ public class Foldout extends CompositeComponent implements IBetterElement
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
 	        RenderSystem.setShaderTexture(0, Constants.BETTER_ICONS);
 			blit(matrixStack, rect.x, rect.y + 4, arrowU, arrowV, 16, 16, 256, 256);
-			
+
 			// Draw foreground text
-			Font font = Foldout.this.screen.getFont(); 
+			Font font = Foldout.this.screen.getFont();
 			font.draw(matrixStack, Foldout.this.identifier.getDisplayName(), rect.x + 16, rect.y + 1 + (FOLDOUT_HEADER_HEIGHT - font.lineHeight) / 2, 0xFF_FF_FF_FF);
 		}
-		
+
 		// Input handling
-		
+
 		@Override
 		protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 		{
 			super.onMouseClicked(mouseX, mouseY, button, state);
-			
+
 			if (this.isHovered() && !state.isConsumed())
 			{
 				this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
@@ -146,14 +144,14 @@ public class Foldout extends CompositeComponent implements IBetterElement
 				state.consume();
 			}
 		}
-		
+
 		@Override
 		protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 		{
 			super.onKeyPressed(keyCode, scanCode, modifiers, state);
 			if (!this.hasFocus() || state.isConsumed())
 				return;
-			
+
 			switch (keyCode)
 			{
 			case GLFW.GLFW_KEY_ENTER:
@@ -167,24 +165,24 @@ public class Foldout extends CompositeComponent implements IBetterElement
 				break;
 			}
 		}
-		
+
 		@Override
 		protected void onCycleFocus(boolean forward, CycleFocusState state)
 		{
 			this.cycleSelfFocus(state);
 			super.onCycleFocus(forward, state);
 		}
-		
+
 		// Narration
-		
+
 		@Override
 		public void updateNarration(NarrationElementOutput narrationOutput)
 		{
-			narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent(Foldout.this.folded ? GuiTexts.SECTION_TITLE_COLLAPSED : GuiTexts.SECTION_TITLE_SHOWN, Foldout.this.identifier.getDisplayName()));
-			narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent(this.hasFocus() ? GuiTexts.SECTION_USAGE_FOCUSED : GuiTexts.SECTION_USAGE_HOVERED));
+			narrationOutput.add(NarratedElementType.TITLE, Component.translatable(Foldout.this.folded ? GuiTexts.SECTION_TITLE_COLLAPSED : GuiTexts.SECTION_TITLE_SHOWN, Foldout.this.identifier.getDisplayName()));
+			narrationOutput.add(NarratedElementType.USAGE, Component.translatable(this.hasFocus() ? GuiTexts.SECTION_USAGE_FOCUSED : GuiTexts.SECTION_USAGE_HOVERED));
 			super.updateNarration(narrationOutput);
 		}
-		
+
 	}
-	
+
 }

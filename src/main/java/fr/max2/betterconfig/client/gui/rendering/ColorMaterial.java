@@ -1,13 +1,13 @@
 package fr.max2.betterconfig.client.gui.rendering;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Matrix4f;
 
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import net.minecraft.client.renderer.GameRenderer;
@@ -28,7 +28,8 @@ public class ColorMaterial implements IMaterial
 	public void renderMaterial(Rectangle rect, PoseStack poseStack, int mouseX, int mouseY, float partialTick)
 	{
 		Matrix4f matrix = poseStack.last().pose();
-		BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
+		Tesselator tesselator = Tesselator.getInstance();
+		BufferBuilder bufferbuilder = tesselator.getBuilder();
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
@@ -38,8 +39,7 @@ public class ColorMaterial implements IMaterial
 		vertex(bufferbuilder, matrix, rect.getRight(), rect.getBottom(), this.botRightColor);
 		vertex(bufferbuilder, matrix, rect.getRight(), rect.getTop(), this.topRightColor);
 		vertex(bufferbuilder, matrix, rect.getLeft(), rect.getTop(), this.topLeftColor);
-		bufferbuilder.end();
-		BufferUploader.end(bufferbuilder);
+		tesselator.end();
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}

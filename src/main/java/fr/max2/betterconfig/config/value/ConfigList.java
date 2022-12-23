@@ -18,7 +18,6 @@ import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
 import fr.max2.betterconfig.util.property.list.ReadableLists;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 
 public final class ConfigList implements IConfigNode
 {
@@ -189,7 +188,7 @@ class ListChildInfo implements IConfigName
 	@Override
 	public Component getDisplayName()
 	{
-		return new TranslatableComponent(ConfigList.LIST_ELEMENT_LABEL_KEY, this.parent.getName(), this.index);
+		return Component.translatable(ConfigList.LIST_ELEMENT_LABEL_KEY, this.parent.getName(), this.index);
 	}
 	
 	@Override

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.gui.GuiUtils;
+import net.minecraftforge.client.gui.ScreenUtils;
 
 public class NineSliceMaterial implements IMaterial
 {
@@ -32,7 +32,7 @@ public class NineSliceMaterial implements IMaterial
 	@Override
 	public void renderMaterial(Rectangle rect, PoseStack poseStack, int mouseX, int mouseY, float partialTick)
 	{
-		GuiUtils.drawContinuousTexturedBox(poseStack, this.atlasId,
+		ScreenUtils.blitWithBorder(poseStack, this.atlasId,
 				rect.x, rect.y, this.u, this.v,
 				rect.size.width, rect.size.height, this.textureWidth, this.textureHeight,
 				this.topBorder, this.bottomBorder, this.leftBorder, this.rightBorder, 0.0f);

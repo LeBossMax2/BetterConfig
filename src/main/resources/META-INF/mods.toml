@@ -6,7 +6,7 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml"
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[37,)"
+loaderVersion="[44,)"
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
 license="MIT"
@@ -31,7 +31,7 @@ logoFile="BetterConfig-Logo.png" #optional
 # A text field displayed in the mod UI
 # credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI
-authors="LeBossMax2" #optional
+authors="Maaxed" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
 BetterConfig adds a configuration screen for every mod.
@@ -44,7 +44,7 @@ The focus of BetterConfig is to be compatible with every Forge mod, to allow for
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true
     # The version range of the dependency
-    versionRange="[37,)" #mandatory
+    versionRange="[44,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -52,6 +52,6 @@ The focus of BetterConfig is to be compatible with every Forge mod, to allow for
 [[dependencies.betterconfig]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18,1.19)"
+    versionRange="[1.19.3,1.20)"
     ordering="NONE"
     side="BOTH"

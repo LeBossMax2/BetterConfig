@@ -17,10 +17,10 @@ public class StyleSheet
 {
 	public static final String STYLESHEET_DIR = "stylesheets";
 	public static final ResourceLocation DEFAULT_STYLESHEET = new ResourceLocation(BetterConfig.MODID, "default_stylesheet");
-	
+
 	private final StyleSheet parent;
 	private final Map<StyleProperty<?>, List<ProcessedStyleRule<?>>> rules;
-	
+
 	private StyleSheet(StyleSheet parent, List<StyleRule> rules)
 	{
 		this.parent = parent;
@@ -38,14 +38,14 @@ public class StyleSheet
 				r.add(new ProcessedStyleRule<>(rule.getCondition(), v));
 			}
 		}
-		
+
 		for (List<?> ruleList : this.rules.values())
 		{
 			Collections.reverse(ruleList);
 		}
 	}
-	
-    public <I, T> T computePropertyValue(IComponent component, StyleProperty<T> property)
+
+    public <T> T computePropertyValue(IComponent component, StyleProperty<T> property)
     {
             T res = this.computePropertyStram(property)
                             .filter(rule -> rule.matches(component))
@@ -60,10 +60,10 @@ public class StyleSheet
     private <T> Stream<ProcessedStyleRule<T>> computePropertyStram(StyleProperty<T> property)
     {
             Stream<ProcessedStyleRule<T>> valueStream = Stream.empty();
-            
+
             if (this.parent != null)
                 valueStream = Stream.concat(valueStream, this.parent.computePropertyStram(property));
-            
+
             @SuppressWarnings("unchecked")
             List<ProcessedStyleRule<T>> rules = (List<ProcessedStyleRule<T>>)(List<?>)this.rules.get(property);
             if (rules != null)
@@ -71,7 +71,7 @@ public class StyleSheet
 
             return valueStream;
     }
-	
+
 	public static class Builder
 	{
 		private ResourceLocation parentSheet = null;
@@ -87,18 +87,18 @@ public class StyleSheet
 			this.rules.addAll(rules);
 			return this;
 		}
-		
+
 		public Builder add(StyleRule... rules)
 		{
 			return this.add(Arrays.asList(rules));
 		}
-		
+
 		public Builder parentSheet(ResourceLocation parentSheet)
 		{
 			this.parentSheet = parentSheet;
 			return this;
 		}
-		
+
 		public StyleSheet build() throws IOException
 		{
 			StyleSheet parent = null;
@@ -107,5 +107,5 @@ public class StyleSheet
 			return new StyleSheet(parent, this.rules);
 		}
 	}
-	
+
 }

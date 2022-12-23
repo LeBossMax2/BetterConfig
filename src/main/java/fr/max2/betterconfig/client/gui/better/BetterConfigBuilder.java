@@ -20,7 +20,7 @@ import fr.max2.betterconfig.util.property.list.IIndexedProperty;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 
 /** A builder for better configuration screen */
@@ -36,10 +36,10 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 	{
 		GuiGroup tableGroup = new BetterConfigBuilder(screen).buildTable(config);
 		tableGroup.addClass("better:root_group");
-		
+
 		return new GuiRoot(screen, tableGroup);
 	}
-	
+
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 
@@ -55,7 +55,7 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 		tableGroup.addClass("better:table_group");
 		return tableGroup;
 	}
-	
+
 	// Table entry visitor
 	
 	private IBetterElement visitNode(IConfigName identifier, IConfigNode node)
@@ -91,7 +91,7 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 		mainGroup.addClass("better:list_group");
 		
 		IReadableList<ConfigList.Entry> values = list.getValueList();
-		mainElements.add(new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), new TranslatableComponent(GuiTexts.ADD_FIRST_TOOLTIP_KEY))
+		mainElements.add(new BetterButton(this.screen, Component.translatable(GuiTexts.ADD_ELEMENT_KEY), Component.translatable(GuiTexts.ADD_FIRST_TOOLTIP_KEY))
 				.addOnPressed(() -> list.addValue(0)));
 		
 		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem.key(), elem.node(), values.getIndexedProperties().get(index)));
@@ -101,14 +101,14 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 			public void onElementAdded(int index, IBetterElement newValue)
 			{
 				if (content.size() == 1)
-					mainElements.add(buildAddLastButton(list)); // Add "add last" button
+					mainElements.add(BetterConfigBuilder.this.buildAddLastButton(list)); // Add "add last" button
 			}
 
 			@Override
 			public void onElementRemoved(int index, IBetterElement oldValue)
 			{
 				oldValue.invalidate();
-				
+
 				if (content.size() == 0)
 					mainElements.remove(2); // Remove "add last" button
 			}
@@ -122,19 +122,19 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 				content.removeOnChangedListener(listListener);
 			}
 		});
-		
+
 		content.onChanged(listListener);
 
-		
+
 		if (content.size() >= 1)
-			mainElements.add(buildAddLastButton(list));
+			mainElements.add(this.buildAddLastButton(list));
 		
 		return new Foldout(this.screen, identifier, mainGroup);
 	}
 
 	private BetterButton buildAddLastButton(ConfigList list)
 	{
-		BetterButton button = new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), new TranslatableComponent(GuiTexts.ADD_LAST_TOOLTIP_KEY));
+		BetterButton button = new BetterButton(this.screen, Component.translatable(GuiTexts.ADD_ELEMENT_KEY), Component.translatable(GuiTexts.ADD_LAST_TOOLTIP_KEY));
 		button.addOnPressed(() -> list.addValue(list.getValueList().size()));
 		return button;
 	}
@@ -151,33 +151,33 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 		IComponent widget = primitive.exploreType(this, identifier);
 		return new ValueEntry(this.screen, identifier, primitive, widget);
 	}
-	
+
 	// Property visitor
-	
+
 	@Override
 	public IComponent visitBoolean(ConfigPrimitive<Boolean> property, IConfigName identifier)
 	{
 		return OptionButton.booleanOption(property);
 	}
-	
+
 	@Override
 	public IComponent visitNumber(ConfigPrimitive<? extends Number> property, IConfigName identifier)
 	{
 		return NumberInputField.numberOption(this.screen, identifier, property);
 	}
-	
+
 	@Override
 	public IComponent visitString(ConfigPrimitive<String> property, IConfigName identifier)
 	{
 		return StringInputField.stringOption(this.screen, identifier, property);
 	}
-	
+
 	@Override
 	public <E extends Enum<E>> IComponent visitEnum(ConfigPrimitive<E> property, IConfigName identifier)
 	{
 		return OptionButton.enumOption(property);
 	}
-	
+
 	@Override
 	public IComponent visitUnknown(ConfigPrimitive<?> property, IConfigName identifier)
 	{
