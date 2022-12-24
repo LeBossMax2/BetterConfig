@@ -10,7 +10,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Button.OnTooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.fmlclient.gui.GuiUtils;
 
 public class TextOverlay implements OnTooltip
 {
@@ -31,7 +30,8 @@ public class TextOverlay implements OnTooltip
 	@Override
 	public void onTooltip(Button button, PoseStack matrixStack, int mouseX, int mouseY)
 	{
-		GuiUtils.drawHoveringText(matrixStack, this.text, mouseX, mouseY, this.screen.width, this.screen.height, 200, this.screen.getMinecraft().font);
+		this.screen.renderComponentTooltip(matrixStack, this.text, mouseX, mouseY);
+		//GuiUtils.drawHoveringText(matrixStack, this.text, mouseX, mouseY, this.screen.width, this.screen.height, 200, this.screen.getMinecraft().font);
 	}
 	
 	@Override

@@ -1,12 +1,12 @@
 package fr.max2.betterconfig.config.impl.spec;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 
 import fr.max2.betterconfig.config.spec.ConfigLocation;
 import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
@@ -27,18 +27,19 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	/** The table containing the specification of each entry */
 	private final UnmodifiableConfig spec;
 	
-	private final Map<String, ConfigTableEntrySpec> specMap;
+	private final List<ConfigTableEntrySpec> entrySpecs;
 	
 	private ForgeConfigTableSpec(ConfigLocation loc, UnmodifiableConfig spec, Function<ConfigLocation, String> levelComments)
 	{
 		this.levelComments = levelComments;
 		this.spec = spec;
 		this.tableLoc = loc;
-		this.specMap = new LinkedHashMap<>();
+		ImmutableList.Builder<ConfigTableEntrySpec> builder = ImmutableList.builder();
 		for (Map.Entry<String, Object> entry : this.spec.valueMap().entrySet())
 		{
-			this.specMap.put(entry.getKey(), childNode(entry.getKey(), entry.getValue()));
+			builder.add(childNode(entry.getKey(), entry.getValue()));
 		}
+		this.entrySpecs = builder.build();
 	}
 	
 	public ForgeConfigTableSpec(UnmodifiableConfig spec, Function<ConfigLocation, String> levelComments)
@@ -53,9 +54,9 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	}
 	
 	@Override
-	public Map<String, ConfigTableEntrySpec> getSpecMap()
+	public List<ConfigTableEntrySpec> getEntrySpecs()
 	{
-		return this.specMap;
+		return this.entrySpecs;
 	}
 	
 	private ConfigTableEntrySpec childNode(String key, Object spec)

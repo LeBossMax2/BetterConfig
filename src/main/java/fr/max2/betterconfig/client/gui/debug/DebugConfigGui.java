@@ -78,7 +78,7 @@ public class DebugConfigGui extends UnitComponent
 	public static DebugConfigGui build(BetterConfigScreen screen, IConfigTable config)
 	{
 		List<String> list = new ArrayList<>();
-		config.exploreEntries(value -> value.exploreNode(new TableBuilder(list), value.getName())).forEach(v -> {});
+		config.getEntryValues().forEach(value -> value.exploreNode(new TableBuilder(list), value.getName()));
 		return new DebugConfigGui(screen, list);
 	}
 	
@@ -95,7 +95,7 @@ public class DebugConfigGui extends UnitComponent
 		@Override
 		public Void visitTable(IConfigTable table, String path)
 		{
-			table.exploreEntries(value -> value.exploreNode(this, path + "." + value.getName())).forEach(v -> {});
+			table.getEntryValues().forEach(value -> value.exploreNode(this, path + "." + value.getName()));
 			return null;
 		}
 		

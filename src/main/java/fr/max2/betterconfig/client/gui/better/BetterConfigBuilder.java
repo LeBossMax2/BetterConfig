@@ -50,7 +50,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	
 	private GuiGroup buildTable(IConfigTable table)
 	{
-		List<IBetterElement> content = table.exploreEntries(value -> value.exploreNode(this)).collect(Collectors.toList());
+		List<IBetterElement> content = table.getEntryValues().stream().map(value -> value.exploreNode(this)).collect(Collectors.toList());
 		GuiGroup tableGroup = new GuiGroup(content);
 		tableGroup.addClass("better:table_group");
 		return tableGroup;
