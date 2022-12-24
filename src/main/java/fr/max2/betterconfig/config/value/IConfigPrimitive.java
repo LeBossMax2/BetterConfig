@@ -42,10 +42,4 @@ public interface IConfigPrimitive<T> extends IConfigNode, IReadableProperty<T>
 	{
 		return this.getSpec().getType().exploreProperty(visitor, this, param);
 	}
-	
-	@Override
-	default <P, R> R exploreNode(IConfigValueVisitor<P, R> visitor, P param)
-	{
-		return visitor.visitPrimitive(this, param);
-	}
 }

@@ -11,7 +11,7 @@ import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
-import fr.max2.betterconfig.config.spec.IConfigSpecVisitor;
+import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
@@ -37,7 +37,7 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 	public ForgeConfigList(IConfigListSpec spec, Info info, List<?> initialValue)
 	{
 		super(spec, info);
-		this.elementBuilder = spec.getElementSpec().exploreNode(new ElementBuilderChooser(), this);
+		this.elementBuilder = this.chooseElementBuilder(spec.getElementSpec());
 		this.initialValue = initialValue;
 
 		this.valueList = new ObservableList<>();
@@ -126,6 +126,37 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 		return "[" + getValueList().stream().map(val -> val.toString()).collect(Collectors.joining(", ")) + "]";
 	}
 	
+	private IElementBuilder chooseElementBuilder(IConfigSpecNode specNode)
+	{
+		if (specNode instanceof IConfigTableSpec tableSpec)
+		{
+			throw new UnsupportedOperationException();
+		}
+		else if (specNode instanceof IConfigListSpec listSpec)
+		{
+			return val -> (ForgeConfigNode<?, ListChildInfo>)new ForgeConfigList<>(listSpec, new ListChildInfo(this), (List<?>)val).addChangeListener(this::onValueChanged);
+		}
+		else if (specNode instanceof IConfigPrimitiveSpec<?> primitiveSpec)
+		{
+			return makePrimitiveElementBuilder(primitiveSpec);
+		}
+		else
+		{
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	private <T> IElementBuilder makePrimitiveElementBuilder(IConfigPrimitiveSpec<T> primitiveSpec)
+	{
+		return val ->
+		{
+			@SuppressWarnings("unchecked")
+			ForgeConfigPrimitive<?, ListChildInfo> node = new ForgeConfigPrimitive<>(primitiveSpec, new ListChildInfo(this), (T)val);
+			node.onChanged(newVal -> this.onValueChanged());
+			return node;
+		};
+	}
+	
 	private static interface IElementBuilder
 	{
 		ForgeConfigNode<?, ListChildInfo> build(Object initialValue);
@@ -175,35 +206,6 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 		public List<? extends Component> getDisplayComment()
 		{
 			return this.parent.getDisplayComment();
-		}
-	}
-	
-	private static class ElementBuilderChooser implements IConfigSpecVisitor<ForgeConfigList<?>, IElementBuilder>
-	{
-		@Override
-		public IElementBuilder visitTable(IConfigTableSpec tableSpec, ForgeConfigList<?> list)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public IElementBuilder visitList(IConfigListSpec listSpec, ForgeConfigList<?> parentList)
-		{
-			// Here T is a List<U> so it is ok to cast to List<?> and cast back to T
-			return val -> (ForgeConfigNode<?, ListChildInfo>)new ForgeConfigList<>(listSpec, new ListChildInfo(parentList), (List<?>)val).addChangeListener(parentList::onValueChanged);
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public <S> IElementBuilder visitPrimitive(IConfigPrimitiveSpec<S> primitiveSpec, ForgeConfigList<?> parentList)
-		{
-			// Here S is the same as T
-			return val ->
-			{
-				ForgeConfigPrimitive<?, ListChildInfo> node = new ForgeConfigPrimitive<>(primitiveSpec, new ListChildInfo(parentList), (S)val);
-				node.onChanged(newVal -> parentList.onValueChanged());
-				return node;
-			};
 		}
 	}
 }

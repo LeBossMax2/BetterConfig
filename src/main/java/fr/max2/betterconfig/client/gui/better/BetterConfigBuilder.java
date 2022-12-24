@@ -10,12 +10,11 @@ import fr.max2.betterconfig.client.gui.better.widget.StringInputField;
 import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.util.GuiTexts;
-import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
-import fr.max2.betterconfig.config.value.IConfigValueVisitor;
+import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.util.property.list.IIndexedProperty;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
@@ -24,7 +23,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 
 
 /** A builder for better configuration screen */
-public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterElement>, IConfigPrimitiveVisitor<Void, IComponent>
+public class BetterConfigBuilder implements IConfigPrimitiveVisitor<Void, IComponent>
 {
 	/**
 	 * Builds the user interface
@@ -50,7 +49,7 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	
 	private GuiGroup buildTable(IConfigTable table)
 	{
-		List<IBetterElement> content = table.getEntryValues().stream().map(value -> value.exploreNode(this)).collect(Collectors.toList());
+		List<IBetterElement> content = table.getEntryValues().stream().map(value -> this.visitNode(value)).collect(Collectors.toList());
 		GuiGroup tableGroup = new GuiGroup(content);
 		tableGroup.addClass("better:table_group");
 		return tableGroup;
@@ -58,14 +57,33 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	
 	// Table entry visitor
 	
-	@Override
-	public IBetterElement visitTable(IConfigTable table, Void entry)
+	private IBetterElement visitNode(IConfigNode node)
+	{
+		if (node instanceof IConfigTable table)
+		{
+			return visitTable(table);
+		}
+		else if (node instanceof IConfigList list)
+		{
+			return this.visitList(list);
+		}
+		else if (node instanceof IConfigPrimitive<?> primitive)
+		{
+			return this.visitPrimitive(primitive);
+		}
+		else
+		{
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	
+	private IBetterElement visitTable(IConfigTable table)
 	{
 		return new Foldout(this.screen, table, this.buildTable(table));
 	}
 	
-	@Override
-	public IBetterElement visitList(IConfigList list, Void entry)
+	private IBetterElement visitList(IConfigList list)
 	{
 		IReadableList<IComponent> mainElements = new ObservableList<>();
 		GuiGroup mainGroup = new GuiGroup(mainElements);
@@ -122,15 +140,14 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	
 	private IBetterElement buildListElementGui(IConfigList list, IConfigNode elem, IIndexedProperty<?> entry)
 	{
-		IBetterElement child = elem.exploreNode(this);
+		IBetterElement child = this.visitNode(elem);
 		
 		return new ListElementEntry(this.screen, child, () -> list.removeValueAt(entry.getIndex()));
 	}
 	
-	@Override
-	public <T> IBetterElement visitPrimitive(IConfigPrimitive<T> primitive, Void entry)
+	private <T> IBetterElement visitPrimitive(IConfigPrimitive<T> primitive)
 	{
-		IComponent widget = primitive.exploreType(this, entry);
+		IComponent widget = primitive.exploreType(this);
 		return new ValueEntry(this.screen, primitive, widget);
 	}
 	

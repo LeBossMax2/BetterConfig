@@ -9,16 +9,15 @@ import java.util.stream.Stream;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.collect.ImmutableList;
 
-import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
 import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
 import fr.max2.betterconfig.config.spec.ConfigLocation;
 import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
+import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
-import fr.max2.betterconfig.config.spec.IConfigSpecVisitor;
-import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigNode;
+import fr.max2.betterconfig.config.value.IConfigTable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -72,7 +71,41 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 	
 	private IConfigNode childNode(String key, ConfigTableEntrySpec spec)
 	{
-		return spec.getNode().exploreNode(new ConfigNodeCreator(this.changeListener, new TableChildInfo(this, spec)), this.configValues.get(key));
+		var info = new TableChildInfo(this, spec);
+		var specNode = spec.getNode();
+		var param = this.configValues.get(key);
+		
+		if (specNode instanceof IConfigTableSpec tableSpec)
+		{
+			return new ForgeConfigTable<>(tableSpec, info, this.changeListener, (UnmodifiableConfig)param);
+		}
+		else if (specNode instanceof IConfigListSpec listSpec)
+		{
+			@SuppressWarnings("unchecked")
+			var configVal = (ConfigValue<List<?>>)param;
+			ForgeConfigList<TableChildInfo> node = new ForgeConfigList<>(listSpec, info, configVal.get());
+			ForgeConfigProperty<List<?>> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getCurrentValue);
+			node.addChangeListener(property::onValueChanged);
+			return node;
+		}
+		else if (specNode instanceof IConfigPrimitiveSpec<?> primitiveSpec)
+		{
+			return this.childPrimitiveNode(primitiveSpec, info, param);
+		}
+		else
+		{
+			throw new UnsupportedOperationException();
+		}
+	}
+	
+	private <T> IConfigNode childPrimitiveNode(IConfigPrimitiveSpec<T> primitiveSpec, TableChildInfo info, Object param)
+	{
+		@SuppressWarnings("unchecked")
+		ConfigValue<T> configVal = (ConfigValue<T>)param;
+		ForgeConfigPrimitive<T, TableChildInfo> node = new ForgeConfigPrimitive<>(primitiveSpec, info, configVal.get());
+		ForgeConfigProperty<T> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getValue);
+		node.onChanged(newVal -> property.onValueChanged());
+		return node;
 	}
 	
 	/** Gets the comments from the spec */
@@ -155,51 +188,6 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		public List<? extends Component> getDisplayComment()
 		{
 			return this.entry.getDisplayComment();
-		}
-	}
-	
-	private static class ConfigNodeCreator implements IConfigSpecVisitor<Object, IConfigNode>
-	{
-		private final Consumer<ForgeConfigProperty<?>> changeListener;
-		private final TableChildInfo info;
-
-		public ConfigNodeCreator(Consumer<ForgeConfigProperty<?>> changeListener, TableChildInfo info)
-		{
-			this.changeListener = changeListener;
-			this.info = info;
-		}
-
-		@Override
-		public IConfigNode visitTable(IConfigTableSpec tableSpec, Object param)
-		{
-			return new ForgeConfigTable<>(tableSpec, this.info, this.changeListener, (UnmodifiableConfig)param);
-		}
-
-		@Override
-		public IConfigNode visitList(IConfigListSpec listSpec, Object param)
-		{
-			return buildList(listSpec, param);
-		}
-
-		@SuppressWarnings("unchecked")
-		private IConfigNode buildList(IConfigListSpec listSpec, Object param)
-		{
-			ConfigValue<List<?>> configVal = (ConfigValue<List<?>>)param;
-			ForgeConfigList<TableChildInfo> node = new ForgeConfigList<>(listSpec, this.info, configVal.get());
-			ForgeConfigProperty<List<?>> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getCurrentValue);
-			node.addChangeListener(property::onValueChanged);
-			return node;
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public <T> IConfigNode visitPrimitive(IConfigPrimitiveSpec<T> primitiveSpec, Object param)
-		{
-			ConfigValue<T> configVal = (ConfigValue<T>)param;
-			ForgeConfigPrimitive<T, TableChildInfo> node = new ForgeConfigPrimitive<>(primitiveSpec, this.info, configVal.get());
-			ForgeConfigProperty<T> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getValue);
-			node.onChanged(newVal -> property.onValueChanged());
-			return node;
 		}
 	}
 	

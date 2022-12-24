@@ -16,11 +16,4 @@ public interface IConfigTableSpec extends IConfigSpecNode
 	UnmodifiableConfig getDefaultValue();
 	
 	List<ConfigTableEntrySpec> getEntrySpecs();
-	
-	@Override
-	default <P, R> R exploreNode(IConfigSpecVisitor<P, R> visitor, P param)
-	{
-		return visitor.visitTable(this, param);
-	}
-	
 }

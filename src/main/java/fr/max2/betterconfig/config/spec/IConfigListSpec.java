@@ -14,10 +14,4 @@ public interface IConfigListSpec extends IConfigSpecNode
 	List<?> getDefaultValue();
 	
 	IConfigSpecNode getElementSpec();
-	
-	@Override
-	default <P, R> R exploreNode(IConfigSpecVisitor<P, R> visitor, P param)
-	{
-		return visitor.visitList(this, param);
-	}
 }

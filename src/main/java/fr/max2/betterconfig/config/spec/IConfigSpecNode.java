@@ -11,11 +11,4 @@ public interface IConfigSpecNode
 	 * Gets the default configuration value
 	 */
 	Object getDefaultValue();
-	
-	default <R> R exploreNode(IConfigSpecVisitor<Void, R> visitor)
-	{
-		return this.exploreNode(visitor, null);
-	}
-	
-	<P, R> R exploreNode(IConfigSpecVisitor<P, R> visitor, P param);
 }

@@ -20,11 +20,4 @@ public interface IConfigNode
 	List<? extends Component> getDisplayComment();
 	
 	void undoChanges();
-	
-	default <R> R exploreNode(IConfigValueVisitor<Void, R> visitor)
-	{
-		return this.exploreNode(visitor, null);
-	}
-	
-	<P, R> R exploreNode(IConfigValueVisitor<P, R> visitor, P param);
 }

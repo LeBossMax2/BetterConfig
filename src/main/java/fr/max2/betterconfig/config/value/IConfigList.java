@@ -21,10 +21,4 @@ public interface IConfigList extends IConfigNode
 	{
 		return this.getValueList().stream().map(elem -> visitor.apply(elem));
 	}
-	
-	@Override
-	default <P, R> R exploreNode(IConfigValueVisitor<P, R> visitor, P param)
-	{
-		return visitor.visitList(this, param);
-	}
 }

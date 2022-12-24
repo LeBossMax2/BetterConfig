@@ -9,12 +9,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
-import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.config.value.IConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
-import fr.max2.betterconfig.config.value.IConfigValueVisitor;
+import fr.max2.betterconfig.config.value.IConfigTable;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -78,45 +77,33 @@ public class DebugConfigGui extends UnitComponent
 	public static DebugConfigGui build(BetterConfigScreen screen, IConfigTable config)
 	{
 		List<String> list = new ArrayList<>();
-		config.getEntryValues().forEach(value -> value.exploreNode(new TableBuilder(list), value.getName()));
+		config.getEntryValues().forEach(value -> buildTable(list, value.getName(), value));
 		return new DebugConfigGui(screen, list);
 	}
 	
-	/** The visitor to build config tables */
-	private static class TableBuilder implements IConfigValueVisitor<String, Void>
+	private static void buildTable(List<String> content, String path, IConfigNode node)
 	{
-		private final List<String> content;
-
-		public TableBuilder(List<String> content)
+		if (node instanceof IConfigTable table)
 		{
-			this.content = content;
+			table.getEntryValues().forEach(value -> buildTable(content, path + "." + value.getName(), value));
 		}
-		
-		@Override
-		public Void visitTable(IConfigTable table, String path)
+		else if (node instanceof IConfigList list)
 		{
-			table.getEntryValues().forEach(value -> value.exploreNode(this, path + "." + value.getName()));
-			return null;
-		}
-		
-		@Override
-		public Void visitList(IConfigList list, String path)
-		{
-			this.content.add(path + " : " + "LIST" + " = {");
+			content.add(path + " : " + "LIST" + " = {");
 			IReadableList<IConfigNode> values = list.getValueList();
 			for (int i = 0; i < values.size(); i++)
 			{
-				values.get(i).exploreNode(this, "[" + i + "]");
+				buildTable(content, "[" + i + "]", values.get(i));
 			}
-			this.content.add("}");
-			return null;
+			content.add("}");
 		}
-		
-		@Override
-		public <T> Void visitPrimitive(IConfigPrimitive<T> primitive, String path)
+		else if (node instanceof IConfigPrimitive<?> primitive)
 		{
-			this.content.add(path + " : " + primitive.exploreType(ValueBuilder.INSTANCE));
-			return null;
+			content.add(path + " : " + primitive.exploreType(ValueBuilder.INSTANCE));
+		}
+		else
+		{
+			throw new UnsupportedOperationException();
 		}
 	}
 

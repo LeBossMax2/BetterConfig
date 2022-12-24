@@ -10,10 +10,4 @@ public interface IConfigTable extends IConfigNode
 	
 	@Override
 	IConfigTableSpec getSpec();
-	
-	@Override
-	default <P, R> R exploreNode(IConfigValueVisitor<P, R> visitor, P param)
-	{
-		return visitor.visitTable(this, param);
-	}
 }

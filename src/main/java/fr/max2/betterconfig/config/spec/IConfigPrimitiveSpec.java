@@ -28,10 +28,4 @@ public interface IConfigPrimitiveSpec<T> extends IConfigSpecNode
 	 * @return a valid value
 	 */
 	T correct(T value);
-	
-	@Override
-	default <P, R> R exploreNode(IConfigSpecVisitor<P, R> visitor, P param)
-	{
-		return visitor.visitPrimitive(this, param);
-	}
 }
