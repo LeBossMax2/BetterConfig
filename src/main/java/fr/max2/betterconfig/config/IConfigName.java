@@ -1,17 +1,16 @@
-package fr.max2.betterconfig.config.impl;
+package fr.max2.betterconfig.config;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import net.minecraft.network.chat.Component;
 
-public interface IForgeNodeInfo
+public interface IConfigName
 {
 	String getName();
 	
 	Component getDisplayName();
 
-	Stream<String> getPath();
+	List<String> getPath();
 	
 	String getCommentString();
 	

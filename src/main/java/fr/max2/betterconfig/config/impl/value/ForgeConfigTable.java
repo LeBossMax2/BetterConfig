@@ -1,20 +1,19 @@
 package fr.max2.betterconfig.config.impl.value;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.collect.ImmutableList;
 
-import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
+import fr.max2.betterconfig.config.IConfigName;
 import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
 import fr.max2.betterconfig.config.spec.ConfigLocation;
-import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
+import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.config.value.IConfigTable;
@@ -23,32 +22,32 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNode<IConfigTableSpec, Info> implements IConfigTable
+public class ForgeConfigTable extends ForgeConfigNode<IConfigTableSpec> implements IConfigTable
 {
 	/** The table containing the value of each entry */
 	private final UnmodifiableConfig configValues;
 
-	private final List<IConfigNode> entryValues;
+	private final List<IConfigTable.Entry> entryValues;
 	/** The function to call when the value is changed */
 	protected final Consumer<ForgeConfigProperty<?>> changeListener;
 
-	private ForgeConfigTable(IConfigTableSpec spec, Info info, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
+	private ForgeConfigTable(IConfigName identifier, IConfigTableSpec spec, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
 	{
-		super(spec, info);
+		super(spec);
 		this.changeListener = changeListener;
 		
 		this.configValues = configValues;
-		ImmutableList.Builder<IConfigNode> builder = ImmutableList.builder();
-		for (ConfigTableEntrySpec entry : this.getSpec().getEntrySpecs())
+		ImmutableList.Builder<IConfigTable.Entry> builder = ImmutableList.builder();
+		for (IConfigTableSpec.Entry entry : this.getSpec().getEntrySpecs())
 		{
-			builder.add(childNode(entry.getLoc().getName(), entry));
+			builder.add(new IConfigTable.Entry(new TableChildInfo(identifier, entry.key()), childNode(entry.key(), entry.node())));
 		}
 		this.entryValues = builder.build();
 	}
 	
-	public static ForgeConfigTable<?> create(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?>> changeListener)
+	public static ForgeConfigTable create(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?>> changeListener)
 	{
-		return new ForgeConfigTable<>(new ForgeConfigTableSpec(spec, getSpecComments(spec)), RootInfo.INSTANCE, changeListener, spec.getValues());
+		return new ForgeConfigTable(RootInfo.INSTANCE, new ForgeConfigTableSpec(spec, getSpecComments(spec)), changeListener, spec.getValues());
 	}
 
 	@Override
@@ -58,7 +57,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 	}
 	
 	@Override
-	public List<IConfigNode> getEntryValues()
+	public List<IConfigTable.Entry> getEntryValues()
 	{
 		return this.entryValues;
 	}
@@ -66,31 +65,29 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 	@Override
 	public void undoChanges()
 	{
-		this.entryValues.forEach(IConfigNode::undoChanges);
+		this.entryValues.forEach(entry -> entry.node().undoChanges());
 	}
 	
-	private IConfigNode childNode(String key, ConfigTableEntrySpec spec)
+	private IConfigNode childNode(IConfigName identifier, IConfigSpecNode specNode)
 	{
-		var info = new TableChildInfo(this, spec);
-		var specNode = spec.getNode();
-		var param = this.configValues.get(key);
+		var param = this.configValues.get(identifier.getName());
 		
 		if (specNode instanceof IConfigTableSpec tableSpec)
 		{
-			return new ForgeConfigTable<>(tableSpec, info, this.changeListener, (UnmodifiableConfig)param);
+			return new ForgeConfigTable(identifier, tableSpec, this.changeListener, (UnmodifiableConfig)param);
 		}
 		else if (specNode instanceof IConfigListSpec listSpec)
 		{
 			@SuppressWarnings("unchecked")
 			var configVal = (ConfigValue<List<?>>)param;
-			ForgeConfigList<TableChildInfo> node = new ForgeConfigList<>(listSpec, info, configVal.get());
+			ForgeConfigList node = new ForgeConfigList(identifier, listSpec, configVal.get());
 			ForgeConfigProperty<List<?>> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getCurrentValue);
 			node.addChangeListener(property::onValueChanged);
 			return node;
 		}
 		else if (specNode instanceof IConfigPrimitiveSpec<?> primitiveSpec)
 		{
-			return this.childPrimitiveNode(primitiveSpec, info, param);
+			return this.childPrimitiveNode(primitiveSpec, param);
 		}
 		else
 		{
@@ -98,11 +95,11 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 	}
 	
-	private <T> IConfigNode childPrimitiveNode(IConfigPrimitiveSpec<T> primitiveSpec, TableChildInfo info, Object param)
+	private <T> IConfigNode childPrimitiveNode(IConfigPrimitiveSpec<T> primitiveSpec, Object param)
 	{
 		@SuppressWarnings("unchecked")
 		ConfigValue<T> configVal = (ConfigValue<T>)param;
-		ForgeConfigPrimitive<T, TableChildInfo> node = new ForgeConfigPrimitive<>(primitiveSpec, info, configVal.get());
+		ForgeConfigPrimitive<T> node = new ForgeConfigPrimitive<>(primitiveSpec, configVal.get());
 		ForgeConfigProperty<T> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getValue);
 		node.onChanged(newVal -> property.onValueChanged());
 		return node;
@@ -114,7 +111,31 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		return loc -> spec.getLevelComment(loc.getPath());
 	}
 	
-	private static enum RootInfo implements IForgeNodeInfo
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder("{");
+		
+		List<IConfigTableSpec.Entry> specs = this.getSpec().getEntrySpecs();
+		
+		boolean fist = true;
+		for (int i = 0; i < specs.size(); i++)
+		{
+			if (fist)
+			{
+				builder.append(", ");
+				fist = false;
+			}
+			builder.append(specs.get(i).key().getName());
+			builder.append(": ");
+			builder.append(this.entryValues.get(i).toString());
+		}	
+		
+		builder.append('}');
+		return builder.toString();
+	}
+	
+	private static enum RootInfo implements IConfigName
 	{
 		INSTANCE;
 		
@@ -131,9 +152,9 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 		
 		@Override
-		public Stream<String> getPath()
+		public List<String> getPath()
 		{
-			return Stream.empty();
+			return List.of();
 		}
 
 		@Override
@@ -145,16 +166,16 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		@Override
 		public List<? extends Component> getDisplayComment()
 		{
-			return Arrays.asList(new TextComponent(""));
+			return List.of(new TextComponent(""));
 		}
 	}
 	
-	private static class TableChildInfo implements IForgeNodeInfo
+	private static class TableChildInfo implements IConfigName
 	{
-		private final ForgeConfigTable<?> parent;
-		private final ConfigTableEntrySpec entry;
+		private final IConfigName parent;
+		private final IConfigName entry;
 
-		private TableChildInfo(ForgeConfigTable<?> parent, ConfigTableEntrySpec entry)
+		private TableChildInfo(IConfigName parent, IConfigName entry)
 		{
 			this.parent = parent;
 			this.entry = entry;
@@ -163,7 +184,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		@Override
 		public String getName()
 		{
-			return this.entry.getLoc().getName();
+			return this.entry.getName();
 		}
 
 		@Override
@@ -173,9 +194,11 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 		
 		@Override
-		public Stream<String> getPath()
+		public List<String> getPath()
 		{
-			return Stream.concat(this.parent.info.getPath(), Stream.of(this.entry.getLoc().getName()));
+			var res = new ArrayList<>(this.parent.getPath());
+			res.add(this.entry.getName());
+			return res;
 		}
 
 		@Override
@@ -189,29 +212,5 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		{
 			return this.entry.getDisplayComment();
 		}
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder builder = new StringBuilder("{");
-		
-		List<ConfigTableEntrySpec> specs = this.getSpec().getEntrySpecs();
-		
-		boolean fist = true;
-		for (int i = 0; i < specs.size(); i++)
-		{
-			if (fist)
-			{
-				builder.append(", ");
-				fist = false;
-			}
-			builder.append(specs.get(i).getLoc().getName());
-			builder.append(": ");
-			builder.append(this.entryValues.get(i).toString());
-		}	
-		
-		builder.append('}');
-		return builder.toString();
 	}
 }

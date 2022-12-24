@@ -77,7 +77,7 @@ public class DebugConfigGui extends UnitComponent
 	public static DebugConfigGui build(BetterConfigScreen screen, IConfigTable config)
 	{
 		List<String> list = new ArrayList<>();
-		config.getEntryValues().forEach(value -> buildTable(list, value.getName(), value));
+		config.getEntryValues().forEach(entry -> buildTable(list, entry.key().getName(), entry.node()));
 		return new DebugConfigGui(screen, list);
 	}
 	
@@ -85,15 +85,15 @@ public class DebugConfigGui extends UnitComponent
 	{
 		if (node instanceof IConfigTable table)
 		{
-			table.getEntryValues().forEach(value -> buildTable(content, path + "." + value.getName(), value));
+			table.getEntryValues().forEach(entry -> buildTable(content, path + "." + entry.key().getName(), entry.node()));
 		}
 		else if (node instanceof IConfigList list)
 		{
 			content.add(path + " : " + "LIST" + " = {");
-			IReadableList<IConfigNode> values = list.getValueList();
+			IReadableList<IConfigList.Entry> values = list.getValueList();
 			for (int i = 0; i < values.size(); i++)
 			{
-				buildTable(content, "[" + i + "]", values.get(i));
+				buildTable(content, "[" + i + "]", values.get(i).node());
 			}
 			content.add("}");
 		}

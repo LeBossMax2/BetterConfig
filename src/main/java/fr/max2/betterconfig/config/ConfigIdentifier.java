@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.config.spec;
+package fr.max2.betterconfig.config;
 
 import java.util.Collections;
 import java.util.List;
@@ -7,22 +7,21 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Strings;
 
+import fr.max2.betterconfig.config.spec.ConfigLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
-public class ConfigTableEntrySpec
+public class ConfigIdentifier implements IConfigName
 {
 	private final ConfigLocation loc;
-	private final IConfigSpecNode node;
 	private final Component displayName;
 	private final String commentString;
 	/** The comments describing the property */
 	private List<? extends Component> commentLines = null;
 	
-	public ConfigTableEntrySpec(ConfigLocation loc, IConfigSpecNode node, Component displayName, String comment)
+	public ConfigIdentifier(ConfigLocation loc, Component displayName, String comment)
 	{
 		this.loc = loc;
-		this.node = node;
 		this.displayName = displayName;
 		this.commentString = comment;
 	}
@@ -31,15 +30,23 @@ public class ConfigTableEntrySpec
 	{
 		return this.loc;
 	}
-	
-	public IConfigSpecNode getNode()
+
+	@Override
+	public String getName()
 	{
-		return this.node;
+		return this.loc.getName();
+	}
+
+	@Override
+	public List<String> getPath()
+	{
+		return this.loc.getPath();
 	}
 
 	/**
 	 * Gets the display name of the property
 	 */
+	@Override
 	public Component getDisplayName()
 	{
 		return this.displayName;
@@ -48,6 +55,7 @@ public class ConfigTableEntrySpec
 	/**
 	 * Gets the comment associated with the config node
 	 */
+	@Override
 	public String getCommentString()
 	{
 		return this.commentString;
@@ -57,6 +65,7 @@ public class ConfigTableEntrySpec
 	 * Gets the comment associated with the config node for display
 	 * @return an unmodifiable list containing the comments
 	 */
+	@Override
 	public List<? extends Component> getDisplayComment()
 	{
 		if (this.commentLines == null)

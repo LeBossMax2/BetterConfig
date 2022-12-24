@@ -19,7 +19,7 @@ import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
-import fr.max2.betterconfig.config.value.IConfigNode;
+import fr.max2.betterconfig.config.IConfigName;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -43,8 +43,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	
-	/** The edited table */
-	private final IConfigNode node;
+	private final IConfigName identifier;
 	/** The content that will be collapsed */
 	private final IBetterElement content;
 	/** The extra info to show on the tooltip */
@@ -54,11 +53,11 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private boolean folded = false;
 	private boolean filteredOut = false;
 
-	public Foldout(BetterConfigScreen screen, IConfigNode node, IBetterElement content)
+	public Foldout(BetterConfigScreen screen, IConfigName identifier, IBetterElement content)
 	{
 		super("better:foldout");
 		this.screen = screen;
-		this.node = node;
+		this.identifier = identifier;
 		this.content = content;
 		this.children.add(new Header());
 		this.children.add(this.content);
@@ -72,7 +71,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	@Override
 	public boolean filterElements(ConfigFilter filter)
 	{
-		boolean matchFilter = filter.matches(this.node);
+		boolean matchFilter = filter.matches(this.identifier);
 		this.filteredOut = this.content.filterElements(matchFilter ? ConfigFilter.ALL : filter);
 		return this.filteredOut;
 	}
@@ -87,8 +86,8 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private void updateTexts()
 	{
 		this.extraInfo.clear();
-		this.extraInfo.add(new TextComponent(this.node.getName()).withStyle(ChatFormatting.YELLOW));
-		this.extraInfo.addAll(this.node.getDisplayComment());
+		this.extraInfo.add(new TextComponent(this.identifier.getName()).withStyle(ChatFormatting.YELLOW));
+		this.extraInfo.addAll(this.identifier.getDisplayComment());
 	}
 	
 	// Mouse interaction
@@ -130,7 +129,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 			
 			// Draw foreground text
 			Font font = Foldout.this.screen.getFont(); 
-			font.draw(matrixStack, Foldout.this.node.getDisplayName(), rect.x + 16, rect.y + 1 + (FOLDOUT_HEADER_HEIGHT - font.lineHeight) / 2, 0xFF_FF_FF_FF);
+			font.draw(matrixStack, Foldout.this.identifier.getDisplayName(), rect.x + 16, rect.y + 1 + (FOLDOUT_HEADER_HEIGHT - font.lineHeight) / 2, 0xFF_FF_FF_FF);
 		}
 		
 		// Input handling
@@ -181,7 +180,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		@Override
 		public void updateNarration(NarrationElementOutput narrationOutput)
 		{
-			narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent(Foldout.this.folded ? GuiTexts.SECTION_TITLE_COLLAPSED : GuiTexts.SECTION_TITLE_SHOWN, Foldout.this.node.getDisplayName()));
+			narrationOutput.add(NarratedElementType.TITLE, new TranslatableComponent(Foldout.this.folded ? GuiTexts.SECTION_TITLE_COLLAPSED : GuiTexts.SECTION_TITLE_SHOWN, Foldout.this.identifier.getDisplayName()));
 			narrationOutput.add(NarratedElementType.USAGE, new TranslatableComponent(this.hasFocus() ? GuiTexts.SECTION_USAGE_FOCUSED : GuiTexts.SECTION_USAGE_HOVERED));
 			super.updateNarration(narrationOutput);
 		}

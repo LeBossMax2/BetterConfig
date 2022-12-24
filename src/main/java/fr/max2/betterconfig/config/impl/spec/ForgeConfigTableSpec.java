@@ -8,8 +8,8 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
+import fr.max2.betterconfig.config.ConfigIdentifier;
 import fr.max2.betterconfig.config.spec.ConfigLocation;
-import fr.max2.betterconfig.config.spec.ConfigTableEntrySpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import net.minecraft.ChatFormatting;
@@ -27,14 +27,14 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	/** The table containing the specification of each entry */
 	private final UnmodifiableConfig spec;
 	
-	private final List<ConfigTableEntrySpec> entrySpecs;
+	private final List<IConfigTableSpec.Entry> entrySpecs;
 	
 	private ForgeConfigTableSpec(ConfigLocation loc, UnmodifiableConfig spec, Function<ConfigLocation, String> levelComments)
 	{
 		this.levelComments = levelComments;
 		this.spec = spec;
 		this.tableLoc = loc;
-		ImmutableList.Builder<ConfigTableEntrySpec> builder = ImmutableList.builder();
+		ImmutableList.Builder<IConfigTableSpec.Entry> builder = ImmutableList.builder();
 		for (Map.Entry<String, Object> entry : this.spec.valueMap().entrySet())
 		{
 			builder.add(childNode(entry.getKey(), entry.getValue()));
@@ -54,18 +54,18 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	}
 	
 	@Override
-	public List<ConfigTableEntrySpec> getEntrySpecs()
+	public List<IConfigTableSpec.Entry> getEntrySpecs()
 	{
 		return this.entrySpecs;
 	}
 	
-	private ConfigTableEntrySpec childNode(String key, Object spec)
+	private IConfigTableSpec.Entry childNode(String key, Object spec)
 	{
 		ConfigLocation location = new ConfigLocation(this.tableLoc, key);
 		if (spec instanceof UnmodifiableConfig)
         {
             Component name = new TextComponent(location.getName()).withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW);
-        	return new ConfigTableEntrySpec(location, new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments), name, this.levelComments.apply(location));
+        	return new IConfigTableSpec.Entry(new ConfigIdentifier(location, name, this.levelComments.apply(location)), new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments));
         }
 		
         ValueSpec forgeSpec = (ValueSpec)spec;
@@ -90,7 +90,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 			valSpec = new ForgeConfigPrimitiveSpec<>(forgeSpec, valueClass);
 		}
         
-        return new ConfigTableEntrySpec(location, valSpec, name, forgeSpec.getComment());
+        return new IConfigTableSpec.Entry(new ConfigIdentifier(location, name, forgeSpec.getComment()), valSpec);
 	}
 	
 	private static Class<?> valueClass(ValueSpec spec)

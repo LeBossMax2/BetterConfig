@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
+import fr.max2.betterconfig.config.ConfigIdentifier;
+
 public interface IConfigTableSpec extends IConfigSpecNode
 {
 	@Override
@@ -15,5 +17,12 @@ public interface IConfigTableSpec extends IConfigSpecNode
 	@Override
 	UnmodifiableConfig getDefaultValue();
 	
-	List<ConfigTableEntrySpec> getEntrySpecs();
+	List<Entry> getEntrySpecs();
+	
+	public static record Entry
+	(
+		ConfigIdentifier key,
+		IConfigSpecNode node
+	)
+	{ }
 }

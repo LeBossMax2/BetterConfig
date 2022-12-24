@@ -3,18 +3,16 @@ package fr.max2.betterconfig.config.impl.value;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.config.impl.IForgeNodeInfo;
+import fr.max2.betterconfig.config.IConfigName;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import fr.max2.betterconfig.config.value.IConfigList;
-import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.util.MappedListView;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
@@ -22,40 +20,43 @@ import fr.max2.betterconfig.util.property.list.ReadableLists;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
-public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNode<IConfigListSpec, Info> implements IConfigList
+public class ForgeConfigList extends ForgeConfigNode<IConfigListSpec> implements IConfigList
 {
 	/** The translation key for the label of elements of a list */
 	public static final String LIST_ELEMENT_LABEL_KEY = BetterConfig.MODID + ".list.child";
 	
 	private final List<Runnable> elemChangeListeners = new ArrayList<>();
+	private final IConfigName identifier;
 	private final IElementBuilder elementBuilder;
 	private final List<?> initialValue;
-	private final IReadableList<ForgeConfigNode<?, ListChildInfo>> valueList;
-	private final IReadableList<IConfigNode> valueListView;
+	private final IReadableList<IConfigList.Entry> valueList;
+	private final IReadableList<IConfigList.Entry> valueListView;
 	private final List<?> currentValue;
 
-	public ForgeConfigList(IConfigListSpec spec, Info info, List<?> initialValue)
+	public ForgeConfigList(IConfigName identifier, IConfigListSpec spec, List<?> initialValue)
 	{
-		super(spec, info);
+		super(spec);
+		this.identifier = identifier;
 		this.elementBuilder = this.chooseElementBuilder(spec.getElementSpec());
 		this.initialValue = initialValue;
 
 		this.valueList = new ObservableList<>();
 		this.valueListView = ReadableLists.unmodifiableList(this.valueList);
-		this.currentValue = new MappedListView<>(this.valueList, elem -> elem.getCurrentValue());
+		this.currentValue = new MappedListView<>(this.valueList, entry -> ((ForgeConfigNode<?>)entry.node()).getCurrentValue());
 		if (initialValue != null)
 		{
 			for (int i = 0; i < initialValue.size(); i++)
 			{
 				Object val = initialValue.get(i);
-				ForgeConfigNode<?, ListChildInfo> elem = this.elementBuilder.build(val);
-				elem.info.setIndex(i);
-				this.valueList.add(elem);
+				var id = new ListChildInfo(this.identifier);
+				ForgeConfigNode<?> elem = this.elementBuilder.build(id, val);
+				id.setIndex(i);
+				this.valueList.add(new Entry(id, elem));
 			}
 		}
 	}
 	
-	public ForgeConfigList<Info> addChangeListener(Runnable listener)
+	public ForgeConfigList addChangeListener(Runnable listener)
 	{
 		this.elemChangeListeners.add(listener);
 		return this;
@@ -68,7 +69,7 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 	}
 
 	@Override
-	public IReadableList<IConfigNode> getValueList()
+	public IReadableList<IConfigList.Entry> getValueList()
 	{
 		return this.valueListView;
 	}
@@ -82,14 +83,16 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 	}
 
 	@Override
-	public IConfigNode addValue(int index)
+	public IConfigList.Entry addValue(int index)
 	{
 		Preconditions.checkPositionIndex(index, this.valueList.size());
-		ForgeConfigNode<?, ListChildInfo> newNode = this.elementBuilder.build(this.getSpec().getElementSpec().getDefaultValue());
-		this.valueList.add(index, newNode);
+		var id = new ListChildInfo(this.identifier);
+		ForgeConfigNode<?> newNode = this.elementBuilder.build(id, this.getSpec().getElementSpec().getDefaultValue());
+		IConfigList.Entry entry = new IConfigList.Entry(id, newNode);
+		this.valueList.add(index, entry);
 		this.updateElementIndicesFrom(index);
 		this.onValueChanged();
-		return newNode;
+		return entry;
 	}
 	
 	@Override
@@ -97,7 +100,7 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 	{
 		for (int i = 0; i < this.initialValue.size(); i++)
 		{
-			this.valueListView.get(i).undoChanges();
+			this.valueListView.get(i).node().undoChanges();
 		}
 		
 		for (int i = this.initialValue.size() - 1; i >= this.initialValue.size(); i--)
@@ -111,7 +114,7 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 	{
 		for (int i = index; i < this.valueList.size(); i++)
 		{
-			this.valueList.get(i).info.setIndex(i);
+			((ListChildInfo)this.valueList.get(i).key()).setIndex(i);
 		}
 	}
 	
@@ -134,7 +137,7 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 		}
 		else if (specNode instanceof IConfigListSpec listSpec)
 		{
-			return val -> (ForgeConfigNode<?, ListChildInfo>)new ForgeConfigList<>(listSpec, new ListChildInfo(this), (List<?>)val).addChangeListener(this::onValueChanged);
+			return (id, val) -> new ForgeConfigList(id, listSpec, (List<?>)val).addChangeListener(this::onValueChanged);
 		}
 		else if (specNode instanceof IConfigPrimitiveSpec<?> primitiveSpec)
 		{
@@ -148,10 +151,10 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 	
 	private <T> IElementBuilder makePrimitiveElementBuilder(IConfigPrimitiveSpec<T> primitiveSpec)
 	{
-		return val ->
+		return (id, val) ->
 		{
 			@SuppressWarnings("unchecked")
-			ForgeConfigPrimitive<?, ListChildInfo> node = new ForgeConfigPrimitive<>(primitiveSpec, new ListChildInfo(this), (T)val);
+			ForgeConfigPrimitive<?> node = new ForgeConfigPrimitive<>(primitiveSpec, (T)val);
 			node.onChanged(newVal -> this.onValueChanged());
 			return node;
 		};
@@ -159,15 +162,15 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 	
 	private static interface IElementBuilder
 	{
-		ForgeConfigNode<?, ListChildInfo> build(Object initialValue);
+		ForgeConfigNode<?> build(IConfigName identifier, Object initialValue);
 	}
 	
-	private static class ListChildInfo implements IForgeNodeInfo
+	private static class ListChildInfo implements IConfigName
 	{
-		private final ForgeConfigList<?> parent;
+		private final IConfigName parent;
 		private int index;
 
-		private ListChildInfo(ForgeConfigList<?> parent)
+		private ListChildInfo(IConfigName parent)
 		{
 			this.parent = parent;
 			this.index = -1;
@@ -191,9 +194,11 @@ public class ForgeConfigList<Info extends IForgeNodeInfo> extends ForgeConfigNod
 		}
 		
 		@Override
-		public Stream<String> getPath()
+		public List<String> getPath()
 		{
-			return Stream.concat(this.parent.info.getPath(), Stream.of(Integer.toString(this.index)));
+			var res = new ArrayList<>(this.parent.getPath());
+			res.add(Integer.toString(this.index));
+			return res;
 		}
 
 		@Override
