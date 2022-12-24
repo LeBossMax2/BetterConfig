@@ -13,13 +13,13 @@ import net.minecraft.network.chat.TextComponent;
 public class ConfigTableEntrySpec
 {
 	private final ConfigLocation loc;
-	private final IConfigSpecNode<?> node;
+	private final IConfigSpecNode node;
 	private final Component displayName;
 	private final String commentString;
 	/** The comments describing the property */
 	private List<? extends Component> commentLines = null;
 	
-	public ConfigTableEntrySpec(ConfigLocation loc, IConfigSpecNode<?> node, Component displayName, String comment)
+	public ConfigTableEntrySpec(ConfigLocation loc, IConfigSpecNode node, Component displayName, String comment)
 	{
 		this.loc = loc;
 		this.node = node;
@@ -32,7 +32,7 @@ public class ConfigTableEntrySpec
 		return this.loc;
 	}
 	
-	public IConfigSpecNode<?> getNode()
+	public IConfigSpecNode getNode()
 	{
 		return this.node;
 	}

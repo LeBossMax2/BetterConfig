@@ -1,16 +1,16 @@
 package fr.max2.betterconfig.config.spec;
 
-public interface IConfigSpecNode<T>
+public interface IConfigSpecNode
 {
 	/**
 	 * Gets the class of the configuration value
 	 */
-	Class<? super T> getValueClass();
+	Class<?> getValueClass();
 	
 	/**
 	 * Gets the default configuration value
 	 */
-	T getDefaultValue();
+	Object getDefaultValue();
 	
 	default <R> R exploreNode(IConfigSpecVisitor<Void, R> visitor)
 	{

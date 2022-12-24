@@ -8,7 +8,7 @@ import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.network.chat.Component;
 
-public abstract class ForgeConfigNode<T, Spec extends IConfigSpecNode<T>, Info extends IForgeNodeInfo> implements IConfigNode<T>
+public abstract class ForgeConfigNode<Spec extends IConfigSpecNode, Info extends IForgeNodeInfo> implements IConfigNode
 {
 	private final Spec spec;
 	protected final Info info;
@@ -55,5 +55,5 @@ public abstract class ForgeConfigNode<T, Spec extends IConfigSpecNode<T>, Info e
 		return this.info.getDisplayComment();
 	}
 	
-	protected abstract T getCurrentValue();
+	protected abstract Object getCurrentValue();
 }

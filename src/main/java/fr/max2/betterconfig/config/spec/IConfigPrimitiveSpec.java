@@ -2,10 +2,13 @@ package fr.max2.betterconfig.config.spec;
 
 import fr.max2.betterconfig.config.ValueType;
 
-public interface IConfigPrimitiveSpec<T> extends IConfigSpecNode<T>
+public interface IConfigPrimitiveSpec<T> extends IConfigSpecNode
 {
 	@Override
 	Class<T> getValueClass();
+	
+	@Override
+	T getDefaultValue();
 	
 	default ValueType getType()
 	{

@@ -2,15 +2,18 @@ package fr.max2.betterconfig.config.spec;
 
 import java.util.List;
 
-public interface IConfigListSpec<T> extends IConfigSpecNode<List<T>>
+public interface IConfigListSpec extends IConfigSpecNode
 {
 	@Override
-	default Class<? super List<T>> getValueClass()
+	default Class<? super List<?>> getValueClass()
 	{
 		return List.class;
 	}
 	
-	IConfigSpecNode<T> getElementSpec();
+	@Override
+	List<?> getDefaultValue();
+	
+	IConfigSpecNode getElementSpec();
 	
 	@Override
 	default <P, R> R exploreNode(IConfigSpecVisitor<P, R> visitor, P param)

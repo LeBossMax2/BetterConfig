@@ -3,7 +3,7 @@ package fr.max2.betterconfig.config.value;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
-public interface IConfigPrimitive<T> extends IConfigNode<T>, IReadableProperty<T>
+public interface IConfigPrimitive<T> extends IConfigNode, IReadableProperty<T>
 {
 	/**
 	 * Gets the current configuration value

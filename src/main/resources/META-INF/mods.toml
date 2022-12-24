@@ -52,6 +52,6 @@ The focus of BetterConfig is to be compatible with every Forge mod, to allow for
 [[dependencies.betterconfig]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.17.1,1.18)"
+    versionRange="[1.18,1.19)"
     ordering="NONE"
     side="BOTH"

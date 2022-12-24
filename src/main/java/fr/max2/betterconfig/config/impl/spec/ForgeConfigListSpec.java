@@ -6,17 +6,17 @@ import java.util.List;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 
-public class ForgeConfigListSpec<T> implements IConfigListSpec<T>
+public class ForgeConfigListSpec<T> implements IConfigListSpec
 {
-	private final IConfigSpecNode<T> elementSpec;
+	private final IConfigSpecNode elementSpec;
 	
-	public ForgeConfigListSpec(IConfigSpecNode<T> elementSpec)
+	public ForgeConfigListSpec(IConfigSpecNode elementSpec)
 	{
 		this.elementSpec = elementSpec;
 	}
 
 	@Override
-	public IConfigSpecNode<T> getElementSpec()
+	public IConfigSpecNode getElementSpec()
 	{
 		return this.elementSpec;
 	}

@@ -5,9 +5,9 @@ import java.util.List;
 import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 import net.minecraft.network.chat.Component;
 
-public interface IConfigNode<T>
+public interface IConfigNode
 {
-	IConfigSpecNode<T> getSpec();
+	IConfigSpecNode getSpec();
 	
 	String getName();
 	

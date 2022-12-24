@@ -78,7 +78,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 		else // Get name from path
 			name = new TextComponent(key);
 		
-		IConfigSpecNode<?> valSpec;
+		IConfigSpecNode valSpec;
 		Class<?> valueClass = valueClass(forgeSpec);
 		
 		if (List.class.isAssignableFrom(valueClass))
@@ -106,7 +106,7 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 		return Object.class;
 	}
 	
-	private static IConfigSpecNode<?> getSpecForValues(List<?> exampleValues)
+	private static IConfigSpecNode getSpecForValues(List<?> exampleValues)
 	{
 		for (Object obj : exampleValues)
 		{

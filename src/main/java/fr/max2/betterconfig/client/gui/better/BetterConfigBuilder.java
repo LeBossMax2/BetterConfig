@@ -65,13 +65,13 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 	}
 	
 	@Override
-	public <T> IBetterElement visitList(IConfigList<T> list, Void entry)
+	public IBetterElement visitList(IConfigList list, Void entry)
 	{
 		IReadableList<IComponent> mainElements = new ObservableList<>();
 		GuiGroup mainGroup = new GuiGroup(mainElements);
 		mainGroup.addClass("better:list_group");
 		
-		IReadableList<IConfigNode<T>> values = list.getValueList();
+		IReadableList<IConfigNode> values = list.getValueList();
 		mainElements.add(new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), new TranslatableComponent(GuiTexts.ADD_FIRST_TOOLTIP_KEY))
 				.addOnPressed(() -> list.addValue(0)));
 		
@@ -113,14 +113,14 @@ public class BetterConfigBuilder implements IConfigValueVisitor<Void, IBetterEle
 		return new Foldout(this.screen, list, mainGroup);
 	}
 
-	private <T> BetterButton buildAddLastButton(IConfigList<T> list)
+	private BetterButton buildAddLastButton(IConfigList list)
 	{
 		BetterButton button = new BetterButton(this.screen, new TranslatableComponent(GuiTexts.ADD_ELEMENT_KEY), new TranslatableComponent(GuiTexts.ADD_LAST_TOOLTIP_KEY));
 		button.addOnPressed(() -> list.addValue(list.getValueList().size()));
 		return button;
 	}
 	
-	private IBetterElement buildListElementGui(IConfigList<?> list, IConfigNode<?> elem, IIndexedProperty<?> entry)
+	private IBetterElement buildListElementGui(IConfigList list, IConfigNode elem, IIndexedProperty<?> entry)
 	{
 		IBetterElement child = elem.exploreNode(this);
 		

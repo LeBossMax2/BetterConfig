@@ -1,24 +1,23 @@
 package fr.max2.betterconfig.config.value;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 
-public interface IConfigList<T> extends IConfigNode<List<T>>
+public interface IConfigList extends IConfigNode
 {
-	IReadableList<IConfigNode<T>> getValueList();
+	IReadableList<IConfigNode> getValueList();
 	
 	void removeValueAt(int index);
 	
-	IConfigNode<T> addValue(int index);
+	IConfigNode addValue(int index);
 	
 	@Override
-	IConfigListSpec<T> getSpec();
+	IConfigListSpec getSpec();
 	
-	default <R> Stream<R> exploreElements(Function<IConfigNode<T>, R> visitor)
+	default <R> Stream<R> exploreElements(Function<IConfigNode, R> visitor)
 	{
 		return this.getValueList().stream().map(elem -> visitor.apply(elem));
 	}

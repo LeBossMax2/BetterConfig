@@ -2,13 +2,11 @@ package fr.max2.betterconfig.config.value;
 
 import java.util.List;
 
-import com.electronwill.nightconfig.core.UnmodifiableConfig;
-
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 
-public interface IConfigTable extends IConfigNode<UnmodifiableConfig>
+public interface IConfigTable extends IConfigNode
 {
-	List<? extends IConfigNode<?>> getEntryValues();
+	List<IConfigNode> getEntryValues();
 	
 	@Override
 	IConfigTableSpec getSpec();

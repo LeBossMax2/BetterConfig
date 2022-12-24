@@ -21,7 +21,7 @@ public interface IConfigSpecVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	<T> R visitList(IConfigListSpec<T> listSpec, P param);
+	R visitList(IConfigListSpec listSpec, P param);
 	
 	/**
 	 * Visits a primitive spec node

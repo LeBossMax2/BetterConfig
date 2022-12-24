@@ -8,7 +8,7 @@ import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.value.IConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 
-public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<T, IConfigPrimitiveSpec<T>, Info> implements IConfigPrimitive<T>
+public class ForgeConfigPrimitive<T, Info extends IForgeNodeInfo> extends ForgeConfigNode<IConfigPrimitiveSpec<T>, Info> implements IConfigPrimitive<T>
 {
 	protected final Set<IListener<? super T>> listeners = new HashSet<>();
 	private final T initialValue;

@@ -44,7 +44,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private final BetterConfigScreen screen;
 	
 	/** The edited table */
-	private final IConfigNode<?> node;
+	private final IConfigNode node;
 	/** The content that will be collapsed */
 	private final IBetterElement content;
 	/** The extra info to show on the tooltip */
@@ -54,7 +54,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private boolean folded = false;
 	private boolean filteredOut = false;
 
-	public Foldout(BetterConfigScreen screen, IConfigNode<?> node, IBetterElement content)
+	public Foldout(BetterConfigScreen screen, IConfigNode node, IBetterElement content)
 	{
 		super("better:foldout");
 		this.screen = screen;

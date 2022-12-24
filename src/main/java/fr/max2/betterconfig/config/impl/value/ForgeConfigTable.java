@@ -24,12 +24,12 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNode<UnmodifiableConfig, IConfigTableSpec, Info> implements IConfigTable
+public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNode<IConfigTableSpec, Info> implements IConfigTable
 {
 	/** The table containing the value of each entry */
 	private final UnmodifiableConfig configValues;
 
-	private final List<IConfigNode<?>> entryValues;
+	private final List<IConfigNode> entryValues;
 	/** The function to call when the value is changed */
 	protected final Consumer<ForgeConfigProperty<?>> changeListener;
 
@@ -39,7 +39,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		this.changeListener = changeListener;
 		
 		this.configValues = configValues;
-		ImmutableList.Builder<IConfigNode<?>> builder = ImmutableList.builder();
+		ImmutableList.Builder<IConfigNode> builder = ImmutableList.builder();
 		for (ConfigTableEntrySpec entry : this.getSpec().getEntrySpecs())
 		{
 			builder.add(childNode(entry.getLoc().getName(), entry));
@@ -59,7 +59,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 	}
 	
 	@Override
-	public List<? extends IConfigNode<?>> getEntryValues()
+	public List<IConfigNode> getEntryValues()
 	{
 		return this.entryValues;
 	}
@@ -70,7 +70,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		this.entryValues.forEach(IConfigNode::undoChanges);
 	}
 	
-	private IConfigNode<?> childNode(String key, ConfigTableEntrySpec spec)
+	private IConfigNode childNode(String key, ConfigTableEntrySpec spec)
 	{
 		return spec.getNode().exploreNode(new ConfigNodeCreator(this.changeListener, new TableChildInfo(this, spec)), this.configValues.get(key));
 	}
@@ -158,7 +158,7 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 	}
 	
-	private static class ConfigNodeCreator implements IConfigSpecVisitor<Object, IConfigNode<?>>
+	private static class ConfigNodeCreator implements IConfigSpecVisitor<Object, IConfigNode>
 	{
 		private final Consumer<ForgeConfigProperty<?>> changeListener;
 		private final TableChildInfo info;
@@ -170,30 +170,30 @@ public class ForgeConfigTable<Info extends IForgeNodeInfo> extends ForgeConfigNo
 		}
 
 		@Override
-		public IConfigNode<?> visitTable(IConfigTableSpec tableSpec, Object param)
+		public IConfigNode visitTable(IConfigTableSpec tableSpec, Object param)
 		{
 			return new ForgeConfigTable<>(tableSpec, this.info, this.changeListener, (UnmodifiableConfig)param);
 		}
 
 		@Override
-		public <T> IConfigNode<?> visitList(IConfigListSpec<T> listSpec, Object param)
+		public IConfigNode visitList(IConfigListSpec listSpec, Object param)
 		{
 			return buildList(listSpec, param);
 		}
 
 		@SuppressWarnings("unchecked")
-		private <T> IConfigNode<?> buildList(IConfigListSpec<T> listSpec, Object param)
+		private IConfigNode buildList(IConfigListSpec listSpec, Object param)
 		{
-			ConfigValue<List<T>> configVal = (ConfigValue<List<T>>)param;
-			ForgeConfigList<T, TableChildInfo> node = new ForgeConfigList<>(listSpec, this.info, configVal.get());
-			ForgeConfigProperty<List<T>> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getCurrentValue);
+			ConfigValue<List<?>> configVal = (ConfigValue<List<?>>)param;
+			ForgeConfigList<TableChildInfo> node = new ForgeConfigList<>(listSpec, this.info, configVal.get());
+			ForgeConfigProperty<List<?>> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getCurrentValue);
 			node.addChangeListener(property::onValueChanged);
 			return node;
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public <T> IConfigNode<?> visitPrimitive(IConfigPrimitiveSpec<T> primitiveSpec, Object param)
+		public <T> IConfigNode visitPrimitive(IConfigPrimitiveSpec<T> primitiveSpec, Object param)
 		{
 			ConfigValue<T> configVal = (ConfigValue<T>)param;
 			ForgeConfigPrimitive<T, TableChildInfo> node = new ForgeConfigPrimitive<>(primitiveSpec, this.info, configVal.get());

@@ -100,10 +100,10 @@ public class DebugConfigGui extends UnitComponent
 		}
 		
 		@Override
-		public <T> Void visitList(IConfigList<T> list, String path)
+		public Void visitList(IConfigList list, String path)
 		{
 			this.content.add(path + " : " + "LIST" + " = {");
-			IReadableList<IConfigNode<T>> values = list.getValueList();
+			IReadableList<IConfigNode> values = list.getValueList();
 			for (int i = 0; i < values.size(); i++)
 			{
 				values.get(i).exploreNode(this, "[" + i + "]");
