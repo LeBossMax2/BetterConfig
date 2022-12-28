@@ -3,17 +3,17 @@ package fr.max2.betterconfig.client.gui.better.widget;
 import java.util.Objects;
 
 import fr.max2.betterconfig.client.gui.component.widget.Button;
-import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.network.chat.TextComponent;
 
 /** The widget for properties of unknown type */
 public class UnknownOptionWidget extends Button
 {
-	private final IConfigPrimitive<?> property;
+	private final ConfigPrimitive<?> property;
 	private final IListener<Object> propertyListener;
 	
-	public UnknownOptionWidget(IConfigPrimitive<?> property)
+	public UnknownOptionWidget(ConfigPrimitive<?> property)
 	{
 		super(new TextComponent(Objects.toString(property.getValue())), NO_OVERLAY);
 		this.addClass("better:unknown");

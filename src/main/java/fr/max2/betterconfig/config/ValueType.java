@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpecVisitor;
-import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 
 /**
@@ -25,9 +25,9 @@ public enum ValueType
 		
 		@SuppressWarnings("unchecked")
 		@Override
-		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, IConfigPrimitive<?> property, P param)
+		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, ConfigPrimitive<?> property, P param)
 		{
-			return visitor.visitBoolean((IConfigPrimitive<Boolean>)property, param);
+			return visitor.visitBoolean((ConfigPrimitive<Boolean>)property, param);
 		}
 	},
 	NUMBER(Number.class)
@@ -41,9 +41,9 @@ public enum ValueType
 		
 		@SuppressWarnings("unchecked")
 		@Override
-		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, IConfigPrimitive<?> property, P param)
+		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, ConfigPrimitive<?> property, P param)
 		{
-			return visitor.visitNumber((IConfigPrimitive<? extends Number>)property, param);
+			return visitor.visitNumber((ConfigPrimitive<? extends Number>)property, param);
 		}
 	},
 	STRING(String.class)
@@ -57,9 +57,9 @@ public enum ValueType
 		
 		@SuppressWarnings("unchecked")
 		@Override
-		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, IConfigPrimitive<?> property, P param)
+		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, ConfigPrimitive<?> property, P param)
 		{
-			return visitor.visitString((IConfigPrimitive<String>)property, param);
+			return visitor.visitString((ConfigPrimitive<String>)property, param);
 		}
 	},
 	ENUM(Enum.class)
@@ -77,13 +77,13 @@ public enum ValueType
 		}
 		
 		@SuppressWarnings("unchecked")
-		private <E extends Enum<E>, P, R> R exploreEnumProp(IConfigPrimitiveVisitor<P, R> visitor, IConfigPrimitive<?> property, P param)
+		private <E extends Enum<E>, P, R> R exploreEnumProp(IConfigPrimitiveVisitor<P, R> visitor, ConfigPrimitive<?> property, P param)
 		{
-			return visitor.visitEnum((IConfigPrimitive<E>)property, param);
+			return visitor.visitEnum((ConfigPrimitive<E>)property, param);
 		}
 		
 		@Override
-		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, IConfigPrimitive<?> property, P param)
+		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, ConfigPrimitive<?> property, P param)
 		{
 			return exploreEnumProp(visitor, property, param);
 		}
@@ -98,7 +98,7 @@ public enum ValueType
 		}
 		
 		@Override
-		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, IConfigPrimitive<?> property, P param)
+		public <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, ConfigPrimitive<?> property, P param)
 		{
 			LOGGER.info("Configuration value of unknown type: " + property.getSpec().getValueClass());
 			return visitor.visitUnknown(property, param);
@@ -132,7 +132,7 @@ public enum ValueType
 	 * @param property
 	 * @return the primitive corresponding to the value user interface
 	 */
-	public <R> R exploreProperty(IConfigPrimitiveVisitor<Void, R> visitor, IConfigPrimitive<?> property)
+	public <R> R exploreProperty(IConfigPrimitiveVisitor<Void, R> visitor, ConfigPrimitive<?> property)
 	{
 		return this.exploreProperty(visitor, property, null);
 	}
@@ -144,7 +144,7 @@ public enum ValueType
 	 * @param property
 	 * @return the primitive corresponding to the value user interface
 	 */
-	public abstract <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, IConfigPrimitive<?> property, P param);
+	public abstract <P, R> R exploreProperty(IConfigPrimitiveVisitor<P, R> visitor, ConfigPrimitive<?> property, P param);
 	
 	/**
 	 * Calls the builder function to build a config property user interface

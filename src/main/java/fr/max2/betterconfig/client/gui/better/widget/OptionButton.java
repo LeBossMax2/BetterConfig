@@ -6,7 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
-import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -15,11 +15,11 @@ import net.minecraft.network.chat.TranslatableComponent;
 /** The widget for option buttons */
 public class OptionButton<V> extends CycleOptionButton<V> 
 {
-	private final IConfigPrimitive<V> property;
+	private final ConfigPrimitive<V> property;
 	private final IListener<V> propertyListener;
 	
 	private OptionButton(List<? extends V> acceptedValues,
-		Function<? super V, Component> valueToText, IConfigPrimitive<V> property)
+		Function<? super V, Component> valueToText, ConfigPrimitive<V> property)
 	{
 		super(
 			acceptedValues.stream().filter(property.getSpec()::isAllowed).collect(Collectors.toList()),
@@ -35,7 +35,7 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	}
 	
 	/** Creates a widget for boolean values */
-	public static OptionButton<Boolean> booleanOption(IConfigPrimitive<Boolean> property)
+	public static OptionButton<Boolean> booleanOption(ConfigPrimitive<Boolean> property)
 	{
 		return new OptionButton<>(
 			Arrays.asList(false, true),
@@ -44,7 +44,7 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	}
 
 	/** Creates a widget for enum values */
-	public static <E extends Enum<E>> OptionButton<E> enumOption(IConfigPrimitive<E> property)
+	public static <E extends Enum<E>> OptionButton<E> enumOption(ConfigPrimitive<E> property)
 	{
 		return new OptionButton<>(
 			Arrays.asList(property.getSpec().getValueClass().getEnumConstants()),

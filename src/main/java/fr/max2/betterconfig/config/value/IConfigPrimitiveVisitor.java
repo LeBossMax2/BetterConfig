@@ -13,7 +13,7 @@ public interface IConfigPrimitiveVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitBoolean(IConfigPrimitive<Boolean> property, P param)
+	default R visitBoolean(ConfigPrimitive<Boolean> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -24,7 +24,7 @@ public interface IConfigPrimitiveVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitNumber(IConfigPrimitive<? extends Number> property, P param)
+	default R visitNumber(ConfigPrimitive<? extends Number> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -35,7 +35,7 @@ public interface IConfigPrimitiveVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default R visitString(IConfigPrimitive<String> property, P param)
+	default R visitString(ConfigPrimitive<String> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -46,7 +46,7 @@ public interface IConfigPrimitiveVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	default <E extends Enum<E>> R visitEnum(IConfigPrimitive<E> property, P param)
+	default <E extends Enum<E>> R visitEnum(ConfigPrimitive<E> property, P param)
 	{
 		return this.visitUnknown(property, param);
 	}
@@ -57,5 +57,5 @@ public interface IConfigPrimitiveVisitor<P, R>
 	 * @param param the parameter of the visitor
 	 * @return the resulting value of the visitor
 	 */
-	R visitUnknown(IConfigPrimitive<?> property, P param);
+	R visitUnknown(ConfigPrimitive<?> property, P param);
 }

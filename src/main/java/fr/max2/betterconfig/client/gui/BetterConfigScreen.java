@@ -16,7 +16,7 @@ import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import fr.max2.betterconfig.client.gui.style.StyleSheetManager;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;
-import fr.max2.betterconfig.config.value.IConfigTable;
+import fr.max2.betterconfig.config.value.ConfigTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -39,7 +39,7 @@ public class BetterConfigScreen extends ComponentScreen
 	/** The list of available configurations in the mod */
 	private final List<ModConfig> modConfigs;
 	/** The current edited configuration table */
-	private final IConfigTable[] currentTables;
+	private final ConfigTable[] currentTables;
 	/** The set of properties that changed and need to be saved */
 	private final Set<ForgeConfigProperty<?>> modifiedProperties = new HashSet<>();
 	/** The index of the current edited configuration in the list */
@@ -57,7 +57,7 @@ public class BetterConfigScreen extends ComponentScreen
 		this.mod = mod;
 		this.modConfigs = configs;
 		this.configIndex = index;
-		this.currentTables = new IConfigTable[configs.size()];
+		this.currentTables = new ConfigTable[configs.size()];
 	}
 	
 	@Override

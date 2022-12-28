@@ -1,93 +1,60 @@
 package fr.max2.betterconfig.config.impl.value;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
-import com.google.common.collect.ImmutableList;
 
 import fr.max2.betterconfig.config.IConfigName;
 import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
 import fr.max2.betterconfig.config.spec.ConfigLocation;
-import fr.max2.betterconfig.config.spec.IConfigListSpec;
-import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
-import fr.max2.betterconfig.config.spec.IConfigSpecNode;
-import fr.max2.betterconfig.config.spec.IConfigTableSpec;
+import fr.max2.betterconfig.config.value.ConfigList;
+import fr.max2.betterconfig.config.value.ConfigPrimitive;
+import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.IConfigNode;
-import fr.max2.betterconfig.config.value.IConfigTable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public class ForgeConfigTable extends ForgeConfigNode<IConfigTableSpec> implements IConfigTable
+public class ForgeConfigTable
 {
-	/** The table containing the value of each entry */
-	private final UnmodifiableConfig configValues;
-
-	private final List<IConfigTable.Entry> entryValues;
-	/** The function to call when the value is changed */
-	protected final Consumer<ForgeConfigProperty<?>> changeListener;
-
-	private ForgeConfigTable(IConfigName identifier, IConfigTableSpec spec, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
+	private static void newForgeConfigTable(ConfigTable table, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
 	{
-		super(spec);
-		this.changeListener = changeListener;
-		
-		this.configValues = configValues;
-		ImmutableList.Builder<IConfigTable.Entry> builder = ImmutableList.builder();
-		for (IConfigTableSpec.Entry entry : this.getSpec().getEntrySpecs())
+		for (ConfigTable.Entry entry : table.getEntryValues())
 		{
-			builder.add(new IConfigTable.Entry(new TableChildInfo(identifier, entry.key()), childNode(entry.key(), entry.node())));
+			childNode(entry.key(), entry.node(), changeListener, configValues);
 		}
-		this.entryValues = builder.build();
 	}
 	
-	public static ForgeConfigTable create(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?>> changeListener)
+	public static ConfigTable create(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?>> changeListener)
 	{
-		return new ForgeConfigTable(RootInfo.INSTANCE, new ForgeConfigTableSpec(spec, getSpecComments(spec)), changeListener, spec.getValues());
-	}
-
-	@Override
-	protected UnmodifiableConfig getCurrentValue()
-	{
-		return this.configValues;
+		ConfigTable table = new ConfigTable(new ForgeConfigTableSpec(spec, getSpecComments(spec)), RootInfo.INSTANCE);
+		newForgeConfigTable(table, changeListener, spec.getValues());
+		table.setAsInitialValue();
+		return table;
 	}
 	
-	@Override
-	public List<IConfigTable.Entry> getEntryValues()
+	private static void childNode(IConfigName identifier, IConfigNode node, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
 	{
-		return this.entryValues;
-	}
-	
-	@Override
-	public void undoChanges()
-	{
-		this.entryValues.forEach(entry -> entry.node().undoChanges());
-	}
-	
-	private IConfigNode childNode(IConfigName identifier, IConfigSpecNode specNode)
-	{
-		var param = this.configValues.get(identifier.getName());
+		var param = configValues.get(identifier.getName());
 		
-		if (specNode instanceof IConfigTableSpec tableSpec)
+		if (node instanceof ConfigTable tableNode)
 		{
-			return new ForgeConfigTable(identifier, tableSpec, this.changeListener, (UnmodifiableConfig)param);
+			newForgeConfigTable(tableNode, changeListener, (UnmodifiableConfig)param);
 		}
-		else if (specNode instanceof IConfigListSpec listSpec)
+		else if (node instanceof ConfigList listNode)
 		{
 			@SuppressWarnings("unchecked")
 			var configVal = (ConfigValue<List<?>>)param;
-			ForgeConfigList node = new ForgeConfigList(identifier, listSpec, configVal.get());
-			ForgeConfigProperty<List<?>> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getCurrentValue);
-			node.addChangeListener(property::onValueChanged);
-			return node;
+			ForgeConfigList.newForgeConfigList(listNode, configVal.get());
+			ForgeConfigProperty<List<?>> property = new ForgeConfigProperty<>(configVal, changeListener, listNode::getValue);
+			listNode.addChangeListener(property::onValueChanged);
 		}
-		else if (specNode instanceof IConfigPrimitiveSpec<?> primitiveSpec)
+		else if (node instanceof ConfigPrimitive<?> primitiveNode)
 		{
-			return this.childPrimitiveNode(primitiveSpec, param);
+			childPrimitiveNode(primitiveNode, param, changeListener);
 		}
 		else
 		{
@@ -95,44 +62,19 @@ public class ForgeConfigTable extends ForgeConfigNode<IConfigTableSpec> implemen
 		}
 	}
 	
-	private <T> IConfigNode childPrimitiveNode(IConfigPrimitiveSpec<T> primitiveSpec, Object param)
+	private static <T> void childPrimitiveNode(ConfigPrimitive<T> node, Object param, Consumer<ForgeConfigProperty<?>> changeListener)
 	{
 		@SuppressWarnings("unchecked")
 		ConfigValue<T> configVal = (ConfigValue<T>)param;
-		ForgeConfigPrimitive<T> node = new ForgeConfigPrimitive<>(primitiveSpec, configVal.get());
-		ForgeConfigProperty<T> property = new ForgeConfigProperty<>(configVal, this.changeListener, node::getValue);
+		node.setValue(configVal.get());
+		ForgeConfigProperty<T> property = new ForgeConfigProperty<>(configVal, changeListener, node::getValue);
 		node.onChanged(newVal -> property.onValueChanged());
-		return node;
 	}
 	
 	/** Gets the comments from the spec */
 	private static Function<ConfigLocation, String> getSpecComments(ForgeConfigSpec spec)
 	{
 		return loc -> spec.getLevelComment(loc.getPath());
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder builder = new StringBuilder("{");
-		
-		List<IConfigTableSpec.Entry> specs = this.getSpec().getEntrySpecs();
-		
-		boolean fist = true;
-		for (int i = 0; i < specs.size(); i++)
-		{
-			if (fist)
-			{
-				builder.append(", ");
-				fist = false;
-			}
-			builder.append(specs.get(i).key().getName());
-			builder.append(": ");
-			builder.append(this.entryValues.get(i).toString());
-		}	
-		
-		builder.append('}');
-		return builder.toString();
 	}
 	
 	private static enum RootInfo implements IConfigName
@@ -167,50 +109,6 @@ public class ForgeConfigTable extends ForgeConfigNode<IConfigTableSpec> implemen
 		public List<? extends Component> getDisplayComment()
 		{
 			return List.of(new TextComponent(""));
-		}
-	}
-	
-	private static class TableChildInfo implements IConfigName
-	{
-		private final IConfigName parent;
-		private final IConfigName entry;
-
-		private TableChildInfo(IConfigName parent, IConfigName entry)
-		{
-			this.parent = parent;
-			this.entry = entry;
-		}
-
-		@Override
-		public String getName()
-		{
-			return this.entry.getName();
-		}
-
-		@Override
-		public Component getDisplayName()
-		{
-			return this.entry.getDisplayName();
-		}
-		
-		@Override
-		public List<String> getPath()
-		{
-			var res = new ArrayList<>(this.parent.getPath());
-			res.add(this.entry.getName());
-			return res;
-		}
-
-		@Override
-		public String getCommentString()
-		{
-			return this.entry.getCommentString();
-		}
-
-		@Override
-		public List<? extends Component> getDisplayComment()
-		{
-			return this.entry.getDisplayComment();
 		}
 	}
 }

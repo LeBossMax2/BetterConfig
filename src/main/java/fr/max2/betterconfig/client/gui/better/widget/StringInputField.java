@@ -4,7 +4,7 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
 import fr.max2.betterconfig.config.IConfigName;
-import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
@@ -13,10 +13,10 @@ import net.minecraft.network.chat.Component;
 public class StringInputField extends TextField
 {
 	/** The property to edit */
-	private final IConfigPrimitive<String> property;
+	private final ConfigPrimitive<String> property;
 	private final IListener<String> propertyListener;
 	
-	private StringInputField(Font fontRenderer, IConfigPrimitive<String> property, Component title)
+	private StringInputField(Font fontRenderer, ConfigPrimitive<String> property, Component title)
 	{
 		super(fontRenderer, title);
 		this.addClass("better:string_input");
@@ -50,7 +50,7 @@ public class StringInputField extends TextField
 	}
 
 	/** Creates a widget for string values */
-	public static StringInputField stringOption(BetterConfigScreen screen, IConfigName identifier, IConfigPrimitive<String> property)
+	public static StringInputField stringOption(BetterConfigScreen screen, IConfigName identifier, ConfigPrimitive<String> property)
 	{
 		return new StringInputField(screen.getFont(), property, identifier.getDisplayName());
 	}

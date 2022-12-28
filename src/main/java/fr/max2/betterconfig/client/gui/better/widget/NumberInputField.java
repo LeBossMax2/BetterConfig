@@ -6,7 +6,7 @@ import fr.max2.betterconfig.client.gui.component.widget.NumberField;
 import fr.max2.betterconfig.client.util.INumberType;
 import fr.max2.betterconfig.client.util.NumberTypes;
 import fr.max2.betterconfig.config.IConfigName;
-import fr.max2.betterconfig.config.value.IConfigPrimitive;
+import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
@@ -15,10 +15,10 @@ import net.minecraft.network.chat.Component;
 public class NumberInputField<N extends Number> extends NumberField<N>
 {
 	/** The property to edit */
-	private final IConfigPrimitive<N> property;
+	private final ConfigPrimitive<N> property;
 	private final IListener<N> propertyListener;
 
-	public NumberInputField(Font fontRenderer, INumberType<N> numberType, IConfigPrimitive<N> property, Component title)
+	public NumberInputField(Font fontRenderer, INumberType<N> numberType, ConfigPrimitive<N> property, Component title)
 	{
 		super(fontRenderer, title, numberType, property.getValue());
 		this.property = property;
@@ -61,7 +61,7 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 	}
 
 	/** Creates a widget for number values */
-	public static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, IConfigName identifier, IConfigPrimitive<N> property)
+	public static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, IConfigName identifier, ConfigPrimitive<N> property)
 	{
 		return new NumberInputField<>(screen.getFont(), NumberTypes.getType(property.getSpec().getValueClass()), property, identifier.getDisplayName());
 	}
