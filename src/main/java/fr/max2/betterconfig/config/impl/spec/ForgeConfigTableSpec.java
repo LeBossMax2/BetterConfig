@@ -9,8 +9,9 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import fr.max2.betterconfig.config.ConfigIdentifier;
+import fr.max2.betterconfig.config.ValueType;
 import fr.max2.betterconfig.config.spec.ConfigLocation;
-import fr.max2.betterconfig.config.spec.IConfigSpecNode;
+import fr.max2.betterconfig.config.spec.ConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigTableSpec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.locale.Language;
@@ -24,9 +25,9 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	private final Function<ConfigLocation, String> levelComments;
 	/** The table containing the specification of each entry */
 	private final UnmodifiableConfig spec;
-	
+
 	private final List<IConfigTableSpec.Entry> entrySpecs;
-	
+
 	private ForgeConfigTableSpec(ConfigLocation loc, UnmodifiableConfig spec, Function<ConfigLocation, String> levelComments)
 	{
 		this.levelComments = levelComments;
@@ -56,14 +57,14 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	{
 		return this.entrySpecs;
 	}
-	
+
 	private IConfigTableSpec.Entry childNode(String key, Object spec)
 	{
 		ConfigLocation location = new ConfigLocation(this.tableLoc, key);
 		if (spec instanceof UnmodifiableConfig)
         {
             Component name = Component.literal(location.getName()).withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW);
-        	return new IConfigTableSpec.Entry(new ConfigIdentifier(location, name, this.levelComments.apply(location)), new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments));
+        	return new IConfigTableSpec.Entry(new ConfigIdentifier(location, name, this.levelComments.apply(location)), new ConfigSpecNode.Table(new ForgeConfigTableSpec(location, (UnmodifiableConfig)spec, this.levelComments)));
         }
 
         ValueSpec forgeSpec = (ValueSpec)spec;
@@ -75,19 +76,27 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 			name = Component.translatable(translationKey);
 		else // Get name from path
 			name = Component.literal(key);
-		
-		IConfigSpecNode valSpec;
+
+		ConfigSpecNode valSpec;
 		Class<?> valueClass = valueClass(forgeSpec);
 
 		if (List.class.isAssignableFrom(valueClass))
 		{
-			valSpec = new ForgeConfigListSpec<>(getSpecForValues((List<?>)forgeSpec.getDefault()));
+			valSpec = new ConfigSpecNode.List(new ForgeConfigListSpec(getSpecForValues((List<?>)forgeSpec.getDefault())));
 		}
 		else
 		{
-			valSpec = new ForgeConfigPrimitiveSpec<>(forgeSpec, valueClass);
+			ValueType type = ValueType.getType(valueClass);
+			if (type == null)
+			{
+				valSpec = new ConfigSpecNode.Unknown(new ForgeUnknownSpec(forgeSpec, valueClass));
+			}
+			else
+			{
+				valSpec = type.makeSpec(new ForgeConfigPrimitiveSpec<>(forgeSpec, valueClass));
+			}
 		}
-        
+
         return new IConfigTableSpec.Entry(new ConfigIdentifier(location, name, forgeSpec.getComment()), valSpec);
 	}
 
@@ -103,8 +112,8 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 
 		return Object.class;
 	}
-	
-	private static IConfigSpecNode getSpecForValues(List<?> exampleValues)
+
+	private static ConfigSpecNode getSpecForValues(List<?> exampleValues)
 	{
 		for (Object obj : exampleValues)
 		{
@@ -114,16 +123,16 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 			Class<?> valClass = obj.getClass();
 			if (List.class.isAssignableFrom(valClass))
 			{
-				return new ForgeConfigListSpec<>(getSpecForValues((List<?>)obj));
+				return new ConfigSpecNode.List(new ForgeConfigListSpec(getSpecForValues((List<?>)obj)));
 			}
 			if (UnmodifiableConfig.class.isAssignableFrom(valClass))
 			{
 				// TODO [#5] Implement list of tables
 				// Don't know how to deal with list of tables
-				return new ForgeListPrimitiveSpec<>(Object.class);
+				return new ConfigSpecNode.Unknown(new ForgeListPrimitiveSpec<>(Object.class));
 			}
-			return new ForgeListPrimitiveSpec<>(valClass);
+			return ConfigSpecNode.Primitive.make(new ForgeListPrimitiveSpec<>(valClass));
 		}
-		return new ForgeListPrimitiveSpec<>(Object.class);
+		return new ConfigSpecNode.Unknown(new ForgeListPrimitiveSpec<>(Object.class));
 	}
 }

@@ -9,9 +9,9 @@ public interface IConfigListSpec extends IConfigSpecNode
 	{
 		return List.class;
 	}
-	
+
 	@Override
 	List<?> getDefaultValue();
-	
-	IConfigSpecNode getElementSpec();
+
+	ConfigSpecNode getElementSpec();
 }

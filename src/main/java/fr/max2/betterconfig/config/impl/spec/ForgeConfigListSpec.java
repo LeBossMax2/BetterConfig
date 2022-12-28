@@ -3,28 +3,28 @@ package fr.max2.betterconfig.config.impl.spec;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.max2.betterconfig.config.spec.ConfigSpecNode;
 import fr.max2.betterconfig.config.spec.IConfigListSpec;
-import fr.max2.betterconfig.config.spec.IConfigSpecNode;
 
-public class ForgeConfigListSpec<T> implements IConfigListSpec
+public class ForgeConfigListSpec implements IConfigListSpec
 {
-	private final IConfigSpecNode elementSpec;
-	
-	public ForgeConfigListSpec(IConfigSpecNode elementSpec)
+	private final ConfigSpecNode elementSpec;
+
+	public ForgeConfigListSpec(ConfigSpecNode elementSpec)
 	{
 		this.elementSpec = elementSpec;
 	}
 
 	@Override
-	public IConfigSpecNode getElementSpec()
+	public ConfigSpecNode getElementSpec()
 	{
 		return this.elementSpec;
 	}
 
 	@Override
-	public List<T> getDefaultValue()
+	public List<?> getDefaultValue()
 	{
 		return new ArrayList<>();
 	}
-	
+
 }

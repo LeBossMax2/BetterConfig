@@ -33,22 +33,22 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 	/** Updates the color of the text to indicates an error */
 	private void updateTextColor(String text)
 	{
-		this.inputField.setTextColor(this.property.getSpec().isAllowed(this.getValue()) ? Constants.DEFAULT_FIELD_TEXT_COLOR : Constants.ERROR_FIELD_TEXT_COLOR);
+		this.inputField.setTextColor(this.property.getSpec().node().isAllowed(this.getValue()) ? Constants.DEFAULT_FIELD_TEXT_COLOR : Constants.ERROR_FIELD_TEXT_COLOR);
 	}
 	
 	@Override
 	protected N correct(N value)
 	{
-		if (this.property.getSpec().isAllowed(value))
+		if (this.property.getSpec().node().isAllowed(value))
 			return value;
 		
-		return this.property.getSpec().correct(value);
+		return this.property.getSpec().node().correct(value);
 	}
 	
 	@Override
 	protected void onValidate(N value)
 	{
-		if (this.property.getSpec().isAllowed(value))
+		if (this.property.getSpec().node().isAllowed(value))
 		{
 			this.property.setValue(value);
 		}
@@ -63,6 +63,6 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 	/** Creates a widget for number values */
 	public static <N extends Number> NumberInputField<N> numberOption(BetterConfigScreen screen, IConfigName identifier, ConfigPrimitive<N> property)
 	{
-		return new NumberInputField<>(screen.getFont(), NumberTypes.getType(property.getSpec().getValueClass()), property, identifier.getDisplayName());
+		return new NumberInputField<>(screen.getFont(), NumberTypes.getType(property.getSpec().node().getValueClass()), property, identifier.getDisplayName());
 	}
 }

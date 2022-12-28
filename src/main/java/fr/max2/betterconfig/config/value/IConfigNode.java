@@ -1,14 +1,14 @@
 package fr.max2.betterconfig.config.value;
 
-import fr.max2.betterconfig.config.spec.IConfigSpecNode;
+import fr.max2.betterconfig.config.spec.ConfigSpecNode;
 
-public sealed interface IConfigNode permits ConfigTable, ConfigList, ConfigPrimitive
+public sealed interface IConfigNode permits ConfigTable, ConfigList, ConfigPrimitive, ConfigUnknown
 {
-	IConfigSpecNode getSpec();
-	
+	ConfigSpecNode getSpec();
+
 	Object getValue();
-	
+
 	void setAsInitialValue();
-	
+
 	void undoChanges();
 }

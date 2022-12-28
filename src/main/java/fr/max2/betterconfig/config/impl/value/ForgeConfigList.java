@@ -5,6 +5,7 @@ import java.util.List;
 import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.value.ConfigUnknown;
 import fr.max2.betterconfig.config.value.IConfigNode;
 
 public class ForgeConfigList
@@ -21,7 +22,7 @@ public class ForgeConfigList
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private static void childNode(IConfigNode node, Object value)
 	{
@@ -36,6 +37,10 @@ public class ForgeConfigList
 		else if (node instanceof ConfigPrimitive<?> primitiveNode)
 		{
 			((ConfigPrimitive<Object>)primitiveNode).setValue(value);
+		}
+		else if (node instanceof ConfigUnknown unknownNode)
+		{
+			unknownNode.setValue(value);
 		}
 		else
 		{

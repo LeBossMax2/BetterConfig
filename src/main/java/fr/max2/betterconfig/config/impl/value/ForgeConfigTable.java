@@ -9,9 +9,11 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import fr.max2.betterconfig.config.IConfigName;
 import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
 import fr.max2.betterconfig.config.spec.ConfigLocation;
+import fr.max2.betterconfig.config.spec.ConfigSpecNode;
 import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.value.ConfigUnknown;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -26,19 +28,19 @@ public class ForgeConfigTable
 			childNode(entry.key(), entry.node(), changeListener, configValues);
 		}
 	}
-	
+
 	public static ConfigTable create(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?>> changeListener)
 	{
-		ConfigTable table = new ConfigTable(new ForgeConfigTableSpec(spec, getSpecComments(spec)), RootInfo.INSTANCE);
+		ConfigTable table = new ConfigTable(new ConfigSpecNode.Table(new ForgeConfigTableSpec(spec, getSpecComments(spec))), RootInfo.INSTANCE);
 		newForgeConfigTable(table, changeListener, spec.getValues());
 		table.setAsInitialValue();
 		return table;
 	}
-	
+
 	private static void childNode(IConfigName identifier, IConfigNode node, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
 	{
 		var param = configValues.get(identifier.getName());
-		
+
 		if (node instanceof ConfigTable tableNode)
 		{
 			newForgeConfigTable(tableNode, changeListener, (UnmodifiableConfig)param);
@@ -55,12 +57,17 @@ public class ForgeConfigTable
 		{
 			childPrimitiveNode(primitiveNode, param, changeListener);
 		}
+		else if (node instanceof ConfigUnknown unknownNode)
+		{
+			ConfigValue<?> configVal = (ConfigValue<?>)param;
+			unknownNode.setValue(configVal.get());
+		}
 		else
 		{
 			throw new UnsupportedOperationException();
 		}
 	}
-	
+
 	private static <T> void childPrimitiveNode(ConfigPrimitive<T> node, Object param, Consumer<ForgeConfigProperty<?>> changeListener)
 	{
 		@SuppressWarnings("unchecked")
@@ -75,7 +82,7 @@ public class ForgeConfigTable
 	{
 		return loc -> spec.getLevelComment(loc.getPath());
 	}
-	
+
 	private static enum RootInfo implements IConfigName
 	{
 		INSTANCE;

@@ -3,26 +3,55 @@ package fr.max2.betterconfig.config.value;
 import java.util.HashSet;
 import java.util.Set;
 
-import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
+import fr.max2.betterconfig.config.spec.ConfigSpecNode;
 import fr.max2.betterconfig.util.property.IListener;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
-public final class ConfigPrimitive<T> implements IConfigNode, IReadableProperty<T>
+public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty<T>
+	permits
+		ConfigPrimitive.Boolean,
+		ConfigPrimitive.String,
+		ConfigPrimitive.Enum,
+		ConfigPrimitive.Number
 {
 	private final Set<IListener<? super T>> listeners = new HashSet<>();
-	private final IConfigPrimitiveSpec<T> spec;
+	private final ConfigSpecNode.Primitive<T> spec;
 	private T initialValue;
 	private T currentValue;
 	
-	public ConfigPrimitive(IConfigPrimitiveSpec<T> spec)
+	private ConfigPrimitive(ConfigSpecNode.Primitive<T> spec)
 	{
 		this.spec = spec;
-		this.initialValue = spec.getDefaultValue();
+		this.initialValue = spec.node().getDefaultValue();
 		this.currentValue = this.initialValue;
+	}
+
+	public static ConfigPrimitive<?> make(ConfigSpecNode.Primitive<?> spec)
+	{
+		if (spec instanceof ConfigSpecNode.Boolean boolNode)
+		{
+			return new Boolean(boolNode);
+		}
+		else if (spec instanceof ConfigSpecNode.Number<?> numberNode)
+		{
+			return new Number<>(numberNode);
+		}
+		else if (spec instanceof ConfigSpecNode.String stringNode)
+		{
+			return new String(stringNode);
+		}
+		else if (spec instanceof ConfigSpecNode.Enum<?> enumNode)
+		{
+			return new Enum<>(enumNode);
+		}
+		else
+		{
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	@Override
-	public IConfigPrimitiveSpec<T> getSpec()
+	public ConfigSpecNode.Primitive<T> getSpec()
 	{
 		return this.spec;
 	}
@@ -77,30 +106,40 @@ public final class ConfigPrimitive<T> implements IConfigNode, IReadableProperty<
 	}
 	
 	@Override
-	public String toString()
+	public java.lang.String toString()
 	{
 		return this.getValue().toString();
 	}
 	
-	/**
-	 * Explores this property using the given visitor
-	 * @param <R> the result type of the visitor
-	 * @param visitor
-	 * @return the result of the visitor
-	 */
-	public <R> R exploreType(IConfigPrimitiveVisitor<Void, R> visitor)
+	public static final class Boolean extends ConfigPrimitive<java.lang.Boolean>
 	{
-		return this.exploreType(visitor, null);
+		private Boolean(ConfigSpecNode.Boolean spec)
+		{
+			super(spec);
+		}
 	}
-
-	/**
-	 * Explores this property using the given visitor
-	 * @param <R> the result type of the visitor
-	 * @param visitor
-	 * @return the result of the visitor
-	 */
-	public <P, R> R exploreType(IConfigPrimitiveVisitor<P, R> visitor, P param)
+	
+	public static final class String extends ConfigPrimitive<java.lang.String>
 	{
-		return this.getSpec().getType().exploreProperty(visitor, this, param);
+		private String(ConfigSpecNode.String spec)
+		{
+			super(spec);
+		}
+	}
+	
+	public static final class Enum<E extends java.lang.Enum<E>> extends ConfigPrimitive<E>
+	{
+		private Enum(ConfigSpecNode.Enum<E> spec)
+		{
+			super(spec);
+		}
+	}
+	
+	public static final class Number<N extends java.lang.Number> extends ConfigPrimitive<N>
+	{
+		private Number(ConfigSpecNode.Number<N> spec)
+		{
+			super(spec);
+		}
 	}
 }

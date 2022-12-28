@@ -17,7 +17,7 @@ import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.IConfigName;
-import fr.max2.betterconfig.config.value.ConfigPrimitive;
+import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
@@ -27,13 +27,13 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 {
 	private final IConfigName identifier;
 	/** The edited property */
-	private final ConfigPrimitive<?> property;
+	private final IConfigNode property;
 	/** The extra info to show on the tooltip */
 	private final List<Component> extraInfo = new ArrayList<>();
 	/** Indicates if the property is hidden or not */
 	private boolean filteredOut = false;
 
-	public ValueEntry(BetterConfigScreen screen, IConfigName identifier, ConfigPrimitive<?> property, IComponent content)
+	public ValueEntry(BetterConfigScreen screen, IConfigName identifier, IConfigNode property, IComponent content)
 	{
 		super("better:value_entry");
 		this.identifier = identifier;
@@ -82,7 +82,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.extraInfo.clear();
 		this.extraInfo.add(Component.literal(this.identifier.getName()).withStyle(ChatFormatting.YELLOW));
 		this.extraInfo.addAll(this.identifier.getDisplayComment());
-		this.extraInfo.add((Component.translatable(GuiTexts.DEFAULT_VALUE_KEY, Component.literal(Objects.toString(this.property.getSpec().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
+		this.extraInfo.add((Component.translatable(GuiTexts.DEFAULT_VALUE_KEY, Component.literal(Objects.toString(this.property.getSpec().node().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override

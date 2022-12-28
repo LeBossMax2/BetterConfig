@@ -15,14 +15,14 @@ public class ConfigFilter
 			return false;
 		}
 	};
-	
+
 	private final List<String> words;
-	
+
 	private ConfigFilter(List<String> words)
 	{
 		this.words = words;
 	}
-	
+
 	public ConfigFilter()
 	{
 		this(new ArrayList<>());
@@ -33,7 +33,7 @@ public class ConfigFilter
 		this.words.clear();
 		if (filter == null)
 			return;
-		
+
 		for (String word : filter.split("[ .,/]"))
 		{
 			if (!word.isEmpty())
@@ -55,7 +55,7 @@ public class ConfigFilter
 	
 	private static boolean entryMatchesWord(IConfigName node, String word)
 	{
-		String comment = node.getCommentString(); 
+		String comment = node.getCommentString();
 		return comment != null && comment.toLowerCase().contains(word)
 		    || node.getDisplayName().getString().toLowerCase().contains(word)
 		    || node.getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));

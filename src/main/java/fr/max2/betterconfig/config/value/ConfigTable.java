@@ -4,32 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.max2.betterconfig.config.IConfigName;
-import fr.max2.betterconfig.config.spec.IConfigListSpec;
-import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
-import fr.max2.betterconfig.config.spec.IConfigSpecNode;
-import fr.max2.betterconfig.config.spec.IConfigTableSpec;
+import fr.max2.betterconfig.config.spec.ConfigSpecNode;
 import net.minecraft.network.chat.Component;
 
 public final class ConfigTable implements IConfigNode
 {
-	private final IConfigTableSpec spec;
+	private final ConfigSpecNode.Table spec;
 	private final List<Entry> entryValues;
-	
-	public ConfigTable(IConfigTableSpec spec, IConfigName identifier)
+
+	public ConfigTable(ConfigSpecNode.Table spec, IConfigName identifier)
 	{
 		this.spec = spec;
-		this.entryValues = spec.getEntrySpecs().stream().map(entry ->
+		this.entryValues = spec.node().getEntrySpecs().stream().map(entry ->
 		{
 			return new Entry(new TableChildInfo(identifier, entry.key()), childNode(entry.key(), entry.node()));
 		}).toList();
 	}
-	
+
 	@Override
-	public IConfigTableSpec getSpec()
+	public ConfigSpecNode.Table getSpec()
 	{
-		return spec;
+		return this.spec;
 	}
-	
+
 	@Override
 	public Object getValue()
 	{
@@ -38,26 +35,26 @@ public final class ConfigTable implements IConfigNode
 
 	public List<Entry> getEntryValues()
 	{
-		return entryValues;
+		return this.entryValues;
 	}
-	
+
 	@Override
 	public void setAsInitialValue()
 	{
 		this.entryValues.forEach(entry -> entry.node().setAsInitialValue());
 	}
-	
+
 	@Override
 	public void undoChanges()
 	{
 		this.entryValues.forEach(entry -> entry.node().undoChanges());
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder("{ ");
-		
+
 		boolean fist = true;
 		for (var entry : this.entryValues)
 		{
@@ -69,40 +66,44 @@ public final class ConfigTable implements IConfigNode
 			builder.append(entry.key().getName());
 			builder.append(":");
 			builder.append(entry.node().toString());
-		}	
-		
+		}
+
 		builder.append(" }");
 		return builder.toString();
 	}
-	
-	private IConfigNode childNode(IConfigName identifier, IConfigSpecNode specNode)
+
+	private static IConfigNode childNode(IConfigName identifier, ConfigSpecNode specNode)
 	{
-		if (specNode instanceof IConfigTableSpec tableSpec)
+		if (specNode instanceof ConfigSpecNode.Table tableSpec)
 		{
 			return new ConfigTable(tableSpec, identifier);
 		}
-		else if (specNode instanceof IConfigListSpec listSpec)
+		else if (specNode instanceof ConfigSpecNode.List listSpec)
 		{
 			ConfigList node = new ConfigList(listSpec, identifier);
 			return node;
 		}
-		else if (specNode instanceof IConfigPrimitiveSpec<?> primitiveSpec)
+		else if (specNode instanceof ConfigSpecNode.Primitive<?> primitiveSpec)
 		{
-			return new ConfigPrimitive<>(primitiveSpec);
+			return ConfigPrimitive.make(primitiveSpec);
+		}
+		else if (specNode instanceof ConfigSpecNode.Unknown unknownSpec)
+		{
+			return new ConfigUnknown(unknownSpec);
 		}
 		else
 		{
 			throw new UnsupportedOperationException();
 		}
 	}
-	
+
 	public static record Entry
 	(
 		IConfigName key,
 		IConfigNode node
 	)
 	{ }
-	
+
 	private static class TableChildInfo implements IConfigName
 	{
 		private final IConfigName parent;
@@ -125,7 +126,7 @@ public final class ConfigTable implements IConfigNode
 		{
 			return this.entry.getDisplayName();
 		}
-		
+
 		@Override
 		public List<String> getPath()
 		{

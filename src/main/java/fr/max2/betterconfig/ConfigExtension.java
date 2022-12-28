@@ -32,7 +32,7 @@ public class ConfigExtension
 	}
 
 	/**
-	 * Configures the CONFIGGUIFACTORY extension point of the given mod to the custom config screen
+	 * Configures the ConfigScreenHandler.ConfigScreenFactory extension point of the given mod to the custom config screen
 	 * @param modId the id of the mod
 	 * @param mod the container of the mod
 	 */
@@ -49,7 +49,7 @@ public class ConfigExtension
 		mod.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory(BetterConfigScreen.factory(mod, configs)));
 	}
 
-	/** Gets the list of modifiable configurations for the fiven mod */
+	/** Gets the list of modifiable configurations for the given mod */
 	private static List<ModConfig> getModConfigs(ModContainer mod)
 	{
 		Map<ModConfig.Type, ModConfig> configMap = ObfuscationReflectionHelper.getPrivateValue(ModContainer.class, mod, "configs");

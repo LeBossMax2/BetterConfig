@@ -12,8 +12,8 @@ import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
-import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.value.ConfigUnknown;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -35,13 +35,13 @@ public class DebugConfigGui extends UnitComponent
 		this.parent = parent;
 		this.labels = labels;
 	}
-	
+
 	// Rendering
 
 	@Override
 	protected void onRender(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		Font font = this.parent.getFont(); 
+		Font font = this.parent.getFont();
 		this.parent.renderBackground(matrixStack);
 		int y = 1;
 		int color = this.getStyleProperty(TEXT_COLOR);
@@ -59,9 +59,9 @@ public class DebugConfigGui extends UnitComponent
 	@Override
 	protected void onRenderOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, EventState state)
 	{ }
-	
+
 	// Narration
-	
+
 	@Override
 	public void updateNarration(NarrationElementOutput narrationOutput)
 	{
@@ -80,7 +80,7 @@ public class DebugConfigGui extends UnitComponent
 		config.getEntryValues().forEach(entry -> buildTable(list, entry.key().getName(), entry.node()));
 		return new DebugConfigGui(screen, list);
 	}
-	
+
 	private static void buildTable(List<String> content, String path, IConfigNode node)
 	{
 		if (node instanceof ConfigTable table)
@@ -99,7 +99,11 @@ public class DebugConfigGui extends UnitComponent
 		}
 		else if (node instanceof ConfigPrimitive<?> primitive)
 		{
-			content.add(path + " : " + primitive.exploreType(ValueBuilder.INSTANCE));
+			content.add(path + " : " + explorePrimitive(primitive));
+		}
+		else if (node instanceof ConfigUnknown unknown)
+		{
+			content.add(path + " : " + "UNKNOWN" + " = " + unknown.getValue());
 		}
 		else
 		{
@@ -107,37 +111,25 @@ public class DebugConfigGui extends UnitComponent
 		}
 	}
 
-	/** The visitor to build config value widgets */
-	private static enum ValueBuilder implements IConfigPrimitiveVisitor<Void, String>
+	private static String explorePrimitive(ConfigPrimitive<?> property)
 	{
-		INSTANCE;
-		
-		@Override
-		public String visitBoolean(ConfigPrimitive<Boolean> property, Void param)
+		if (property instanceof ConfigPrimitive.Boolean boolNode)
 		{
 			return "BOOL" + " = " + property.getValue();
 		}
-		
-		@Override
-		public String visitNumber(ConfigPrimitive<? extends Number> property, Void param)
+		else if (property instanceof ConfigPrimitive.Number<?> numberNode)
 		{
 			return "NUMBER" + " = " + property.getValue();
 		}
-		
-		@Override
-		public String visitString(ConfigPrimitive<String> property, Void param)
+		else if (property instanceof ConfigPrimitive.String stringNode)
 		{
 			return "STRING" + " = " + property.getValue();
 		}
-		
-		@Override
-		public <E extends Enum<E>> String visitEnum(ConfigPrimitive<E> property, Void param)
+		else if (property instanceof ConfigPrimitive.Enum<?> enumNode)
 		{
 			return "ENUM" + " = " + property.getValue();
 		}
-		
-		@Override
-		public String visitUnknown(ConfigPrimitive<?> property, Void param)
+		else
 		{
 			return "UNKNOWN" + " = " + property.getValue();
 		}

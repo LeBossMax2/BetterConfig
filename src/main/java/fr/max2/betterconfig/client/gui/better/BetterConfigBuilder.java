@@ -14,8 +14,8 @@ import fr.max2.betterconfig.config.IConfigName;
 import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
-import fr.max2.betterconfig.config.value.IConfigPrimitiveVisitor;
 import fr.max2.betterconfig.config.value.ConfigTable;
+import fr.max2.betterconfig.config.value.ConfigUnknown;
 import fr.max2.betterconfig.util.property.list.IIndexedProperty;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
@@ -24,7 +24,7 @@ import net.minecraft.network.chat.Component;
 
 
 /** A builder for better configuration screen */
-public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName, IComponent>
+public class BetterConfigBuilder
 {
 	/**
 	 * Builds the user interface
@@ -47,7 +47,7 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 	{
 		this.screen = screen;
 	}
-	
+
 	private GuiGroup buildTable(ConfigTable table)
 	{
 		List<IBetterElement> content = table.getEntryValues().stream().map(entry -> this.visitNode(entry.key(), entry.node())).collect(Collectors.toList());
@@ -57,12 +57,12 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 	}
 
 	// Table entry visitor
-	
+
 	private IBetterElement visitNode(IConfigName identifier, IConfigNode node)
 	{
 		if (node instanceof ConfigTable table)
 		{
-			return visitTable(identifier, table);
+			return this.visitTable(identifier, table);
 		}
 		else if (node instanceof ConfigList list)
 		{
@@ -72,28 +72,32 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 		{
 			return this.visitPrimitive(identifier, primitive);
 		}
+		else if (node instanceof ConfigUnknown unknown)
+		{
+			return new ValueEntry(this.screen, identifier, unknown, new UnknownOptionWidget(unknown));
+		}
 		else
 		{
 			throw new UnsupportedOperationException();
 		}
 	}
-	
-	
+
+
 	private IBetterElement visitTable(IConfigName identifier, ConfigTable table)
 	{
 		return new Foldout(this.screen, identifier, this.buildTable(table));
 	}
-	
+
 	private IBetterElement visitList(IConfigName identifier, ConfigList list)
 	{
 		IReadableList<IComponent> mainElements = new ObservableList<>();
 		GuiGroup mainGroup = new GuiGroup(mainElements);
 		mainGroup.addClass("better:list_group");
-		
+
 		IReadableList<ConfigList.Entry> values = list.getValueList();
 		mainElements.add(new BetterButton(this.screen, Component.translatable(GuiTexts.ADD_ELEMENT_KEY), Component.translatable(GuiTexts.ADD_FIRST_TOOLTIP_KEY))
 				.addOnPressed(() -> list.addValue(0)));
-		
+
 		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, elem.key(), elem.node(), values.getIndexedProperties().get(index)));
 		IListListener<IBetterElement> listListener = new IListListener<>()
 		{
@@ -128,7 +132,7 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 
 		if (content.size() >= 1)
 			mainElements.add(this.buildAddLastButton(list));
-		
+
 		return new Foldout(this.screen, identifier, mainGroup);
 	}
 
@@ -138,49 +142,38 @@ public class BetterConfigBuilder implements IConfigPrimitiveVisitor<IConfigName,
 		button.addOnPressed(() -> list.addValue(list.getValueList().size()));
 		return button;
 	}
-	
+
 	private IBetterElement buildListElementGui(ConfigList list, IConfigName identifier, IConfigNode elem, IIndexedProperty<?> entry)
 	{
 		IBetterElement child = this.visitNode(identifier, elem);
-		
+
 		return new ListElementEntry(this.screen, child, () -> list.removeValueAt(entry.getIndex()));
 	}
-	
+
 	private <T> IBetterElement visitPrimitive(IConfigName identifier, ConfigPrimitive<T> primitive)
 	{
-		IComponent widget = primitive.exploreType(this, identifier);
+		IComponent widget;
+		if (primitive instanceof ConfigPrimitive.Boolean boolNode)
+		{
+			widget = OptionButton.booleanOption(boolNode);
+		}
+		else if (primitive instanceof ConfigPrimitive.Number<?> numberNode)
+		{
+			widget = NumberInputField.numberOption(this.screen, identifier, numberNode);
+		}
+		else if (primitive instanceof ConfigPrimitive.String stringNode)
+		{
+			widget = StringInputField.stringOption(this.screen, identifier, stringNode);
+		}
+		else if (primitive instanceof ConfigPrimitive.Enum<?> enumNode)
+		{
+			widget = OptionButton.enumOption(enumNode);
+		}
+		else
+		{
+			widget = new UnknownOptionWidget(primitive);
+		}
+
 		return new ValueEntry(this.screen, identifier, primitive, widget);
-	}
-
-	// Property visitor
-
-	@Override
-	public IComponent visitBoolean(ConfigPrimitive<Boolean> property, IConfigName identifier)
-	{
-		return OptionButton.booleanOption(property);
-	}
-
-	@Override
-	public IComponent visitNumber(ConfigPrimitive<? extends Number> property, IConfigName identifier)
-	{
-		return NumberInputField.numberOption(this.screen, identifier, property);
-	}
-
-	@Override
-	public IComponent visitString(ConfigPrimitive<String> property, IConfigName identifier)
-	{
-		return StringInputField.stringOption(this.screen, identifier, property);
-	}
-
-	@Override
-	public <E extends Enum<E>> IComponent visitEnum(ConfigPrimitive<E> property, IConfigName identifier)
-	{
-		return OptionButton.enumOption(property);
-	}
-
-	@Override
-	public IComponent visitUnknown(ConfigPrimitive<?> property, IConfigName identifier)
-	{
-		return new UnknownOptionWidget(property);
 	}
 }
