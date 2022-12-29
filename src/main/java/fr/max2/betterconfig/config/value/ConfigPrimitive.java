@@ -23,8 +23,8 @@ public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty
 	private ConfigPrimitive(ConfigSpec.Primitive<T> spec)
 	{
 		this.spec = spec;
-		this.initialValue = spec.node().getDefaultValue();
-		this.currentValue = this.initialValue;
+		this.initialValue = null;
+		this.currentValue = null;
 	}
 
 	public static ConfigPrimitive<?> make(IConfigName identifier, ConfigSpec.Primitive<?> spec)

@@ -47,12 +47,6 @@ public class ForgeConfigTableSpec implements IConfigTableSpec
 	}
 
 	@Override
-	public UnmodifiableConfig getDefaultValue()
-	{
-		throw new UnsupportedOperationException(); // TODO [#5] Implement default value for tables
-	}
-
-	@Override
 	public List<IConfigTableSpec.Entry> getEntrySpecs()
 	{
 		return this.entrySpecs;

@@ -2,8 +2,6 @@ package fr.max2.betterconfig.config.value;
 
 import java.util.Objects;
 
-import com.google.common.base.Preconditions;
-
 import fr.max2.betterconfig.config.IConfigName;
 import fr.max2.betterconfig.config.spec.ConfigSpec;
 
@@ -16,8 +14,8 @@ public final class ConfigUnknown implements IConfigNode
 	private ConfigUnknown(ConfigSpec.Unknown spec)
 	{
 		this.spec = spec;
-		this.initialValue = spec.node().getDefaultValue();
-		this.value = this.initialValue;
+		this.initialValue = null;
+		this.value = null;
 	}
 
 	public static ConfigUnknown make(IConfigName identifier, ConfigSpec.Unknown spec)
@@ -43,7 +41,6 @@ public final class ConfigUnknown implements IConfigNode
 
 	public void setValue(Object value)
 	{
-		Preconditions.checkArgument(this.spec.node().getValueClass().isInstance(value));
 		this.value = value;
 	}
 

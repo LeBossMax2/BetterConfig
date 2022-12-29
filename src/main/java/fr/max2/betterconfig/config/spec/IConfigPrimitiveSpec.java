@@ -4,10 +4,14 @@ import fr.max2.betterconfig.config.ValueType;
 
 public interface IConfigPrimitiveSpec<T> extends IConfigSpecNode
 {
-	@Override
+	/**
+	 * Gets the class of the configuration value
+	 */
 	Class<T> getValueClass();
 
-	@Override
+	/**
+	 * Gets the default configuration value
+	 */
 	T getDefaultValue();
 
 	default ValueType getType()

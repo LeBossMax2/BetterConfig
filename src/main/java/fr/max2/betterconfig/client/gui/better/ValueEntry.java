@@ -17,6 +17,7 @@ import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.IConfigNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
@@ -82,7 +83,8 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.extraInfo.clear();
 		this.extraInfo.add(Component.literal(this.identifier.getName()).withStyle(ChatFormatting.YELLOW));
 		this.extraInfo.addAll(this.identifier.getDisplayComment());
-		this.extraInfo.add((Component.translatable(GuiTexts.DEFAULT_VALUE_KEY, Component.literal(Objects.toString(this.property.getSpec().node().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
+		if (this.property instanceof ConfigPrimitive<?> primitive)
+			this.extraInfo.add((Component.translatable(GuiTexts.DEFAULT_VALUE_KEY, Component.literal(Objects.toString(primitive.getSpec().node().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override
