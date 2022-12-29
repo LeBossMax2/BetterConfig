@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Strings;
 
-import fr.max2.betterconfig.config.spec.ConfigLocation;
 import net.minecraft.network.chat.Component;
 
 public class ConfigIdentifier implements IConfigName

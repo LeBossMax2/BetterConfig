@@ -6,7 +6,7 @@ public interface IConfigSpecNode
 	 * Gets the class of the configuration value
 	 */
 	Class<?> getValueClass();
-	
+
 	/**
 	 * Gets the default configuration value
 	 */

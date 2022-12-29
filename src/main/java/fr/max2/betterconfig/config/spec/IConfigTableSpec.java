@@ -22,7 +22,7 @@ public interface IConfigTableSpec extends IConfigSpecNode
 	public static record Entry
 	(
 		ConfigIdentifier key,
-		ConfigSpecNode node
+		ConfigSpec node
 	)
 	{ }
 }

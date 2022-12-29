@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.config.impl.spec;
 
-import fr.max2.betterconfig.config.ValueType;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 
 public class ForgeListPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
@@ -33,6 +32,6 @@ public class ForgeListPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 	@Override
 	public T getDefaultValue()
 	{
-		return this.valueClass.cast(ValueType.getType(this.valueClass).getDefaultValue(this.valueClass));
+		return this.valueClass.cast(this.getType().getDefaultValue(this.valueClass));
 	}
 }

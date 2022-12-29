@@ -4,23 +4,29 @@ import java.util.Objects;
 
 import com.google.common.base.Preconditions;
 
-import fr.max2.betterconfig.config.spec.ConfigSpecNode;
+import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.spec.ConfigSpec;
 
 public final class ConfigUnknown implements IConfigNode
 {
-	private final ConfigSpecNode.Unknown spec;
+	private final ConfigSpec.Unknown spec;
 	private Object initialValue;
 	private Object value;
 
-	public ConfigUnknown(ConfigSpecNode.Unknown spec)
+	private ConfigUnknown(ConfigSpec.Unknown spec)
 	{
 		this.spec = spec;
 		this.initialValue = spec.node().getDefaultValue();
 		this.value = this.initialValue;
 	}
 
+	public static ConfigUnknown make(IConfigName identifier, ConfigSpec.Unknown spec)
+	{
+		return new ConfigUnknown(spec);
+	}
+
 	@Override
-	public ConfigSpecNode.Unknown getSpec()
+	public ConfigSpec.Unknown getSpec()
 	{
 		return this.spec;
 	}

@@ -4,25 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.max2.betterconfig.config.IConfigName;
-import fr.max2.betterconfig.config.spec.ConfigSpecNode;
+import fr.max2.betterconfig.config.spec.ConfigSpec;
 import net.minecraft.network.chat.Component;
 
 public final class ConfigTable implements IConfigNode
 {
-	private final ConfigSpecNode.Table spec;
+	private final ConfigSpec.Table spec;
 	private final List<Entry> entryValues;
 
-	public ConfigTable(ConfigSpecNode.Table spec, IConfigName identifier)
+	private ConfigTable(ConfigSpec.Table spec, IConfigName identifier)
 	{
 		this.spec = spec;
 		this.entryValues = spec.node().getEntrySpecs().stream().map(entry ->
 		{
-			return new Entry(new TableChildInfo(identifier, entry.key()), childNode(entry.key(), entry.node()));
+			return new Entry(new TableChildInfo(identifier, entry.key()), IConfigNode.make(entry.key(), entry.node()));
 		}).toList();
 	}
 
+	public static ConfigTable make(IConfigName identifier, ConfigSpec.Table spec)
+	{
+		return new ConfigTable(spec, identifier);
+	}
+
 	@Override
-	public ConfigSpecNode.Table getSpec()
+	public ConfigSpec.Table getSpec()
 	{
 		return this.spec;
 	}
@@ -70,31 +75,6 @@ public final class ConfigTable implements IConfigNode
 
 		builder.append(" }");
 		return builder.toString();
-	}
-
-	private static IConfigNode childNode(IConfigName identifier, ConfigSpecNode specNode)
-	{
-		if (specNode instanceof ConfigSpecNode.Table tableSpec)
-		{
-			return new ConfigTable(tableSpec, identifier);
-		}
-		else if (specNode instanceof ConfigSpecNode.List listSpec)
-		{
-			ConfigList node = new ConfigList(listSpec, identifier);
-			return node;
-		}
-		else if (specNode instanceof ConfigSpecNode.Primitive<?> primitiveSpec)
-		{
-			return ConfigPrimitive.make(primitiveSpec);
-		}
-		else if (specNode instanceof ConfigSpecNode.Unknown unknownSpec)
-		{
-			return new ConfigUnknown(unknownSpec);
-		}
-		else
-		{
-			throw new UnsupportedOperationException();
-		}
 	}
 
 	public static record Entry

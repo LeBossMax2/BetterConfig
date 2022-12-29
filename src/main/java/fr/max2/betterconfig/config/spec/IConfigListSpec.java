@@ -13,5 +13,5 @@ public interface IConfigListSpec extends IConfigSpecNode
 	@Override
 	List<?> getDefaultValue();
 
-	ConfigSpecNode getElementSpec();
+	ConfigSpec getElementSpec();
 }

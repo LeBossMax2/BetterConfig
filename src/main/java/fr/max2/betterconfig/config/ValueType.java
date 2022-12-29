@@ -3,7 +3,7 @@ package fr.max2.betterconfig.config;
 import java.util.function.Function;
 
 import fr.max2.betterconfig.client.util.NumberTypes;
-import fr.max2.betterconfig.config.spec.ConfigSpecNode;
+import fr.max2.betterconfig.config.spec.ConfigSpec;
 import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 
 /**
@@ -12,7 +12,7 @@ import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public enum ValueType
 {
-	BOOLEAN(Boolean.class, ConfigSpecNode.Boolean::new)
+	BOOLEAN(Boolean.class, ConfigSpec.Boolean::new)
 	{
 		@Override
 		public Object getDefaultValue(Class<?> valueClass)
@@ -20,7 +20,7 @@ public enum ValueType
 			return Boolean.FALSE;
 		}
 	},
-	NUMBER(Number.class, ConfigSpecNode.Number::new)
+	NUMBER(Number.class, ConfigSpec.Number::new)
 	{
 		@Override
 		public Object getDefaultValue(Class<?> valueClass)
@@ -28,7 +28,7 @@ public enum ValueType
 			return NumberTypes.getType(valueClass).parse("0");
 		}
 	},
-	STRING(String.class, ConfigSpecNode.String::new)
+	STRING(String.class, ConfigSpec.String::new)
 	{
 		@Override
 		public Object getDefaultValue(Class<?> valueClass)
@@ -36,7 +36,7 @@ public enum ValueType
 			return "";
 		}
 	},
-	ENUM(Enum.class, ConfigSpecNode.Enum::new)
+	ENUM(Enum.class, ConfigSpec.Enum::new)
 	{
 		@Override
 		public Object getDefaultValue(Class<?> valueClass)
@@ -48,9 +48,9 @@ public enum ValueType
 	/** The super class corresponding to the type */
 	private final Class<?> superClass;
 
-	private final Function<IConfigPrimitiveSpec, ConfigSpecNode.Primitive> specConstructor;
+	private final Function<IConfigPrimitiveSpec, ConfigSpec.Primitive> specConstructor;
 
-	private ValueType(Class<?> clazz, Function<IConfigPrimitiveSpec, ConfigSpecNode.Primitive> specConstructor)
+	private ValueType(Class<?> clazz, Function<IConfigPrimitiveSpec, ConfigSpec.Primitive> specConstructor)
 	{
 		this.superClass = clazz;
 		this.specConstructor = specConstructor;
@@ -68,7 +68,7 @@ public enum ValueType
 
 	public abstract Object getDefaultValue(Class<?> valueClass);
 
-	public <T> ConfigSpecNode.Primitive<T> makeSpec(IConfigPrimitiveSpec<T> innerSpec)
+	public <T> ConfigSpec.Primitive<T> makeSpec(IConfigPrimitiveSpec<T> innerSpec)
 	{
 		return this.specConstructor.apply(innerSpec);
 	}

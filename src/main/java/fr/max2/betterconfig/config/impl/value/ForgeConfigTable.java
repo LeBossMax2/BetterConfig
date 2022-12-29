@@ -6,10 +6,10 @@ import java.util.function.Function;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
+import fr.max2.betterconfig.config.ConfigLocation;
 import fr.max2.betterconfig.config.IConfigName;
 import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
-import fr.max2.betterconfig.config.spec.ConfigLocation;
-import fr.max2.betterconfig.config.spec.ConfigSpecNode;
+import fr.max2.betterconfig.config.spec.ConfigSpec;
 import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
@@ -31,7 +31,7 @@ public class ForgeConfigTable
 
 	public static ConfigTable create(ForgeConfigSpec spec, Consumer<ForgeConfigProperty<?>> changeListener)
 	{
-		ConfigTable table = new ConfigTable(new ConfigSpecNode.Table(new ForgeConfigTableSpec(spec, getSpecComments(spec))), RootInfo.INSTANCE);
+		ConfigTable table = ConfigTable.make(RootInfo.INSTANCE, new ConfigSpec.Table(new ForgeConfigTableSpec(spec, getSpecComments(spec))));
 		newForgeConfigTable(table, changeListener, spec.getValues());
 		table.setAsInitialValue();
 		return table;

@@ -1,4 +1,4 @@
-package fr.max2.betterconfig.config.spec;
+package fr.max2.betterconfig.config;
 
 import java.util.List;
 

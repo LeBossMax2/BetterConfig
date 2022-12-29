@@ -1,28 +1,26 @@
 package fr.max2.betterconfig.config.spec;
 
-import fr.max2.betterconfig.config.ValueType;
-
-public sealed interface ConfigSpecNode permits ConfigSpecNode.Unknown, ConfigSpecNode.Table, ConfigSpecNode.List, ConfigSpecNode.Primitive
+public sealed interface ConfigSpec permits ConfigSpec.Unknown, ConfigSpec.Table, ConfigSpec.List, ConfigSpec.Primitive
 {
 	IConfigSpecNode node();
 
-	public static final record Unknown(IConfigSpecNode node) implements ConfigSpecNode
+	public static final record Unknown(IConfigSpecNode node) implements ConfigSpec
 	{ }
 
-	public static final record Table(IConfigTableSpec node) implements ConfigSpecNode
+	public static final record Table(IConfigTableSpec node) implements ConfigSpec
 	{ }
 
-	public static final record List(IConfigListSpec node) implements ConfigSpecNode
+	public static final record List(IConfigListSpec node) implements ConfigSpec
 	{ }
 
-	public static sealed interface Primitive<T> extends ConfigSpecNode permits Boolean, String, Enum, Number
+	public static sealed interface Primitive<T> extends ConfigSpec permits Boolean, String, Enum, Number
 	{
 		@Override
 		IConfigPrimitiveSpec<T> node();
 
 		public static <T> Primitive<T> make(IConfigPrimitiveSpec<T> node)
 		{
-			return ValueType.getType(node.getValueClass()).makeSpec(node);
+			return node.getType().makeSpec(node);
 		}
 	}
 
