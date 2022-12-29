@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.spec.ConfigListSpec;
 import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.ConfigSpec;
@@ -20,21 +20,21 @@ import fr.max2.betterconfig.util.property.list.ObservableList;
 import fr.max2.betterconfig.util.property.list.ReadableLists;
 import net.minecraft.network.chat.Component;
 
-public final class ConfigList implements IConfigNode
+public final class ConfigList implements ConfigNode
 {
 	/** The translation key for the label of elements of a list */
 	public static final String LIST_ELEMENT_LABEL_KEY = BetterConfig.MODID + ".list.child";
 
 	private final List<Runnable> elemChangeListeners = new ArrayList<>();
 	private final ConfigListSpec spec;
-	private final IConfigName identifier;
-	private final Function<IConfigName, IConfigNode> elementBuilder;
+	private final ConfigName identifier;
+	private final Function<ConfigName, ConfigNode> elementBuilder;
 	private final IReadableList<Entry> valueList;
 	private final IReadableList<Entry> valueListView;
 	private final List<?> currentValue;
 	private int initialSize = 0;
 
-	private ConfigList(ConfigListSpec spec, IConfigName identifier)
+	private ConfigList(ConfigListSpec spec, ConfigName identifier)
 	{
 		this.spec = spec;
 		this.identifier = identifier;
@@ -44,7 +44,7 @@ public final class ConfigList implements IConfigNode
 		this.currentValue = new MappedListView<>(this.valueList, entry -> entry.node().getValue());
 	}
 
-	public static ConfigList make(IConfigName identifier, ConfigListSpec spec)
+	public static ConfigList make(ConfigName identifier, ConfigListSpec spec)
 	{
 		return new ConfigList(spec, identifier);
 	}
@@ -135,7 +135,7 @@ public final class ConfigList implements IConfigNode
 		return "[ " + this.getValueList().stream().map(val -> val.toString()).collect(Collectors.joining(", ")) + " ]";
 	}
 
-	private Function<IConfigName, IConfigNode> chooseElementBuilder(ConfigSpec specNode)
+	private Function<ConfigName, ConfigNode> chooseElementBuilder(ConfigSpec specNode)
 	{
 		if (specNode instanceof ConfigTableSpec tableSpec)
 		{
@@ -159,7 +159,7 @@ public final class ConfigList implements IConfigNode
 		}
 	}
 
-	private <T> Function<IConfigName, IConfigNode> makePrimitiveElementBuilder(ConfigPrimitiveSpec<T> primitiveSpec)
+	private <T> Function<ConfigName, ConfigNode> makePrimitiveElementBuilder(ConfigPrimitiveSpec<T> primitiveSpec)
 	{
 		return id ->
 		{
@@ -171,18 +171,18 @@ public final class ConfigList implements IConfigNode
 
 	public static record Entry
 	(
-		IConfigName key,
-		IConfigNode node
+		ConfigName key,
+		ConfigNode node
 	)
 	{ }
 }
 
-class ListChildInfo implements IConfigName
+class ListChildInfo implements ConfigName
 {
-	private final IConfigName parent;
+	private final ConfigName parent;
 	private int index;
 
-	public ListChildInfo(IConfigName parent)
+	public ListChildInfo(ConfigName parent)
 	{
 		this.parent = parent;
 		this.index = -1;

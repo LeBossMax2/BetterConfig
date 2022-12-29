@@ -19,7 +19,7 @@ import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -41,7 +41,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	/** The parent screen */
 	private final BetterConfigScreen screen;
 	
-	private final IConfigName identifier;
+	private final ConfigName identifier;
 	/** The content that will be collapsed */
 	private final IBetterElement content;
 	/** The extra info to show on the tooltip */
@@ -51,7 +51,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	private boolean folded = false;
 	private boolean filteredOut = false;
 
-	public Foldout(BetterConfigScreen screen, IConfigName identifier, IBetterElement content)
+	public Foldout(BetterConfigScreen screen, ConfigName identifier, IBetterElement content)
 	{
 		super("better:foldout");
 		this.screen = screen;

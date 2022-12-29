@@ -10,9 +10,9 @@ import fr.max2.betterconfig.client.gui.better.widget.StringInputField;
 import fr.max2.betterconfig.client.gui.better.widget.UnknownOptionWidget;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import fr.max2.betterconfig.client.util.GuiTexts;
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.value.ConfigList;
-import fr.max2.betterconfig.config.value.IConfigNode;
+import fr.max2.betterconfig.config.value.ConfigNode;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.ConfigUnknown;
@@ -58,7 +58,7 @@ public class BetterConfigBuilder
 
 	// Table entry visitor
 
-	private IBetterElement visitNode(IConfigName identifier, IConfigNode node)
+	private IBetterElement visitNode(ConfigName identifier, ConfigNode node)
 	{
 		if (node instanceof ConfigTable table)
 		{
@@ -83,12 +83,12 @@ public class BetterConfigBuilder
 	}
 
 
-	private IBetterElement visitTable(IConfigName identifier, ConfigTable table)
+	private IBetterElement visitTable(ConfigName identifier, ConfigTable table)
 	{
 		return new Foldout(this.screen, identifier, this.buildTable(table));
 	}
 
-	private IBetterElement visitList(IConfigName identifier, ConfigList list)
+	private IBetterElement visitList(ConfigName identifier, ConfigList list)
 	{
 		IReadableList<IComponent> mainElements = new ObservableList<>();
 		GuiGroup mainGroup = new GuiGroup(mainElements);
@@ -143,14 +143,14 @@ public class BetterConfigBuilder
 		return button;
 	}
 
-	private IBetterElement buildListElementGui(ConfigList list, IConfigName identifier, IConfigNode elem, IIndexedProperty<?> entry)
+	private IBetterElement buildListElementGui(ConfigList list, ConfigName identifier, ConfigNode elem, IIndexedProperty<?> entry)
 	{
 		IBetterElement child = this.visitNode(identifier, elem);
 
 		return new ListElementEntry(this.screen, child, () -> list.removeValueAt(entry.getIndex()));
 	}
 
-	private <T> IBetterElement visitPrimitive(IConfigName identifier, ConfigPrimitive<T> primitive)
+	private <T> IBetterElement visitPrimitive(ConfigName identifier, ConfigPrimitive<T> primitive)
 	{
 		IComponent widget;
 		if (primitive instanceof ConfigPrimitive.Boolean boolNode)

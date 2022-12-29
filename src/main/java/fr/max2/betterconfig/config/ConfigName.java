@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.minecraft.network.chat.Component;
 
-public interface IConfigName
+public interface ConfigName
 {
 	String getName();
 	

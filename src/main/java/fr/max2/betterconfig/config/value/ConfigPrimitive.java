@@ -3,12 +3,12 @@ package fr.max2.betterconfig.config.value;
 import java.util.HashSet;
 import java.util.Set;
 
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import fr.max2.betterconfig.util.property.IListener;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
-public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty<T>
+public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<T>
 	permits
 		ConfigPrimitive.Boolean,
 		ConfigPrimitive.String,
@@ -27,7 +27,7 @@ public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty
 		this.currentValue = null;
 	}
 
-	public static ConfigPrimitive<?> make(IConfigName identifier, ConfigPrimitiveSpec<?> spec)
+	public static ConfigPrimitive<?> make(ConfigName identifier, ConfigPrimitiveSpec<?> spec)
 	{
 		if (spec instanceof ConfigPrimitiveSpec.Boolean boolNode)
 		{

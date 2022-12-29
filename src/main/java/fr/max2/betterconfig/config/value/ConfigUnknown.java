@@ -2,10 +2,10 @@ package fr.max2.betterconfig.config.value;
 
 import java.util.Objects;
 
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.spec.ConfigUnknownSpec;
 
-public final class ConfigUnknown implements IConfigNode
+public final class ConfigUnknown implements ConfigNode
 {
 	private final ConfigUnknownSpec spec;
 	private Object initialValue;
@@ -18,7 +18,7 @@ public final class ConfigUnknown implements IConfigNode
 		this.value = null;
 	}
 
-	public static ConfigUnknown make(IConfigName identifier, ConfigUnknownSpec spec)
+	public static ConfigUnknown make(ConfigName identifier, ConfigUnknownSpec spec)
 	{
 		return new ConfigUnknown(spec);
 	}

@@ -10,7 +10,7 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.config.value.ConfigList;
-import fr.max2.betterconfig.config.value.IConfigNode;
+import fr.max2.betterconfig.config.value.ConfigNode;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.ConfigUnknown;
@@ -81,7 +81,7 @@ public class DebugConfigGui extends UnitComponent
 		return new DebugConfigGui(screen, list);
 	}
 
-	private static void buildTable(List<String> content, String path, IConfigNode node)
+	private static void buildTable(List<String> content, String path, ConfigNode node)
 	{
 		if (node instanceof ConfigTable table)
 		{

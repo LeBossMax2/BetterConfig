@@ -16,9 +16,9 @@ import fr.max2.betterconfig.client.gui.layout.Alignment;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.ConfigFilter;
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
-import fr.max2.betterconfig.config.value.IConfigNode;
+import fr.max2.betterconfig.config.value.ConfigNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
@@ -26,15 +26,15 @@ import net.minecraft.network.chat.Component;
 /** The container for table entries */
 public class ValueEntry extends CompositeComponent implements IBetterElement
 {
-	private final IConfigName identifier;
+	private final ConfigName identifier;
 	/** The edited property */
-	private final IConfigNode property;
+	private final ConfigNode property;
 	/** The extra info to show on the tooltip */
 	private final List<Component> extraInfo = new ArrayList<>();
 	/** Indicates if the property is hidden or not */
 	private boolean filteredOut = false;
 
-	public ValueEntry(BetterConfigScreen screen, IConfigName identifier, IConfigNode property, IComponent content)
+	public ValueEntry(BetterConfigScreen screen, ConfigName identifier, ConfigNode property, IComponent content)
 	{
 		super("better:value_entry");
 		this.identifier = identifier;

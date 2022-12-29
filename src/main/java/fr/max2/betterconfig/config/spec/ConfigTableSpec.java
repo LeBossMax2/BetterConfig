@@ -1,6 +1,6 @@
 package fr.max2.betterconfig.config.spec;
 
-import fr.max2.betterconfig.config.ConfigIdentifier;
+import fr.max2.betterconfig.config.ConfigName;
 
 public final class ConfigTableSpec implements ConfigSpec
 {
@@ -18,7 +18,7 @@ public final class ConfigTableSpec implements ConfigSpec
 
 	public static record Entry
 	(
-		ConfigIdentifier key,
+		ConfigName key,
 		ConfigSpec node
 	)
 	{ }

@@ -10,7 +10,7 @@ public class ConfigFilter
 	public static final ConfigFilter NONE = new ConfigFilter(Collections.emptyList())
 	{
 		@Override
-		public boolean matches(IConfigName node)
+		public boolean matches(ConfigName node)
 		{
 			return false;
 		}
@@ -43,7 +43,7 @@ public class ConfigFilter
 		}
 	}
 	
-	public boolean matches(IConfigName node)
+	public boolean matches(ConfigName node)
 	{
 		for (String word : this.words)
 		{
@@ -53,7 +53,7 @@ public class ConfigFilter
 		return true;
 	}
 	
-	private static boolean entryMatchesWord(IConfigName node, String word)
+	private static boolean entryMatchesWord(ConfigName node, String word)
 	{
 		String comment = node.getCommentString();
 		return comment != null && comment.toLowerCase().contains(word)

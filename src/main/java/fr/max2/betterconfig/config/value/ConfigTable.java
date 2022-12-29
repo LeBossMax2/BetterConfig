@@ -3,25 +3,24 @@ package fr.max2.betterconfig.config.value;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.spec.ConfigTableSpec;
 import net.minecraft.network.chat.Component;
 
-public final class ConfigTable implements IConfigNode
+public final class ConfigTable implements ConfigNode
 {
 	private final ConfigTableSpec spec;
 	private final List<Entry> entryValues;
 
-	private ConfigTable(ConfigTableSpec spec, IConfigName identifier)
+	private ConfigTable(ConfigTableSpec spec, ConfigName identifier)
 	{
 		this.spec = spec;
 		this.entryValues = spec.entries().stream().map(entry ->
-		{
-			return new Entry(new TableChildInfo(identifier, entry.key()), IConfigNode.make(entry.key(), entry.node()));
-		}).toList();
+			new Entry(new TableChildInfo(identifier, entry.key()), ConfigNode.make(entry.key(), entry.node()))
+		).toList();
 	}
 
-	public static ConfigTable make(IConfigName identifier, ConfigTableSpec spec)
+	public static ConfigTable make(ConfigName identifier, ConfigTableSpec spec)
 	{
 		return new ConfigTable(spec, identifier);
 	}
@@ -79,17 +78,17 @@ public final class ConfigTable implements IConfigNode
 
 	public static record Entry
 	(
-		IConfigName key,
-		IConfigNode node
+		ConfigName key,
+		ConfigNode node
 	)
 	{ }
 
-	private static class TableChildInfo implements IConfigName
+	private static class TableChildInfo implements ConfigName
 	{
-		private final IConfigName parent;
-		private final IConfigName entry;
+		private final ConfigName parent;
+		private final ConfigName entry;
 
-		private TableChildInfo(IConfigName parent, IConfigName entry)
+		private TableChildInfo(ConfigName parent, ConfigName entry)
 		{
 			this.parent = parent;
 			this.entry = entry;

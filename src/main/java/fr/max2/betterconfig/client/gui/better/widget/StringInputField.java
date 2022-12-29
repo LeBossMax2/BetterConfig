@@ -3,7 +3,7 @@ package fr.max2.betterconfig.client.gui.better.widget;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.client.gui.Font;
@@ -50,7 +50,7 @@ public class StringInputField extends TextField
 	}
 
 	/** Creates a widget for string values */
-	public static StringInputField stringOption(BetterConfigScreen screen, IConfigName identifier, ConfigPrimitive<String> property)
+	public static StringInputField stringOption(BetterConfigScreen screen, ConfigName identifier, ConfigPrimitive<String> property)
 	{
 		return new StringInputField(screen.getFont(), property, identifier.getDisplayName());
 	}

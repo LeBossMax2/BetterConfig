@@ -7,13 +7,13 @@ import java.util.function.Function;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
 import fr.max2.betterconfig.config.ConfigLocation;
-import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
 import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.ConfigUnknown;
-import fr.max2.betterconfig.config.value.IConfigNode;
+import fr.max2.betterconfig.config.value.ConfigNode;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
@@ -36,7 +36,7 @@ public class ForgeConfigTable
 		return table;
 	}
 
-	private static void childNode(IConfigName identifier, IConfigNode node, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
+	private static void childNode(ConfigName identifier, ConfigNode node, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
 	{
 		var param = configValues.get(identifier.getName());
 
@@ -82,7 +82,7 @@ public class ForgeConfigTable
 		return loc -> spec.getLevelComment(loc.getPath());
 	}
 
-	private static enum RootInfo implements IConfigName
+	private static enum RootInfo implements ConfigName
 	{
 		INSTANCE;
 

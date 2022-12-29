@@ -9,7 +9,7 @@ import com.google.common.base.Strings;
 
 import net.minecraft.network.chat.Component;
 
-public class ConfigIdentifier implements IConfigName
+public class ConfigIdentifier implements ConfigName
 {
 	private final ConfigLocation loc;
 	private final Component displayName;

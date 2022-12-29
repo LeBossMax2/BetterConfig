@@ -6,7 +6,7 @@ import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.ConfigUnknown;
-import fr.max2.betterconfig.config.value.IConfigNode;
+import fr.max2.betterconfig.config.value.ConfigNode;
 
 public class ForgeConfigList
 {
@@ -24,7 +24,7 @@ public class ForgeConfigList
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void childNode(IConfigNode node, Object value)
+	private static void childNode(ConfigNode node, Object value)
 	{
 		if (node instanceof ConfigTable tableNode)
 		{
