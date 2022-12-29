@@ -15,7 +15,7 @@ public class StringInputField extends TextField
 	/** The property to edit */
 	private final ConfigPrimitive<String> property;
 	private final IListener<String> propertyListener;
-	
+
 	private StringInputField(Font fontRenderer, ConfigPrimitive<String> property, Component title)
 	{
 		super(fontRenderer, title);
@@ -23,17 +23,17 @@ public class StringInputField extends TextField
 		this.property = property;
 		this.setValue(property.getValue());
 		this.setResponder(this::updateTextColor);
-		
+
 		this.propertyListener = this::setValue;
 		this.property.onChanged(this.propertyListener);
 	}
-	
+
 	/** Updates the color of the text to indicates an error */
 	private void updateTextColor(String text)
 	{
 		this.setTextColor(this.property.getSpec().node().isAllowed(text) ? Constants.DEFAULT_FIELD_TEXT_COLOR : Constants.ERROR_FIELD_TEXT_COLOR);
 	}
-	
+
 	@Override
 	protected void onValidate(String text)
 	{
@@ -42,7 +42,7 @@ public class StringInputField extends TextField
 			this.property.setValue(text);
 		}
 	}
-	
+
 	@Override
 	public void invalidate()
 	{

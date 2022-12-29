@@ -2,7 +2,7 @@ package fr.max2.betterconfig.config.spec;
 
 import fr.max2.betterconfig.config.ValueType;
 
-public interface IConfigPrimitiveSpec<T> extends IConfigSpecNode
+public interface IConfigPrimitiveSpec<T>
 {
 	/**
 	 * Gets the class of the configuration value

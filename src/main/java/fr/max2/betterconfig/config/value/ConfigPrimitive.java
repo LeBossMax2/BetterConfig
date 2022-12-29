@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import fr.max2.betterconfig.config.IConfigName;
-import fr.max2.betterconfig.config.spec.ConfigSpec;
+import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import fr.max2.betterconfig.util.property.IListener;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
@@ -16,32 +16,32 @@ public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty
 		ConfigPrimitive.Number
 {
 	private final Set<IListener<? super T>> listeners = new HashSet<>();
-	private final ConfigSpec.Primitive<T> spec;
+	private final ConfigPrimitiveSpec<T> spec;
 	private T initialValue;
 	private T currentValue;
 
-	private ConfigPrimitive(ConfigSpec.Primitive<T> spec)
+	private ConfigPrimitive(ConfigPrimitiveSpec<T> spec)
 	{
 		this.spec = spec;
 		this.initialValue = null;
 		this.currentValue = null;
 	}
 
-	public static ConfigPrimitive<?> make(IConfigName identifier, ConfigSpec.Primitive<?> spec)
+	public static ConfigPrimitive<?> make(IConfigName identifier, ConfigPrimitiveSpec<?> spec)
 	{
-		if (spec instanceof ConfigSpec.Boolean boolNode)
+		if (spec instanceof ConfigPrimitiveSpec.Boolean boolNode)
 		{
 			return new Boolean(boolNode);
 		}
-		else if (spec instanceof ConfigSpec.Number<?> numberNode)
+		else if (spec instanceof ConfigPrimitiveSpec.Number<?> numberNode)
 		{
 			return new Number<>(numberNode);
 		}
-		else if (spec instanceof ConfigSpec.String stringNode)
+		else if (spec instanceof ConfigPrimitiveSpec.String stringNode)
 		{
 			return new String(stringNode);
 		}
-		else if (spec instanceof ConfigSpec.Enum<?> enumNode)
+		else if (spec instanceof ConfigPrimitiveSpec.Enum<?> enumNode)
 		{
 			return new Enum<>(enumNode);
 		}
@@ -52,7 +52,7 @@ public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty
 	}
 
 	@Override
-	public ConfigSpec.Primitive<T> getSpec()
+	public ConfigPrimitiveSpec<T> getSpec()
 	{
 		return this.spec;
 	}
@@ -114,7 +114,7 @@ public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty
 
 	public static final class Boolean extends ConfigPrimitive<java.lang.Boolean>
 	{
-		private Boolean(ConfigSpec.Boolean spec)
+		private Boolean(ConfigPrimitiveSpec.Boolean spec)
 		{
 			super(spec);
 		}
@@ -122,7 +122,7 @@ public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty
 
 	public static final class String extends ConfigPrimitive<java.lang.String>
 	{
-		private String(ConfigSpec.String spec)
+		private String(ConfigPrimitiveSpec.String spec)
 		{
 			super(spec);
 		}
@@ -130,7 +130,7 @@ public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty
 
 	public static final class Enum<E extends java.lang.Enum<E>> extends ConfigPrimitive<E>
 	{
-		private Enum(ConfigSpec.Enum<E> spec)
+		private Enum(ConfigPrimitiveSpec.Enum<E> spec)
 		{
 			super(spec);
 		}
@@ -138,7 +138,7 @@ public sealed class ConfigPrimitive<T> implements IConfigNode, IReadableProperty
 
 	public static final class Number<N extends java.lang.Number> extends ConfigPrimitive<N>
 	{
-		private Number(ConfigSpec.Number<N> spec)
+		private Number(ConfigPrimitiveSpec.Number<N> spec)
 		{
 			super(spec);
 		}

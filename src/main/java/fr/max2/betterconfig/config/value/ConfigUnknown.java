@@ -3,28 +3,28 @@ package fr.max2.betterconfig.config.value;
 import java.util.Objects;
 
 import fr.max2.betterconfig.config.IConfigName;
-import fr.max2.betterconfig.config.spec.ConfigSpec;
+import fr.max2.betterconfig.config.spec.ConfigUnknownSpec;
 
 public final class ConfigUnknown implements IConfigNode
 {
-	private final ConfigSpec.Unknown spec;
+	private final ConfigUnknownSpec spec;
 	private Object initialValue;
 	private Object value;
 
-	private ConfigUnknown(ConfigSpec.Unknown spec)
+	private ConfigUnknown(ConfigUnknownSpec spec)
 	{
 		this.spec = spec;
 		this.initialValue = null;
 		this.value = null;
 	}
 
-	public static ConfigUnknown make(IConfigName identifier, ConfigSpec.Unknown spec)
+	public static ConfigUnknown make(IConfigName identifier, ConfigUnknownSpec spec)
 	{
 		return new ConfigUnknown(spec);
 	}
 
 	@Override
-	public ConfigSpec.Unknown getSpec()
+	public ConfigUnknownSpec getSpec()
 	{
 		return this.spec;
 	}

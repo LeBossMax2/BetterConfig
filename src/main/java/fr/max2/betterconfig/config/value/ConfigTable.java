@@ -4,30 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.max2.betterconfig.config.IConfigName;
-import fr.max2.betterconfig.config.spec.ConfigSpec;
+import fr.max2.betterconfig.config.spec.ConfigTableSpec;
 import net.minecraft.network.chat.Component;
 
 public final class ConfigTable implements IConfigNode
 {
-	private final ConfigSpec.Table spec;
+	private final ConfigTableSpec spec;
 	private final List<Entry> entryValues;
 
-	private ConfigTable(ConfigSpec.Table spec, IConfigName identifier)
+	private ConfigTable(ConfigTableSpec spec, IConfigName identifier)
 	{
 		this.spec = spec;
-		this.entryValues = spec.node().getEntrySpecs().stream().map(entry ->
+		this.entryValues = spec.entries().stream().map(entry ->
 		{
 			return new Entry(new TableChildInfo(identifier, entry.key()), IConfigNode.make(entry.key(), entry.node()));
 		}).toList();
 	}
 
-	public static ConfigTable make(IConfigName identifier, ConfigSpec.Table spec)
+	public static ConfigTable make(IConfigName identifier, ConfigTableSpec spec)
 	{
 		return new ConfigTable(spec, identifier);
 	}
 
 	@Override
-	public ConfigSpec.Table getSpec()
+	public ConfigTableSpec getSpec()
 	{
 		return this.spec;
 	}

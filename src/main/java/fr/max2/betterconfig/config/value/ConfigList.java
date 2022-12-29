@@ -9,7 +9,11 @@ import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.config.IConfigName;
+import fr.max2.betterconfig.config.spec.ConfigListSpec;
+import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.ConfigSpec;
+import fr.max2.betterconfig.config.spec.ConfigTableSpec;
+import fr.max2.betterconfig.config.spec.ConfigUnknownSpec;
 import fr.max2.betterconfig.util.MappedListView;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
@@ -22,7 +26,7 @@ public final class ConfigList implements IConfigNode
 	public static final String LIST_ELEMENT_LABEL_KEY = BetterConfig.MODID + ".list.child";
 
 	private final List<Runnable> elemChangeListeners = new ArrayList<>();
-	private final ConfigSpec.List spec;
+	private final ConfigListSpec spec;
 	private final IConfigName identifier;
 	private final Function<IConfigName, IConfigNode> elementBuilder;
 	private final IReadableList<Entry> valueList;
@@ -30,23 +34,23 @@ public final class ConfigList implements IConfigNode
 	private final List<?> currentValue;
 	private int initialSize = 0;
 
-	private ConfigList(ConfigSpec.List spec, IConfigName identifier)
+	private ConfigList(ConfigListSpec spec, IConfigName identifier)
 	{
 		this.spec = spec;
 		this.identifier = identifier;
-		this.elementBuilder = this.chooseElementBuilder(spec.node().getElementSpec());
+		this.elementBuilder = this.chooseElementBuilder(spec.elementSpec());
 		this.valueList = new ObservableList<>();
 		this.valueListView = ReadableLists.unmodifiableList(this.valueList);
 		this.currentValue = new MappedListView<>(this.valueList, entry -> entry.node().getValue());
 	}
 
-	public static ConfigList make(IConfigName identifier, ConfigSpec.List spec)
+	public static ConfigList make(IConfigName identifier, ConfigListSpec spec)
 	{
 		return new ConfigList(spec, identifier);
 	}
 
 	@Override
-	public ConfigSpec.List getSpec()
+	public ConfigListSpec getSpec()
 	{
 		return this.spec;
 	}
@@ -133,19 +137,19 @@ public final class ConfigList implements IConfigNode
 
 	private Function<IConfigName, IConfigNode> chooseElementBuilder(ConfigSpec specNode)
 	{
-		if (specNode instanceof ConfigSpec.Table tableSpec)
+		if (specNode instanceof ConfigTableSpec tableSpec)
 		{
 			throw new UnsupportedOperationException();
 		}
-		else if (specNode instanceof ConfigSpec.List listSpec)
+		else if (specNode instanceof ConfigListSpec listSpec)
 		{
 			return id -> ConfigList.make(id, listSpec).addChangeListener(this::onValueChanged);
 		}
-		else if (specNode instanceof ConfigSpec.Primitive<?> primitiveSpec)
+		else if (specNode instanceof ConfigPrimitiveSpec<?> primitiveSpec)
 		{
 			return this.makePrimitiveElementBuilder(primitiveSpec);
 		}
-		else if (specNode instanceof ConfigSpec.Unknown unknownSpec)
+		else if (specNode instanceof ConfigUnknownSpec unknownSpec)
 		{
 			return id -> ConfigUnknown.make(id, unknownSpec);
 		}
@@ -155,7 +159,7 @@ public final class ConfigList implements IConfigNode
 		}
 	}
 
-	private <T> Function<IConfigName, IConfigNode> makePrimitiveElementBuilder(ConfigSpec.Primitive<T> primitiveSpec)
+	private <T> Function<IConfigName, IConfigNode> makePrimitiveElementBuilder(ConfigPrimitiveSpec<T> primitiveSpec)
 	{
 		return id ->
 		{

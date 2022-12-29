@@ -20,7 +20,7 @@ public class ForgeConfigPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 	{
 		return this.valueClass;
 	}
-	
+
 	@Override
 	public boolean isAllowed(T value)
 	{

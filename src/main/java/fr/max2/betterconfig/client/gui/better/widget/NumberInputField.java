@@ -23,10 +23,10 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 		super(fontRenderer, title, numberType, property.getValue());
 		this.property = property;
 		this.inputField.setResponder(this::updateTextColor);
-		
+
 		this.propertyListener = this::setValue;
 		this.property.onChanged(this.propertyListener);
-		
+
 		this.addClass("better:number_field");
 	}
 
@@ -35,16 +35,16 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 	{
 		this.inputField.setTextColor(this.property.getSpec().node().isAllowed(this.getValue()) ? Constants.DEFAULT_FIELD_TEXT_COLOR : Constants.ERROR_FIELD_TEXT_COLOR);
 	}
-	
+
 	@Override
 	protected N correct(N value)
 	{
 		if (this.property.getSpec().node().isAllowed(value))
 			return value;
-		
+
 		return this.property.getSpec().node().correct(value);
 	}
-	
+
 	@Override
 	protected void onValidate(N value)
 	{
@@ -53,7 +53,7 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 			this.property.setValue(value);
 		}
 	}
-	
+
 	@Override
 	public void invalidate()
 	{
