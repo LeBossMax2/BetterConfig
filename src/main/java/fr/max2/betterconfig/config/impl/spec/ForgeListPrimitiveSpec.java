@@ -1,20 +1,15 @@
 package fr.max2.betterconfig.config.impl.spec;
 
-import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
+import fr.max2.betterconfig.config.PrimitiveType;
+import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 
-public class ForgeListPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
+public class ForgeListPrimitiveSpec<T> implements ConfigPrimitiveSpec.SpecData<T>
 {
 	private final Class<T> valueClass;
 
 	public ForgeListPrimitiveSpec(Class<T> valueClass)
 	{
 		this.valueClass = valueClass;
-	}
-
-	@Override
-	public Class<T> getValueClass()
-	{
-		return this.valueClass;
 	}
 
 	@Override
@@ -32,6 +27,6 @@ public class ForgeListPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 	@Override
 	public T getDefaultValue()
 	{
-		return this.valueClass.cast(this.getType().getDefaultValue(this.valueClass));
+		return PrimitiveType.getType(this.valueClass).getDefaultValue();
 	}
 }

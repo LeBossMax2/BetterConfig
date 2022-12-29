@@ -1,9 +1,9 @@
 package fr.max2.betterconfig.config.impl.spec;
 
-import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
+import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
 
-public class ForgeConfigPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
+public class ForgeConfigPrimitiveSpec<T> implements ConfigPrimitiveSpec.SpecData<T>
 {
 	/** The specification */
 	private final ValueSpec spec;
@@ -13,12 +13,6 @@ public class ForgeConfigPrimitiveSpec<T> implements IConfigPrimitiveSpec<T>
 	{
 		this.spec = spec;
 		this.valueClass = valueClass;
-	}
-
-	@Override
-	public Class<T> getValueClass()
-	{
-		return this.valueClass;
 	}
 
 	@Override

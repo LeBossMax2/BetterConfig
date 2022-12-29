@@ -4,89 +4,72 @@ import java.util.function.Function;
 
 import fr.max2.betterconfig.client.util.NumberTypes;
 import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
-import fr.max2.betterconfig.config.spec.IConfigPrimitiveSpec;
+import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec.SpecData;
 
 /**
  * Represents the type of values inside a config
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
-public enum ValueType
+public class PrimitiveType<T>
 {
-	BOOLEAN(Boolean.class, ConfigPrimitiveSpec.Boolean::new)
-	{
-		@Override
-		public Object getDefaultValue(Class<?> valueClass)
-		{
-			return Boolean.FALSE;
-		}
-	},
-	NUMBER(Number.class, ConfigPrimitiveSpec.Number::new)
-	{
-		@Override
-		public Object getDefaultValue(Class<?> valueClass)
-		{
-			return NumberTypes.getType(valueClass).parse("0");
-		}
-	},
-	STRING(String.class, ConfigPrimitiveSpec.String::new)
-	{
-		@Override
-		public Object getDefaultValue(Class<?> valueClass)
-		{
-			return "";
-		}
-	},
-	ENUM(Enum.class, ConfigPrimitiveSpec.Enum::new)
-	{
-		@Override
-		public Object getDefaultValue(Class<?> valueClass)
-		{
-			return valueClass.getEnumConstants()[0];
-		}
-	};
+	private static final PrimitiveType<Boolean> BOOLEAN = new PrimitiveType<>(false, specData -> new ConfigPrimitiveSpec.Boolean(specData));
+	private static final PrimitiveType<String> STRING = new PrimitiveType<>("", specData -> new ConfigPrimitiveSpec.String(specData));
 
-	/** The super class corresponding to the type */
-	private final Class<?> superClass;
-
-	private final Function<IConfigPrimitiveSpec, ConfigPrimitiveSpec> specConstructor;
-
-	private ValueType(Class<?> clazz, Function<IConfigPrimitiveSpec, ConfigPrimitiveSpec> specConstructor)
+	private static <T extends Number> PrimitiveType<T> newNumber(Class<T> valueClass)
 	{
-		this.superClass = clazz;
+		return new PrimitiveType<>(NumberTypes.getType(valueClass).parse("0"), specData -> new ConfigPrimitiveSpec.Number<>(valueClass, specData));
+	}
+
+	private static <T extends Enum<T>> PrimitiveType<T> newEnum(Class<T> valueClass)
+	{
+		return new PrimitiveType<>(valueClass.getEnumConstants()[0], specData -> new ConfigPrimitiveSpec.Enum<>(valueClass, specData));
+	}
+
+	private final T defaultValue;
+	private final Function<ConfigPrimitiveSpec.SpecData<T>, ConfigPrimitiveSpec<T>> specConstructor;
+
+	private PrimitiveType(T defaultValue, Function<SpecData<T>, ConfigPrimitiveSpec<T>> specConstructor)
+	{
+		this.defaultValue = defaultValue;
 		this.specConstructor = specConstructor;
 	}
 
-	/**
-	 * Checks if the given class is of this type
-	 * @param valueClass the class to check
-	 * @return true if the class is of this type, false otherwise
-	 */
-	public boolean matches(Class<?> valueClass)
+	public T getDefaultValue()
 	{
-		return this.superClass.isAssignableFrom(valueClass);
+		return this.defaultValue;
 	}
 
-	public abstract Object getDefaultValue(Class<?> valueClass);
-
-	public <T> ConfigPrimitiveSpec<T> makeSpec(IConfigPrimitiveSpec<T> innerSpec)
+	public ConfigPrimitiveSpec<T> makeSpec(ConfigPrimitiveSpec.SpecData<T> specData)
 	{
-		return this.specConstructor.apply(innerSpec);
+		return this.specConstructor.apply(specData);
 	}
+
 	/**
-	 * Gets the {@code ValueType} corresponding to the given class
+	 * Gets the {@code PrimitiveType} corresponding to the given class
 	 * @param valueClass
 	 * @return the first type that matches the given class
 	 */
-	public static ValueType getType(Class<?> valueClass)
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> PrimitiveType<T> getType(Class<T> valueClass)
 	{
-		for (ValueType type : ValueType.values())
+		if (Boolean.class == valueClass)
 		{
-			if (type.matches(valueClass))
-			{
-				return type;
-			}
+			return (PrimitiveType)BOOLEAN;
 		}
-
-		return null;
+		else if (String.class == valueClass)
+		{
+			return (PrimitiveType)STRING;
+		}
+		else if (valueClass.isEnum())
+		{
+			return newEnum((Class)valueClass);
+		}
+		else if (Number.class.isAssignableFrom(valueClass))
+		{
+			return newNumber((Class)valueClass);
+		}
+		else
+		{
+			return null;
+		}
 	}
 }

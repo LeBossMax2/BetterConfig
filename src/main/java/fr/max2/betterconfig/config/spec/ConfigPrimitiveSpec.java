@@ -1,23 +1,134 @@
 package fr.max2.betterconfig.config.spec;
 
-public sealed interface ConfigPrimitiveSpec<T> extends ConfigSpec permits ConfigPrimitiveSpec.Boolean, ConfigPrimitiveSpec.String, ConfigPrimitiveSpec.Enum, ConfigPrimitiveSpec.Number
+public sealed abstract class ConfigPrimitiveSpec<T> implements ConfigSpec
+	permits
+		ConfigPrimitiveSpec.Boolean,
+		ConfigPrimitiveSpec.String,
+		ConfigPrimitiveSpec.Enum,
+		ConfigPrimitiveSpec.Number
 {
-	IConfigPrimitiveSpec<T> node();
+	private final SpecData<T> data;
 
-	public static <T> ConfigPrimitiveSpec<T> make(IConfigPrimitiveSpec<T> node)
+	public ConfigPrimitiveSpec(SpecData<T> data)
 	{
-		return node.getType().makeSpec(node);
+		this.data = data;
 	}
 
-	public static final record Boolean(IConfigPrimitiveSpec<java.lang.Boolean> node) implements ConfigPrimitiveSpec<java.lang.Boolean>
-	{ }
+	/**
+	 * Gets the class of the configuration value
+	 */
+	public abstract Class<T> valueClass();
 
-	public static final record String(IConfigPrimitiveSpec<java.lang.String> node) implements ConfigPrimitiveSpec<java.lang.String>
-	{ }
+	/**
+	 * Gets the default configuration value
+	 */
+	public T getDefaultValue()
+	{
+		return this.data.getDefaultValue();
+	}
 
-	public static final record Enum<E extends java.lang.Enum<E>>(IConfigPrimitiveSpec<E> node) implements ConfigPrimitiveSpec<E>
-	{ }
+	/**
+	 * Checks if the given value is a valid value
+	 * @param value the value to check
+	 * @return true if the value matches the spec, false otherwise
+	 */
+	public boolean isAllowed(T value)
+	{
+		return this.data.isAllowed(value);
+	}
 
-	public static final record Number<N extends java.lang.Number>(IConfigPrimitiveSpec<N> node) implements ConfigPrimitiveSpec<N>
-	{ }
+	/**
+	 * Correct the given value to match the spec
+	 * @param value the value to fix
+	 * @return a valid value
+	 */
+	public T correct(T value)
+	{
+		return this.data.correct(value);
+	}
+
+	public static final class Boolean extends ConfigPrimitiveSpec<java.lang.Boolean>
+	{
+		public Boolean(SpecData<java.lang.Boolean> node)
+		{
+			super(node);
+		}
+
+		@Override
+		public Class<java.lang.Boolean> valueClass()
+		{
+			return java.lang.Boolean.class;
+		}
+	}
+
+	public static final class String extends ConfigPrimitiveSpec<java.lang.String>
+	{
+
+		public String(SpecData<java.lang.String> node)
+		{
+			super(node);
+		}
+
+		@Override
+		public Class<java.lang.String> valueClass()
+		{
+			return java.lang.String.class;
+		}
+	}
+
+	public static final class Enum<E extends java.lang.Enum<E>> extends ConfigPrimitiveSpec<E>
+	{
+		private final Class<E> valueClass;
+
+		public Enum(Class<E> valueClass, SpecData<E> node)
+		{
+			super(node);
+			this.valueClass = valueClass;
+		}
+
+		@Override
+		public Class<E> valueClass()
+		{
+			return this.valueClass;
+		}
+	}
+
+	public static final class Number<N extends java.lang.Number> extends ConfigPrimitiveSpec<N>
+	{
+		private final Class<N> valueClass;
+
+		public Number(Class<N> valueClass, SpecData<N> node)
+		{
+			super(node);
+			this.valueClass = valueClass;
+		}
+
+		@Override
+		public Class<N> valueClass()
+		{
+			return this.valueClass;
+		}
+	}
+
+	public static interface SpecData<T>
+	{
+		/**
+		 * Gets the default configuration value
+		 */
+		T getDefaultValue();
+
+		/**
+		 * Checks if the given value is a valid value
+		 * @param value the value to check
+		 * @return true if the value matches the spec, false otherwise
+		 */
+		boolean isAllowed(T value);
+
+		/**
+		 * Correct the given value to match the spec
+		 * @param value the value to fix
+		 * @return a valid value
+		 */
+		T correct(T value);
+	}
 }

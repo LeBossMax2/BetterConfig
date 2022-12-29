@@ -31,13 +31,13 @@ public class StringInputField extends TextField
 	/** Updates the color of the text to indicates an error */
 	private void updateTextColor(String text)
 	{
-		this.setTextColor(this.property.getSpec().node().isAllowed(text) ? Constants.DEFAULT_FIELD_TEXT_COLOR : Constants.ERROR_FIELD_TEXT_COLOR);
+		this.setTextColor(this.property.getSpec().isAllowed(text) ? Constants.DEFAULT_FIELD_TEXT_COLOR : Constants.ERROR_FIELD_TEXT_COLOR);
 	}
 
 	@Override
 	protected void onValidate(String text)
 	{
-		if (this.property.getSpec().node().isAllowed(text))
+		if (this.property.getSpec().isAllowed(text))
 		{
 			this.property.setValue(text);
 		}

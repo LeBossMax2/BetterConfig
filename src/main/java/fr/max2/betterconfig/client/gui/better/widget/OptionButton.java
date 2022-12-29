@@ -20,7 +20,7 @@ public class OptionButton<V> extends CycleOptionButton<V>
 		Function<? super V, Component> valueToText, ConfigPrimitive<V> property)
 	{
 		super(
-			acceptedValues.stream().filter(property.getSpec().node()::isAllowed).collect(Collectors.toList()),
+			acceptedValues.stream().filter(property.getSpec()::isAllowed).collect(Collectors.toList()),
 			valueToText,
 			property.getValue(),
 			NO_OVERLAY);
@@ -45,7 +45,7 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	public static <E extends Enum<E>> OptionButton<E> enumOption(ConfigPrimitive<E> property)
 	{
 		return new OptionButton<>(
-			Arrays.asList(property.getSpec().node().getValueClass().getEnumConstants()),
+			Arrays.asList(property.getSpec().valueClass().getEnumConstants()),
 			enuw -> Component.literal(enuw.name()),
 			property);
 	}

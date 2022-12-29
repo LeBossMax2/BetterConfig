@@ -84,7 +84,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.extraInfo.add(Component.literal(this.identifier.getName()).withStyle(ChatFormatting.YELLOW));
 		this.extraInfo.addAll(this.identifier.getDisplayComment());
 		if (this.property instanceof ConfigPrimitive<?> primitive)
-			this.extraInfo.add((Component.translatable(GuiTexts.DEFAULT_VALUE_KEY, Component.literal(Objects.toString(primitive.getSpec().node().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
+			this.extraInfo.add((Component.translatable(GuiTexts.DEFAULT_VALUE_KEY, Component.literal(Objects.toString(primitive.getSpec().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override

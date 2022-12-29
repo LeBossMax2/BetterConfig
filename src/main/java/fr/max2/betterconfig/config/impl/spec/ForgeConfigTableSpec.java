@@ -10,9 +10,8 @@ import com.google.common.collect.ImmutableList;
 
 import fr.max2.betterconfig.config.ConfigIdentifier;
 import fr.max2.betterconfig.config.ConfigLocation;
-import fr.max2.betterconfig.config.ValueType;
+import fr.max2.betterconfig.config.PrimitiveType;
 import fr.max2.betterconfig.config.spec.ConfigListSpec;
-import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.ConfigSpec;
 import fr.max2.betterconfig.config.spec.ConfigTableSpec;
 import fr.max2.betterconfig.config.spec.ConfigUnknownSpec;
@@ -57,27 +56,25 @@ public class ForgeConfigTableSpec
 		else // Get name from path
 			name = Component.literal(key);
 
-		ConfigSpec valSpec;
-		Class<?> valueClass = valueClass(forgeSpec);
-
-		if (List.class.isAssignableFrom(valueClass))
-		{
-			valSpec = new ConfigListSpec(getSpecForValues((List<?>)forgeSpec.getDefault()));
-		}
-		else
-		{
-			ValueType type = ValueType.getType(valueClass);
-			if (type == null)
-			{
-				valSpec = new ConfigUnknownSpec(new ForgeUnknownSpec(forgeSpec, valueClass));
-			}
-			else
-			{
-				valSpec = type.makeSpec(new ForgeConfigPrimitiveSpec<>(forgeSpec, valueClass));
-			}
-		}
+		ConfigSpec valSpec = makeSpec(forgeSpec, valueClass(forgeSpec));
 
         return new ConfigTableSpec.Entry(new ConfigIdentifier(location, name, forgeSpec.getComment()), valSpec);
+	}
+
+	private static <T> ConfigSpec makeSpec(ValueSpec forgeSpec, Class<T> valueClass)
+	{
+		if (List.class.isAssignableFrom(valueClass))
+		{
+			return new ConfigListSpec(makeListChildSpec((List<?>)forgeSpec.getDefault()));
+		}
+
+		var type = PrimitiveType.getType(valueClass);
+		if (type != null)
+		{
+			return type.makeSpec(new ForgeConfigPrimitiveSpec<>(forgeSpec, valueClass));
+		}
+
+		return new ConfigUnknownSpec(new ForgeUnknownSpec(forgeSpec, valueClass));
 	}
 
 	private static Class<?> valueClass(ValueSpec spec)
@@ -93,26 +90,40 @@ public class ForgeConfigTableSpec
 		return Object.class;
 	}
 
-	private static ConfigSpec getSpecForValues(List<?> exampleValues)
+	private static ConfigSpec makeListChildSpec(List<?> exampleValues)
 	{
 		for (Object obj : exampleValues)
 		{
 			if (obj == null)
 				continue;
 
-			Class<?> valClass = obj.getClass();
-			if (List.class.isAssignableFrom(valClass))
-			{
-				return new ConfigListSpec(getSpecForValues((List<?>)obj));
-			}
-			if (UnmodifiableConfig.class.isAssignableFrom(valClass))
-			{
-				// TODO [#5] Implement list of tables
-				// Don't know how to deal with list of tables
-				return new ConfigUnknownSpec(new ForgeUnknownSpec(null, Object.class));
-			}
-			return ConfigPrimitiveSpec.make(new ForgeListPrimitiveSpec<>(valClass));
+			var spec = makeChildSpec(obj, obj.getClass());
+			if (spec != null)
+				return spec;
 		}
 		return new ConfigUnknownSpec(new ForgeUnknownSpec(null, Object.class));
+	}
+
+	private static <T> ConfigSpec makeChildSpec(Object obj, Class<T> valClass)
+	{
+		if (List.class.isAssignableFrom(valClass))
+		{
+			return new ConfigListSpec(makeListChildSpec((List<?>)obj));
+		}
+
+		if (UnmodifiableConfig.class.isAssignableFrom(valClass))
+		{
+			// TODO [#5] Implement list of tables
+			// Don't know how to deal with list of tables
+			return new ConfigUnknownSpec(new ForgeUnknownSpec(null, valClass));
+		}
+
+		var type = PrimitiveType.getType(valClass);
+		if (type != null)
+		{
+			return type.makeSpec(new ForgeListPrimitiveSpec<>(valClass));
+		}
+
+		return null;
 	}
 }
