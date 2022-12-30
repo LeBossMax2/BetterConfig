@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import fr.max2.betterconfig.client.gui.better.ConfigName;
+
 public class ConfigFilter
 {
 	public static final ConfigFilter ALL = new ConfigFilter(Collections.emptyList());

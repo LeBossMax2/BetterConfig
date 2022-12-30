@@ -8,7 +8,7 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
-import fr.max2.betterconfig.config.ConfigIdentifier;
+import fr.max2.betterconfig.config.ConfigTableKey;
 import fr.max2.betterconfig.config.ConfigLocation;
 import fr.max2.betterconfig.config.PrimitiveType;
 import fr.max2.betterconfig.config.spec.ConfigListSpec;
@@ -43,7 +43,7 @@ public class ForgeConfigTableSpec
 		if (spec instanceof UnmodifiableConfig)
         {
             Component name = Component.literal(location.getName()).withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW);
-        	return new ConfigTableSpec.Entry(new ConfigIdentifier(location, name, levelComments.apply(location)), ForgeConfigTableSpec.newForgeConfigTableSpec(location, (UnmodifiableConfig)spec, levelComments));
+        	return new ConfigTableSpec.Entry(new ConfigTableKey(location.getName(), name, levelComments.apply(location)), ForgeConfigTableSpec.newForgeConfigTableSpec(location, (UnmodifiableConfig)spec, levelComments));
         }
 
         ValueSpec forgeSpec = (ValueSpec)spec;
@@ -58,7 +58,7 @@ public class ForgeConfigTableSpec
 
 		ConfigSpec valSpec = makeSpec(forgeSpec, valueClass(forgeSpec));
 
-        return new ConfigTableSpec.Entry(new ConfigIdentifier(location, name, forgeSpec.getComment()), valSpec);
+        return new ConfigTableSpec.Entry(new ConfigTableKey(location.getName(), name, forgeSpec.getComment()), valSpec);
 	}
 
 	private static <T> ConfigSpec makeSpec(ValueSpec forgeSpec, Class<T> valueClass)

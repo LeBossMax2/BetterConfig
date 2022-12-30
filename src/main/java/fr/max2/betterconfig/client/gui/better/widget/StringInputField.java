@@ -1,9 +1,9 @@
 package fr.max2.betterconfig.client.gui.better.widget;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
+import fr.max2.betterconfig.client.gui.better.ConfigName;
 import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
-import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.client.gui.Font;

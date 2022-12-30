@@ -85,7 +85,7 @@ public class DebugConfigGui extends UnitComponent
 	{
 		if (node instanceof ConfigTable table)
 		{
-			table.getEntryValues().forEach(entry -> buildTable(content, path + "." + entry.key().getName(), entry.node()));
+			table.getEntryValues().forEach(entry -> buildTable(content, path + "." + entry.key(), entry.node()));
 		}
 		else if (node instanceof ConfigList list)
 		{

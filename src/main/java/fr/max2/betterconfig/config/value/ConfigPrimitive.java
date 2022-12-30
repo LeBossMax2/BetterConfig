@@ -3,7 +3,7 @@ package fr.max2.betterconfig.config.value;
 import java.util.HashSet;
 import java.util.Set;
 
-import fr.max2.betterconfig.config.ConfigName;
+import fr.max2.betterconfig.config.PrimitiveType;
 import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import fr.max2.betterconfig.util.property.IListener;
 import fr.max2.betterconfig.util.property.IReadableProperty;
@@ -23,11 +23,11 @@ public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<
 	private ConfigPrimitive(ConfigPrimitiveSpec<T> spec)
 	{
 		this.spec = spec;
-		this.initialValue = null;
-		this.currentValue = null;
+		this.initialValue = PrimitiveType.getType(spec.valueClass()).getDefaultValue();
+		this.currentValue = this.initialValue;
 	}
 
-	public static ConfigPrimitive<?> make(ConfigName identifier, ConfigPrimitiveSpec<?> spec)
+	public static ConfigPrimitive<?> make(ConfigPrimitiveSpec<?> spec)
 	{
 		if (spec instanceof ConfigPrimitiveSpec.Boolean boolNode)
 		{

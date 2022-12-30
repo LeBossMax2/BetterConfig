@@ -9,51 +9,37 @@ import com.google.common.base.Strings;
 
 import net.minecraft.network.chat.Component;
 
-public class ConfigIdentifier implements ConfigName
+public class ConfigTableKey
 {
-	private final ConfigLocation loc;
+	private final String name;
 	private final Component displayName;
 	private final String commentString;
 	/** The comments describing the property */
 	private List<? extends Component> commentLines = null;
-	
-	public ConfigIdentifier(ConfigLocation loc, Component displayName, String comment)
+
+	public ConfigTableKey(String name, Component displayName, String comment)
 	{
-		this.loc = loc;
+		this.name = name;
 		this.displayName = displayName;
 		this.commentString = comment;
 	}
 
-	public ConfigLocation getLoc()
-	{
-		return this.loc;
-	}
-
-	@Override
 	public String getName()
 	{
-		return this.loc.getName();
-	}
-
-	@Override
-	public List<String> getPath()
-	{
-		return this.loc.getPath();
+		return this.name;
 	}
 
 	/**
 	 * Gets the display name of the property
 	 */
-	@Override
 	public Component getDisplayName()
 	{
 		return this.displayName;
 	}
-	
+
 	/**
 	 * Gets the comment associated with the config node
 	 */
-	@Override
 	public String getCommentString()
 	{
 		return this.commentString;
@@ -63,7 +49,6 @@ public class ConfigIdentifier implements ConfigName
 	 * Gets the comment associated with the config node for display
 	 * @return an unmodifiable list containing the comments
 	 */
-	@Override
 	public List<? extends Component> getDisplayComment()
 	{
 		if (this.commentLines == null)

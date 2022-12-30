@@ -1,24 +1,26 @@
 package fr.max2.betterconfig.config.spec;
 
-import fr.max2.betterconfig.config.ConfigName;
+import java.util.List;
+
+import fr.max2.betterconfig.config.ConfigTableKey;
 
 public final class ConfigTableSpec implements ConfigSpec
 {
-	private final java.util.List<Entry> entries;
+	private final List<Entry> entries;
 
-	public ConfigTableSpec(java.util.List<Entry> entries)
+	public ConfigTableSpec(List<Entry> entries)
 	{
-		this.entries = java.util.List.copyOf(entries);
+		this.entries = List.copyOf(entries);
 	}
 
-	public java.util.List<Entry> entries()
+	public List<Entry> entries()
 	{
 		return this.entries;
 	}
 
 	public static record Entry
 	(
-		ConfigName key,
+		ConfigTableKey key,
 		ConfigSpec node
 	)
 	{ }

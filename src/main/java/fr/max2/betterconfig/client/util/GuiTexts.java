@@ -6,14 +6,16 @@ public final class GuiTexts
 {
 	private GuiTexts()
 	{ }
-	
+
 	public static final String CANCEL_CONFIG_KEY = BetterConfig.MODID + ".config.cancel";
 	public static final String SAVE_CONFIG_KEY = "gui.done";
-	
+
 	/** The translation key for displaying the default value */
 	public static final String DEFAULT_VALUE_KEY = BetterConfig.MODID + ".option.default_value";
 	/** The translation key for the text field of the search bar */
 	public static final String SEARCH_BAR_KEY = BetterConfig.MODID + ".option.search";
+	/** The translation key for the label of elements of a list */
+	public static final String LIST_ELEMENT_LABEL_KEY = BetterConfig.MODID + ".list.child";
 	/** The translation key for the text on the add element button in lists */
 	public static final String ADD_ELEMENT_KEY = BetterConfig.MODID + ".list.add";
 	/** The translation key for the tooltip on the add element button at the start of lists */
@@ -26,9 +28,9 @@ public final class GuiTexts
 	public static final String UNDO_TOOLTIP_KEY = BetterConfig.MODID + ".undo.tooltip";
 	/** The translation key for the tooltop of reset button */
 	public static final String RESET_TOOLTIP_KEY = BetterConfig.MODID + ".reset.tooltip";
-	
+
 	// Narration
-	
+
 	public static final String SECTION_TITLE_SHOWN = BetterConfig.MODID + ".narration.section.title.shown";
 	public static final String SECTION_TITLE_COLLAPSED = BetterConfig.MODID + ".narration.section.title.collapsed";
 	public static final String SECTION_USAGE_FOCUSED = BetterConfig.MODID + ".narration.section.usage.focused";

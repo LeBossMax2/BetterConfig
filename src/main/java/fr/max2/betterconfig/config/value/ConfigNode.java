@@ -2,7 +2,6 @@ package fr.max2.betterconfig.config.value;
 
 import com.google.common.base.Preconditions;
 
-import fr.max2.betterconfig.config.ConfigName;
 import fr.max2.betterconfig.config.spec.ConfigListSpec;
 import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.ConfigSpec;
@@ -19,26 +18,25 @@ public sealed interface ConfigNode permits ConfigTable, ConfigList, ConfigPrimit
 
 	void undoChanges();
 
-	public static ConfigNode make(ConfigName identifier, ConfigSpec spec)
+	public static ConfigNode make(ConfigSpec spec)
 	{
-		Preconditions.checkNotNull(identifier);
 		Preconditions.checkNotNull(spec);
 
 		if (spec instanceof ConfigTableSpec tableSpec)
 		{
-			return ConfigTable.make(identifier, tableSpec);
+			return ConfigTable.make(tableSpec);
 		}
 		else if (spec instanceof ConfigListSpec listSpec)
 		{
-			return ConfigList.make(identifier, listSpec);
+			return ConfigList.make(listSpec);
 		}
 		else if (spec instanceof ConfigPrimitiveSpec<?> primitiveSpec)
 		{
-			return ConfigPrimitive.make(identifier, primitiveSpec);
+			return ConfigPrimitive.make(primitiveSpec);
 		}
 		else if (spec instanceof ConfigUnknownSpec unknownSpec)
 		{
-			return ConfigUnknown.make(identifier, unknownSpec);
+			return ConfigUnknown.make(unknownSpec);
 		}
 		else
 		{

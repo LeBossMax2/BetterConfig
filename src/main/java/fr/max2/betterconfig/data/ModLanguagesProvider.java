@@ -9,7 +9,6 @@ import com.google.common.base.Preconditions;
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
 import fr.max2.betterconfig.client.util.GuiTexts;
-import fr.max2.betterconfig.config.value.ConfigList;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -42,13 +41,13 @@ public class ModLanguagesProvider implements DataProvider
 
 		this.add(GuiTexts.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
 		this.add(GuiTexts.SEARCH_BAR_KEY, "Search", "Rechercher");
+		this.add(GuiTexts.LIST_ELEMENT_LABEL_KEY, "%s[%d]", "%s[%d]");
 		this.add(GuiTexts.ADD_ELEMENT_KEY, "Add", "Ajouter");
 		this.add(GuiTexts.ADD_FIRST_TOOLTIP_KEY, "Add a new element at the start of the list", "Ajouter un nouvel élément au début de la liste");
 		this.add(GuiTexts.ADD_LAST_TOOLTIP_KEY, "Add a new element at the end of the list", "Ajouter un nouvel élément à la fin de la liste");
 		this.add(GuiTexts.REMOVE_TOOLTIP_KEY, "Remove this element from the list", "Retirer cet élément de la liste");
 		this.add(GuiTexts.UNDO_TOOLTIP_KEY, "Undo", "Annuler le changement");
 		this.add(GuiTexts.RESET_TOOLTIP_KEY, "Reset to default", "Réinitialiserà la valeur par défaut");
-		this.add(ConfigList.LIST_ELEMENT_LABEL_KEY, "%s[%d]", "%s[%d]");
 
 		// Narration
 		this.add(GuiTexts.SECTION_TITLE_SHOWN, "%s section", "Section %s");
