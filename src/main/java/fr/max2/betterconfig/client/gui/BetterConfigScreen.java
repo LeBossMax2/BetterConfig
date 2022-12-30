@@ -15,7 +15,7 @@ import fr.max2.betterconfig.client.gui.component.ComponentScreen;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import fr.max2.betterconfig.client.gui.style.StyleSheetManager;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
-import fr.max2.betterconfig.config.impl.value.ForgeConfigTable;
+import fr.max2.betterconfig.config.impl.value.ForgeConfig;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -65,7 +65,7 @@ public class BetterConfigScreen extends ComponentScreen
 	protected void init()
 	{
 		if (this.currentTables[this.configIndex] == null)
-			this.currentTables[this.configIndex] = ForgeConfigTable.create(this.modConfigs.get(this.configIndex).<ForgeConfigSpec>getSpec().self(), this::onPropertyChanged);
+			this.currentTables[this.configIndex] = ForgeConfig.make(this.modConfigs.get(this.configIndex).<ForgeConfigSpec>getSpec().self(), this::onPropertyChanged);
 		// Builds the user interface
 		this.setContent(this.uiBuilder.build(this, this.currentTables[this.configIndex]));
 	}
