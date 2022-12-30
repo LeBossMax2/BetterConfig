@@ -24,7 +24,7 @@ public abstract class CompositeComponent extends BCComponent<ICompositeComponent
 	{
 		super(type);
 		this.children = children;
-		this.children.onChanged(new IListListener<IComponent>()
+		this.children.onChanged().add(new IListListener<IComponent>()
 		{
 			@Override
 			public void onElementAdded(int index, IComponent newValue)

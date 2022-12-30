@@ -22,7 +22,7 @@ public class UnknownOptionWidget extends Button
 
 		this.property = property;
 		this.propertyListener = newVal -> this.setMessage(Component.literal(Objects.toString(newVal)));
-		this.property.onChanged(this.propertyListener);
+		this.property.onChanged().add(this.propertyListener);
 	}
 
 	public UnknownOptionWidget(ConfigUnknown property)
@@ -39,6 +39,6 @@ public class UnknownOptionWidget extends Button
 	public void invalidate()
 	{
 		if (this.property != null && this.propertyListener != null)
-			this.property.removeOnChangedListener(this.propertyListener);
+			this.property.onChanged().remove(this.propertyListener);
 	}
 }

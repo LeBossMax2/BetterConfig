@@ -8,7 +8,7 @@ import fr.max2.betterconfig.client.gui.component.CycleFocusState;
 import fr.max2.betterconfig.client.gui.component.EventState;
 import fr.max2.betterconfig.client.gui.component.UnitComponent;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
-import fr.max2.betterconfig.util.Event;
+import fr.max2.betterconfig.util.EventDispatcher;
 import fr.max2.betterconfig.util.IEvent;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -24,7 +24,7 @@ import net.minecraft.sounds.SoundEvents;
 public class Button extends UnitComponent
 {
 	private Component message;
-	private Event<OnPress> onPressed = new Event<>();
+	private EventDispatcher<OnPress> onPressed = EventDispatcher.ordered();
 	private boolean isActive = true;
 
 	public Button(Component displayString, OnTooltip overlay)
@@ -131,7 +131,7 @@ public class Button extends UnitComponent
 	protected void onPress()
 	{
 		this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-		this.layoutManager.enqueueWork(() -> this.onPressed.call(OnPress::onPress));
+		this.layoutManager.enqueueWork(() -> this.onPressed.dispatch(OnPress::onPress));
 	}
 
 	// Narration

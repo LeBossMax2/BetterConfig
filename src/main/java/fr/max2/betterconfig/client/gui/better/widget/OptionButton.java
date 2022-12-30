@@ -29,7 +29,7 @@ public class OptionButton<V> extends CycleOptionButton<V>
 
 		this.property = property;
 		this.propertyListener = this::setCurrentValue;
-		this.property.onChanged(this.propertyListener);
+		this.property.onChanged().add(this.propertyListener);
 	}
 
 	/** Creates a widget for boolean values */
@@ -53,6 +53,6 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	@Override
 	public void invalidate()
 	{
-		this.property.removeOnChangedListener(this.propertyListener);
+		this.property.onChanged().remove(this.propertyListener);
 	}
 }

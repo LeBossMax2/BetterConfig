@@ -121,11 +121,11 @@ public class BetterConfigBuilder
 			public void invalidate()
 			{
 				super.invalidate();
-				content.removeOnChangedListener(listListener);
+				content.onChanged().remove(listListener);
 			}
 		});
 
-		content.onChanged(listListener);
+		content.onChanged().add(listListener);
 
 
 		if (content.size() >= 1)

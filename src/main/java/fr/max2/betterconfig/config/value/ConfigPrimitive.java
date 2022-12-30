@@ -1,10 +1,9 @@
 package fr.max2.betterconfig.config.value;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import fr.max2.betterconfig.config.PrimitiveType;
 import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
+import fr.max2.betterconfig.util.EventDispatcher;
+import fr.max2.betterconfig.util.IEvent;
 import fr.max2.betterconfig.util.property.IListener;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
@@ -15,7 +14,7 @@ public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<
 		ConfigPrimitive.Enum,
 		ConfigPrimitive.Number
 {
-	private final Set<IListener<? super T>> listeners = new HashSet<>();
+	private final EventDispatcher<IListener<? super T>> onChanged = EventDispatcher.unordered();
 	private final ConfigPrimitiveSpec<T> spec;
 	private T initialValue;
 	private T currentValue;
@@ -90,20 +89,14 @@ public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<
 	}
 
 	@Override
-	public void onChanged(IListener<? super T> listener)
+	public IEvent<IListener<? super T>> onChanged()
 	{
-		this.listeners.add(listener);
-	}
-
-	@Override
-	public void removeOnChangedListener(IListener<? super T> listener)
-	{
-		this.listeners.remove(listener);
+		return this.onChanged;
 	}
 
 	private void onValiChanged()
 	{
-		this.listeners.forEach(l -> l.onValueChanged(this.currentValue));
+		this.onChanged.dispatch(l -> l.onValueChanged(this.currentValue));
 	}
 
 	@Override

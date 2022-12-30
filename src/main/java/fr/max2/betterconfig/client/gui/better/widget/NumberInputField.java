@@ -25,7 +25,7 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 		this.inputField.setResponder(this::updateTextColor);
 
 		this.propertyListener = this::setValue;
-		this.property.onChanged(this.propertyListener);
+		this.property.onChanged().add(this.propertyListener);
 
 		this.addClass("better:number_field");
 	}
@@ -57,7 +57,7 @@ public class NumberInputField<N extends Number> extends NumberField<N>
 	@Override
 	public void invalidate()
 	{
-		this.property.removeOnChangedListener(this.propertyListener);
+		this.property.onChanged().remove(this.propertyListener);
 	}
 
 	/** Creates a widget for number values */

@@ -49,7 +49,7 @@ public class ForgeConfigTable
 			var configVal = (ConfigValue<List<?>>)param;
 			ForgeConfigList.newForgeConfigList(listNode, configVal.get());
 			ForgeConfigProperty<List<?>> property = new ForgeConfigProperty<>(configVal, changeListener, listNode::getValue);
-			listNode.addChangeListener(property::onValueChanged);
+			listNode.onChanged().add(property::onValueChanged);
 		}
 		else if (node instanceof ConfigPrimitive<?> primitiveNode)
 		{
@@ -72,7 +72,7 @@ public class ForgeConfigTable
 		ConfigValue<T> configVal = (ConfigValue<T>)param;
 		node.setValue(configVal.get());
 		ForgeConfigProperty<T> property = new ForgeConfigProperty<>(configVal, changeListener, node::getValue);
-		node.onChanged(newVal -> property.onValueChanged());
+		node.onChanged().add(newVal -> property.onValueChanged());
 	}
 
 	/** Gets the comments from the spec */

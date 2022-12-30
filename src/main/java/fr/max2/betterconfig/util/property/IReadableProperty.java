@@ -1,9 +1,10 @@
 package fr.max2.betterconfig.util.property;
 
+import fr.max2.betterconfig.util.IEvent;
+
 public interface IReadableProperty<T>
 {
 	T getValue();
-	
-	void onChanged(IListener<? super T> listener);
-	void removeOnChangedListener(IListener<? super T> listener);
+
+	IEvent<IListener<? super T>> onChanged();
 }

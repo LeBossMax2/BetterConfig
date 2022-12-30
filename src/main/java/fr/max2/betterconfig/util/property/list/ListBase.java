@@ -2,17 +2,16 @@ package fr.max2.betterconfig.util.property.list;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
+import fr.max2.betterconfig.util.EventDispatcher;
+import fr.max2.betterconfig.util.IEvent;
 import fr.max2.betterconfig.util.MappedListView;
 import fr.max2.betterconfig.util.property.IListener;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
 public abstract class ListBase<T, P extends IReadableProperty<T>> extends MappedListView<P, T> implements IReadableList<T>
 {
-	protected final Set<IListListener<? super T>> listeners = new HashSet<>();
+	protected final EventDispatcher<IListListener<? super T>> onChanged = EventDispatcher.unordered();
 	protected final List<IReadableProperty<T>> elementProperties;
 	protected List<IndexedPropertyBase<T>> indexedPropertiesMut;
 	protected List<IIndexedProperty<T>> indexedProperties;
@@ -50,15 +49,9 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 	}
 
 	@Override
-	public void onChanged(IListListener<? super T> listener)
+	public IEvent<IListListener<? super T>> onChanged()
 	{
-		this.listeners.add(listener);
-	}
-
-	@Override
-	public void removeOnChangedListener(IListListener<? super T> listener)
-	{
-		this.listeners.remove(listener);
+		return this.onChanged;
 	}
 
 	protected void addElement(int index, P newProperty)
@@ -75,7 +68,7 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 			}
 		}
 
-		this.listeners.forEach(l -> l.onElementAdded(index, newProperty.getValue()));
+		this.onChanged.dispatch(l -> l.onElementAdded(index, newProperty.getValue()));
 	}
 
 	protected P removeElement(int index)
@@ -92,13 +85,13 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 			}
 		}
 
-		this.listeners.forEach(l -> l.onElementRemoved(index, property.getValue()));
+		this.onChanged.dispatch(l -> l.onElementRemoved(index, property.getValue()));
 		return property;
 	}
 
 	protected static class PropertyBase<T> implements IReadableProperty<T>
 	{
-		protected final Set<IListener<? super T>> listeners = new HashSet<>();
+		protected final EventDispatcher<IListener<? super T>> onChanged = EventDispatcher.unordered();
 		protected T currentValue;
 
 		protected PropertyBase(T initialValue)
@@ -113,22 +106,16 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		}
 
 		@Override
-		public void onChanged(IListener<? super T> listener)
+		public IEvent<IListener<? super T>> onChanged()
 		{
-			this.listeners.add(listener);
-		}
-
-		@Override
-		public void removeOnChangedListener(IListener<? super T> listener)
-		{
-			this.listeners.remove(listener);
+			return this.onChanged;
 		}
 
 		protected T setValue(T newValue)
 		{
 			T oldValue = this.currentValue;
 			this.currentValue = newValue;
-			this.listeners.forEach(l -> l.onValueChanged(newValue));
+			this.onChanged.dispatch(l -> l.onValueChanged(newValue));
 			return oldValue;
 		}
 	}
@@ -151,15 +138,9 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 		}
 
 		@Override
-		public void onChanged(IListener<? super T> listener)
+		public IEvent<IListener<? super T>> onChanged()
 		{
-			this.parent.onChanged(listener);
-		}
-
-		@Override
-		public void removeOnChangedListener(IListener<? super T> listener)
-		{
-			this.parent.removeOnChangedListener(listener);
+			return this.parent.onChanged();
 		}
 
 		public void updateIndex(int index)

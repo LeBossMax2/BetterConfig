@@ -9,15 +9,15 @@ public class DerivedList<T, R> extends ListBase<R, IReadableProperty<R>>
 	public DerivedList(IReadableList<T> parent, IIndexedFunc<? super T, R> mapper)
 	{
 		this.derivationMapper = mapper;
-		
+
 		int i = 0;
 		for (IReadableProperty<? extends T> property : parent.getElementProperties())
 		{
 			this.parent.add(new DerivedProperty(i, property));
 			i++;
 		}
-		
-		parent.onChanged(new IListListener<T>()
+
+		parent.onChanged().add(new IListListener<T>()
 		{
 			@Override
 			public void onElementAdded(int index, T newValue)
@@ -32,13 +32,13 @@ public class DerivedList<T, R> extends ListBase<R, IReadableProperty<R>>
 			}
 		});
 	}
-	
+
 	private class DerivedProperty extends ListBase.PropertyBase<R>
 	{
 		public DerivedProperty(int index, IReadableProperty<? extends T> baseProperty)
 		{
 			super(DerivedList.this.derivationMapper.apply(index, baseProperty.getValue()));
-			baseProperty.onChanged(newVal -> this.setValue(DerivedList.this.derivationMapper.apply(index, newVal)));
+			baseProperty.onChanged().add(newVal -> this.setValue(DerivedList.this.derivationMapper.apply(index, newVal)));
 		}
 	}
 }

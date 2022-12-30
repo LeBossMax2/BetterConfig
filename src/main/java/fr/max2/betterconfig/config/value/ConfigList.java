@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.config.value;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -12,6 +11,8 @@ import fr.max2.betterconfig.config.spec.ConfigPrimitiveSpec;
 import fr.max2.betterconfig.config.spec.ConfigSpec;
 import fr.max2.betterconfig.config.spec.ConfigTableSpec;
 import fr.max2.betterconfig.config.spec.ConfigUnknownSpec;
+import fr.max2.betterconfig.util.EventDispatcher;
+import fr.max2.betterconfig.util.IEvent;
 import fr.max2.betterconfig.util.MappedListView;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
@@ -19,7 +20,7 @@ import fr.max2.betterconfig.util.property.list.ReadableLists;
 
 public final class ConfigList implements ConfigNode
 {
-	private final List<Runnable> elemChangeListeners = new ArrayList<>();
+	private final EventDispatcher<Runnable> onChanged = EventDispatcher.ordered();
 	private final ConfigListSpec spec;
 	private final Supplier<ConfigNode> elementBuilder;
 	private final IReadableList<Entry> valueList;
@@ -47,10 +48,9 @@ public final class ConfigList implements ConfigNode
 		return this.spec;
 	}
 
-	public ConfigList addChangeListener(Runnable listener)
+	public IEvent<Runnable> onChanged()
 	{
-		this.elemChangeListeners.add(listener);
-		return this;
+		return this.onChanged;
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public final class ConfigList implements ConfigNode
 
 	private void onValueChanged()
 	{
-		this.elemChangeListeners.forEach(Runnable::run);
+		this.onChanged.dispatch(Runnable::run);
 	}
 
 	@Override
@@ -135,7 +135,12 @@ public final class ConfigList implements ConfigNode
 		}
 		else if (specNode instanceof ConfigListSpec listSpec)
 		{
-			return () -> ConfigList.make(listSpec).addChangeListener(this::onValueChanged);
+			return () ->
+			{
+				var configList = ConfigList.make(listSpec);
+				configList.onChanged().add(this::onValueChanged);
+				return configList;
+			};
 		}
 		else if (specNode instanceof ConfigPrimitiveSpec<?> primitiveSpec)
 		{
@@ -156,7 +161,7 @@ public final class ConfigList implements ConfigNode
 		return () ->
 		{
 			ConfigPrimitive<?> node = ConfigPrimitive.make(primitiveSpec);
-			node.onChanged(newVal -> this.onValueChanged());
+			node.onChanged().add(newVal -> this.onValueChanged());
 			return node;
 		};
 	}

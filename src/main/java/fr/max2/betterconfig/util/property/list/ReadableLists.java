@@ -3,21 +3,22 @@ package fr.max2.betterconfig.util.property.list;
 import java.util.AbstractList;
 import java.util.List;
 
+import fr.max2.betterconfig.util.IEvent;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
 public enum ReadableLists
 {
 	;
-	
+
 	public static <T> IReadableList<T> unmodifiableList(IReadableList<? extends T> base)
 	{
 		return new UnmodifiableList<>(base);
 	}
-	
+
 	public static class UnmodifiableList<T> extends AbstractList<T> implements IReadableList<T>
 	{
 		private IReadableList<? extends T> parent;
-		
+
 		public UnmodifiableList(IReadableList<? extends T> parent)
 		{
 			this.parent = parent;
@@ -28,7 +29,7 @@ public enum ReadableLists
 		{
 			return this.parent.getElementProperties();
 		}
-		
+
 		@Override
 		public List<? extends IIndexedProperty<? extends T>> getIndexedProperties()
 		{
@@ -36,15 +37,9 @@ public enum ReadableLists
 		}
 
 		@Override
-		public void onChanged(IListListener<? super T> listener)
+		public IEvent<? super IListListener<? super T>> onChanged()
 		{
-			this.parent.onChanged(listener);
-		}
-		
-		@Override
-		public void removeOnChangedListener(IListListener<? super T> listener)
-		{
-			this.parent.removeOnChangedListener(listener);
+			return this.parent.onChanged();
 		}
 
 		@Override

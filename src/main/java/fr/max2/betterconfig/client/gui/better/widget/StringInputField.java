@@ -25,7 +25,7 @@ public class StringInputField extends TextField
 		this.setResponder(this::updateTextColor);
 
 		this.propertyListener = this::setValue;
-		this.property.onChanged(this.propertyListener);
+		this.property.onChanged().add(this.propertyListener);
 	}
 
 	/** Updates the color of the text to indicates an error */
@@ -46,7 +46,7 @@ public class StringInputField extends TextField
 	@Override
 	public void invalidate()
 	{
-		this.property.removeOnChangedListener(this.propertyListener);
+		this.property.onChanged().remove(this.propertyListener);
 	}
 
 	/** Creates a widget for string values */
