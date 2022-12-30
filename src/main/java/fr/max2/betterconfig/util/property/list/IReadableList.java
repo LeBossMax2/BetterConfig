@@ -10,14 +10,9 @@ public interface IReadableList<T> extends List<T>
 {
 	List<? extends IReadableProperty<? extends T>> getElementProperties();
 
-	default <R> IReadableList<R> derived(IIndexedFunc<T, R> mapper)
-	{
-		return new DerivedList<>(this, mapper);
-	}
-
 	default <R> IReadableList<R> derived(Function<T, R> mapper)
 	{
-		return this.derived((index, val) -> mapper.apply(val));
+		return new DerivedList<>(this, mapper);
 	}
 
 	IEvent<? super IListListener<? super T>> onChanged();

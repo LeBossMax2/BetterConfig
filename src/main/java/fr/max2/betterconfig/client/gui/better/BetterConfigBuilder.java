@@ -94,7 +94,7 @@ public class BetterConfigBuilder
 		mainElements.add(new BetterButton(this.screen, Component.translatable(GuiTexts.ADD_ELEMENT_KEY), Component.translatable(GuiTexts.ADD_FIRST_TOOLTIP_KEY))
 				.addOnPressed(() -> list.addValue(0)));
 
-		IReadableList<IBetterElement> content = list.getValueList().derived((index, elem) -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), elem.index()));
+		IReadableList<IBetterElement> content = list.getValueList().derived(elem -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), elem.index()));
 		IListListener<IBetterElement> listListener = new IListListener<>()
 		{
 			@Override
