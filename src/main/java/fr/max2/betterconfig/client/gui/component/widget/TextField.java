@@ -20,46 +20,46 @@ public class TextField extends WidgetComponent<EditBox>
 		((InnerField)this.widget).parent = this;
 		this.widget.setMaxLength(Integer.MAX_VALUE);
 	}
-	
+
 	@Override
 	protected void setPos(int x, int y)
 	{
 		super.setPos(x + 1, y + 1);
 	}
-	
+
 	@Override
 	protected void setSize(int w, int h)
 	{
 		super.setSize(w - 2, h - 2);
 	}
-	
+
 	public Component getMessage()
 	{
 		return this.widget.getMessage();
 	}
-	
+
 	public String getValue()
 	{
 		return this.widget.getValue();
 	}
-	
+
 	public void setValue(String value)
 	{
 		this.widget.setValue(value);
 	}
-	
+
 	public void setResponder(Consumer<String> responder)
 	{
 		this.widget.setResponder(responder);
 	}
-	
+
 	public void setTextColor(int color)
 	{
 		this.widget.setTextColor(color);
 	}
-	
+
 	// Input handling
-	
+
 	@Override
 	protected void onKeyPressed(int keyCode, int scanCode, int modifiers, EventState state)
 	{
@@ -68,7 +68,7 @@ public class TextField extends WidgetComponent<EditBox>
 		super.onKeyPressed(keyCode, scanCode, modifiers, state);
 		if (state.isConsumed())
 			return;
-		
+
 		switch (keyCode)
 		{
 		case GLFW.GLFW_KEY_ENTER:
@@ -87,7 +87,7 @@ public class TextField extends WidgetComponent<EditBox>
 	 */
 	protected void onValidate(String text)
 	{ }
-	
+
 	private static class InnerField extends EditBox
 	{
 		private TextField parent;
@@ -96,13 +96,13 @@ public class TextField extends WidgetComponent<EditBox>
 		{
 			super(pFont, 0, 0, 100000, 0, pMessage);
 		}
-		
+
 		@Override
 		public void setValue(String text)
 		{
 			super.setValue(text == null ? "" : text);
 		}
-		
+
 		@Override
 		protected void setFocused(boolean focused)
 		{
@@ -112,17 +112,7 @@ public class TextField extends WidgetComponent<EditBox>
 				this.onFocusedChanged(focused);
 			}
 		}
-		
-		@Override
-		public void setFocus(boolean focused)
-		{
-			if (this.isFocused() != focused)
-			{
-				super.setFocus(focused);
-				this.onFocusedChanged(focused);
-			}
-		}
-		
+
 		@Override
 		protected void onFocusedChanged(boolean focused)
 		{
@@ -132,6 +122,6 @@ public class TextField extends WidgetComponent<EditBox>
 				this.parent.onValidate(this.getValue());
 			}
 		}
-		
+
 	}
 }

@@ -209,8 +209,13 @@ public class ScrollPane extends BCComponent<IScrollComponent> implements IScroll
 	protected void onMouseScrolled(double mouseX, double mouseY, double delta, EventState state)
 	{
 		this.checkLayout();
+
 		if (!this.isPointInside(mouseX, mouseY))
-			return;
+		{
+			// Consume the state to prevent inner elements to be scrolled
+			state = new EventState();
+			state.consume();
+		}
 
 		IScrollComponent.super.mouseScrolled(mouseX, mouseY, delta, state);
 		if (state.isConsumed())
@@ -224,22 +229,27 @@ public class ScrollPane extends BCComponent<IScrollComponent> implements IScroll
 	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
 		this.checkLayout();
-		if (!this.isPointInside(mouseX, mouseY))
+		if (this.isPointInside(mouseX, mouseY))
+		{
+			Rectangle rect = this.getRect();
+			int scrollBarLeft = rect.getRight() - this.scrollBarWidth;
+
+			if (button == 0 && mouseX >= scrollBarLeft)
+			{
+				// If mouse on scroll bar
+				this.scrolling = true;
+				state.consume();
+			}
+		}
+		else
 		{
 			this.scrolling = false;
-			return;
-		}
 
-		Rectangle rect = this.getRect();
-
-		int scrollBarLeft = rect.getRight() - this.scrollBarWidth;
-
-		if (button == 0 && mouseX >= scrollBarLeft)
-		{
-			// If mouse on scroll bar
-			this.scrolling = true;
+			// Consume the state to prevent inner elements to be clicked
+			state = new EventState();
 			state.consume();
 		}
+
 		IScrollComponent.super.mouseClicked(mouseX, mouseY, button, state);
 	}
 

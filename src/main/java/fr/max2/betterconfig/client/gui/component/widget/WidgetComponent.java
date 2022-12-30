@@ -73,8 +73,18 @@ public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComp
 	protected void onMouseClicked(double mouseX, double mouseY, int button, EventState state)
 	{
 		this.updatePosition();
-		if (this.widget.mouseClicked(mouseX, mouseY, button))
+		if (state.isConsumed())
+		{
+			if (this.widget.isFocused())
+			{
+				// Ensure this widget is not focused
+				this.widget.changeFocus(true);
+			}
+		}
+		else if (this.widget.mouseClicked(mouseX, mouseY, button))
+		{
 			state.consume();
+		}
 	}
 
 	@Override
