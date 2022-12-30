@@ -16,7 +16,6 @@ import fr.max2.betterconfig.client.gui.layout.Alignment;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.util.GuiTexts;
-import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.fml.config.ModConfig;
 

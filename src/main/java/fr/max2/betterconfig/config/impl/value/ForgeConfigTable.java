@@ -6,8 +6,8 @@ import java.util.function.Function;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
-import fr.max2.betterconfig.config.ConfigLocation;
 import fr.max2.betterconfig.config.ConfigTableKey;
+import fr.max2.betterconfig.config.impl.ConfigLocation;
 import fr.max2.betterconfig.config.impl.spec.ForgeConfigTableSpec;
 import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;

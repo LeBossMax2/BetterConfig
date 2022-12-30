@@ -50,7 +50,7 @@ public abstract class BCComponent<LP> extends GuiComponent implements IComponent
 	protected IComponentParent layoutManager;
 	protected IComponent parent;
 	protected Size prefSize;
-	protected Rectangle relativeRect;
+	protected Rectangle relativeRect = new Rectangle();
 	private Rectangle absoluteRect = new Rectangle();
 	protected boolean hovered = false;
 	protected boolean hasFocus = false;
@@ -285,6 +285,12 @@ public abstract class BCComponent<LP> extends GuiComponent implements IComponent
 
 	private void updateHoverState(double mouseX, double mouseY)
 	{
+		if (!this.getStyleProperty(ComponentLayoutConfig.VISIBILITY).isVisible())
+		{
+			this.hovered = false;
+			return;
+		}
+
 		this.hovered = this.isPointInside(mouseX, mouseY);
 	}
 

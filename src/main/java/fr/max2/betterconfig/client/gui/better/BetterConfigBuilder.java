@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.client.gui.better;
 
-import java.util.ArrayList;
 import java.util.List;
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.better.widget.NumberInputField;
@@ -33,7 +32,7 @@ public class BetterConfigBuilder
 	 */
 	public static IComponent build(BetterConfigScreen screen, ConfigTable config)
 	{
-		GuiGroup tableGroup = new BetterConfigBuilder(screen).buildTable(RootInfo.INSTANCE, config);
+		GuiGroup tableGroup = new BetterConfigBuilder(screen).buildTable(config);
 		tableGroup.addClass("better:root_group");
 
 		return new GuiRoot(screen, tableGroup);
@@ -47,9 +46,9 @@ public class BetterConfigBuilder
 		this.screen = screen;
 	}
 
-	private GuiGroup buildTable(ConfigName identifier, ConfigTable table)
+	private GuiGroup buildTable(ConfigTable table)
 	{
-		List<IBetterElement> content = table.getEntryValues().stream().map(entry -> this.visitNode(new TableChildInfo(identifier, entry.key()), entry.node())).toList();
+		List<IBetterElement> content = table.getEntryValues().stream().map(entry -> this.visitNode(new TableChildInfo(entry.key()), entry.node())).toList();
 		GuiGroup tableGroup = new GuiGroup(content);
 		tableGroup.addClass("better:table_group");
 		return tableGroup;
@@ -84,7 +83,7 @@ public class BetterConfigBuilder
 
 	private IBetterElement visitTable(ConfigName identifier, ConfigTable table)
 	{
-		return new Foldout(this.screen, identifier, this.buildTable(identifier, table));
+		return new Foldout(this.screen, identifier, this.buildTable(table));
 	}
 
 	private IBetterElement visitList(ConfigName identifier, ConfigList list)
@@ -201,14 +200,6 @@ class ListChildInfo implements ConfigName
 	}
 
 	@Override
-	public List<String> getPath()
-	{
-		var res = new ArrayList<>(this.parent.getPath());
-		res.add(Integer.toString(this.index.get()));
-		return res;
-	}
-
-	@Override
 	public String getCommentString()
 	{
 		return this.parent.getCommentString();
@@ -223,12 +214,10 @@ class ListChildInfo implements ConfigName
 
 class TableChildInfo implements ConfigName
 {
-	private final ConfigName parent;
 	private final ConfigTableKey entry;
 
-	public TableChildInfo(ConfigName parent, ConfigTableKey entry)
+	public TableChildInfo(ConfigTableKey entry)
 	{
-		this.parent = parent;
 		this.entry = entry;
 	}
 
@@ -245,14 +234,6 @@ class TableChildInfo implements ConfigName
 	}
 
 	@Override
-	public List<String> getPath()
-	{
-		var res = new ArrayList<>(this.parent.getPath());
-		res.add(this.entry.getName());
-		return res;
-	}
-
-	@Override
 	public String getCommentString()
 	{
 		return this.entry.getCommentString();
@@ -262,40 +243,5 @@ class TableChildInfo implements ConfigName
 	public List<? extends Component> getDisplayComment()
 	{
 		return this.entry.getDisplayComment();
-	}
-}
-
-enum RootInfo implements ConfigName
-{
-	INSTANCE;
-
-	@Override
-	public String getName()
-	{
-		return "";
-	}
-
-	@Override
-	public Component getDisplayName()
-	{
-		return Component.empty();
-	}
-
-	@Override
-	public List<String> getPath()
-	{
-		return List.of();
-	}
-
-	@Override
-	public String getCommentString()
-	{
-		return "";
-	}
-
-	@Override
-	public List<? extends Component> getDisplayComment()
-	{
-		return List.of(Component.literal(""));
 	}
 }

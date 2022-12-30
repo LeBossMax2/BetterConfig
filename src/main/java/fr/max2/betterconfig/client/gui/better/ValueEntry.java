@@ -15,7 +15,6 @@ import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
 import fr.max2.betterconfig.client.gui.layout.Alignment;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.util.GuiTexts;
-import fr.max2.betterconfig.config.ConfigFilter;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigNode;
 import net.minecraft.ChatFormatting;
@@ -66,7 +65,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 	@Override
 	public boolean filterElements(ConfigFilter filter)
 	{
-		this.filteredOut = !filter.matches(this.identifier);
+		this.filteredOut = !filter.apply(this.identifier).matches();
 		return this.filteredOut;
 	}
 

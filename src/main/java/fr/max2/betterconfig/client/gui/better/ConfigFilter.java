@@ -1,22 +1,12 @@
-package fr.max2.betterconfig.config;
+package fr.max2.betterconfig.client.gui.better;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import fr.max2.betterconfig.client.gui.better.ConfigName;
-
 public class ConfigFilter
 {
 	public static final ConfigFilter ALL = new ConfigFilter(Collections.emptyList());
-	public static final ConfigFilter NONE = new ConfigFilter(Collections.emptyList())
-	{
-		@Override
-		public boolean matches(ConfigName node)
-		{
-			return false;
-		}
-	};
 
 	private final List<String> words;
 
@@ -44,22 +34,47 @@ public class ConfigFilter
 			}
 		}
 	}
-	
-	public boolean matches(ConfigName node)
+
+	public boolean matches()
 	{
-		for (String word : this.words)
-		{
-			if (!entryMatchesWord(node, word))
-				return false;
-		}
-		return true;
+		return this.words.isEmpty();
 	}
-	
+
+	public ConfigFilter apply(ConfigName node)
+	{
+		int i = this.words.size() - 1;
+		boolean noMatch = true;
+		for (; i >= 0; i--)
+		{
+			if (entryMatchesWord(node, this.words.get(i)))
+			{
+				noMatch = false;
+				break;
+			}
+		}
+
+		if (noMatch)
+		{
+			return this;
+		}
+
+		var wordsLeft = new ArrayList<>(this.words);
+		for (; i >= 0; i--)
+		{
+			if (entryMatchesWord(node, this.words.get(i)))
+			{
+				wordsLeft.remove(i);
+			}
+		}
+
+		return wordsLeft.isEmpty() ? ALL : new ConfigFilter(wordsLeft);
+	}
+
 	private static boolean entryMatchesWord(ConfigName node, String word)
 	{
 		String comment = node.getCommentString();
 		return comment != null && comment.toLowerCase().contains(word)
 		    || node.getDisplayName().getString().toLowerCase().contains(word)
-		    || node.getPath().stream().anyMatch(p -> p.toLowerCase().contains(word));
+		    || node.getName().toLowerCase().contains(word);
 	}
 }

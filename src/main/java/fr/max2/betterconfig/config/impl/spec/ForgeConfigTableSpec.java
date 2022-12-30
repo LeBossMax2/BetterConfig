@@ -9,8 +9,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import fr.max2.betterconfig.config.ConfigTableKey;
-import fr.max2.betterconfig.config.ConfigLocation;
 import fr.max2.betterconfig.config.PrimitiveType;
+import fr.max2.betterconfig.config.impl.ConfigLocation;
 import fr.max2.betterconfig.config.spec.ConfigListSpec;
 import fr.max2.betterconfig.config.spec.ConfigSpec;
 import fr.max2.betterconfig.config.spec.ConfigTableSpec;

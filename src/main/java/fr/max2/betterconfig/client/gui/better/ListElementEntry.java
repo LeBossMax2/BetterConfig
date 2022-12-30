@@ -6,7 +6,6 @@ import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
 import fr.max2.betterconfig.client.gui.component.widget.Button.OnPress;
 import fr.max2.betterconfig.client.util.GuiTexts;
-import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.network.chat.Component;
 
 public class ListElementEntry extends CompositeComponent implements IBetterElement

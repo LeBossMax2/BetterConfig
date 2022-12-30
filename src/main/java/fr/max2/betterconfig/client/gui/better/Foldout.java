@@ -18,7 +18,6 @@ import fr.max2.betterconfig.client.gui.component.widget.TextOverlay;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.util.GuiTexts;
-import fr.max2.betterconfig.config.ConfigFilter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -39,7 +38,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 
 	/** The parent screen */
 	private final BetterConfigScreen screen;
-	
+
 	private final ConfigName identifier;
 	/** The content that will be collapsed */
 	private final IBetterElement content;
@@ -68,8 +67,8 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	@Override
 	public boolean filterElements(ConfigFilter filter)
 	{
-		boolean matchFilter = filter.matches(this.identifier);
-		this.filteredOut = this.content.filterElements(matchFilter ? ConfigFilter.ALL : filter);
+		ConfigFilter matchFilter = filter.apply(this.identifier);
+		this.filteredOut = this.content.filterElements(matchFilter);
 		return this.filteredOut;
 	}
 
