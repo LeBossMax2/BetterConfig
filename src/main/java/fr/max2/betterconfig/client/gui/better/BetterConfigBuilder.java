@@ -47,7 +47,7 @@ public class BetterConfigBuilder
 
 	private GuiGroup buildTable(ConfigTable table)
 	{
-		List<IBetterElement> content = table.getEntryValues().stream().map(entry -> this.visitNode(new TableChildInfo(entry.key()), entry.node())).toList();
+		List<IBetterElement> content = table.entries().stream().map(entry -> this.visitNode(new TableChildInfo(entry.key()), entry.node())).toList();
 		GuiGroup tableGroup = new GuiGroup(content);
 		tableGroup.addClass("better:table_group");
 		return tableGroup;

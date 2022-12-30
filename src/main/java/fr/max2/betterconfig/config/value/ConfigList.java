@@ -18,6 +18,9 @@ import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
 import fr.max2.betterconfig.util.property.list.ReadableLists;
 
+/**
+ * A node containing a list in a configuration tree
+ */
 public final class ConfigList implements ConfigNode
 {
 	private final EventDispatcher<Runnable> onChanged = EventDispatcher.ordered();
@@ -37,6 +40,11 @@ public final class ConfigList implements ConfigNode
 		this.currentValue = new MappedListView<>(this.valueList, entry -> entry.node().getValue());
 	}
 
+	/**
+	 * Builds a {@code ConfigList} for the given specification
+	 * @param spec the specification of the node to create
+	 * @return the newly created list node
+	 */
 	public static ConfigList make(ConfigListSpec spec)
 	{
 		return new ConfigList(spec);
@@ -48,6 +56,9 @@ public final class ConfigList implements ConfigNode
 		return this.spec;
 	}
 
+	/**
+	 * Returns the event triggered when the value of this node changed
+	 */
 	public IEvent<Runnable> onChanged()
 	{
 		return this.onChanged;
@@ -59,18 +70,19 @@ public final class ConfigList implements ConfigNode
 		return this.currentValue;
 	}
 
+	/**
+	 * Returns the list of entries in this list
+	 */
 	public IReadableList<Entry> getValueList()
 	{
 		return this.valueListView;
 	}
 
-	public void removeValueAt(int index)
-	{
-		this.valueList.remove(index);
-		this.updateElementIndicesFrom(index);
-		this.onValueChanged();
-	}
-
+	/**
+	 * Adds a new entry to the list at the given index
+	 * @param index the insertion index
+	 * @return the newly created entry
+	 */
 	public Entry addValue(int index)
 	{
 		Preconditions.checkPositionIndex(index, this.valueList.size());
@@ -79,6 +91,17 @@ public final class ConfigList implements ConfigNode
 		this.updateElementIndicesFrom(index);
 		this.onValueChanged();
 		return entry;
+	}
+
+	/**
+	 * Removes the entry at the given index from the list
+	 * @param index the removal index
+	 */
+	public void removeValueAt(int index)
+	{
+		this.valueList.remove(index);
+		this.updateElementIndicesFrom(index);
+		this.onValueChanged();
 	}
 
 	private void updateElementIndicesFrom(int index)
@@ -142,7 +165,12 @@ public final class ConfigList implements ConfigNode
 		}
 		else if (specNode instanceof ConfigPrimitiveSpec<?> primitiveSpec)
 		{
-			return this.makePrimitiveElementBuilder(primitiveSpec);
+			return () ->
+			{
+				var node = ConfigPrimitive.make(primitiveSpec);
+				node.onChanged().add(newVal -> this.onValueChanged());
+				return node;
+			};
 		}
 		else if (specNode instanceof ConfigUnknownSpec unknownSpec)
 		{
@@ -154,28 +182,24 @@ public final class ConfigList implements ConfigNode
 		}
 	}
 
-	private <T> Supplier<ConfigNode> makePrimitiveElementBuilder(ConfigPrimitiveSpec<T> primitiveSpec)
-	{
-		return () ->
-		{
-			ConfigPrimitive<?> node = ConfigPrimitive.make(primitiveSpec);
-			node.onChanged().add(newVal -> this.onValueChanged());
-			return node;
-		};
-	}
-
 	public static record Entry
 	(
+		/** The index holder of the entry */
 		Index index,
+		/** The configuration value of the entry */
 		ConfigNode node
 	)
 	{ }
 
+	/**
+	 * Holds the index of an entry
+	 * The value of the index may change when inserting or removing elements from the list
+	 */
 	public static class Index
 	{
 		private int index;
 
-		public Index(int initialIndex)
+		private Index(int initialIndex)
 		{
 			this.index = initialIndex;
 		}
@@ -185,6 +209,9 @@ public final class ConfigList implements ConfigNode
 			this.index = index;
 		}
 
+		/**
+		 * Returns the current index
+		 */
 		public int get()
 		{
 			return this.index;

@@ -21,7 +21,7 @@ public class ForgeConfigTable
 {
 	private static void newForgeConfigTable(ConfigTable table, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)
 	{
-		for (ConfigTable.Entry entry : table.getEntryValues())
+		for (ConfigTable.Entry entry : table.entries())
 		{
 			childNode(entry.key(), entry.node(), changeListener, configValues);
 		}

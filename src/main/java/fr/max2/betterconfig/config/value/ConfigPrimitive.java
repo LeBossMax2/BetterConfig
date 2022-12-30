@@ -7,6 +7,9 @@ import fr.max2.betterconfig.util.IEvent;
 import fr.max2.betterconfig.util.property.IListener;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
+/**
+ * A node containing a primitive value in a configuration tree
+ */
 public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<T>
 	permits
 		ConfigPrimitive.Boolean,
@@ -26,6 +29,11 @@ public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<
 		this.currentValue = this.initialValue;
 	}
 
+	/**
+	 * Builds a {@code ConfigPrimitive} for the given specification
+	 * @param spec the specification of the node to create
+	 * @return the newly created primitive node
+	 */
 	public static ConfigPrimitive<?> make(ConfigPrimitiveSpec<?> spec)
 	{
 		if (spec instanceof ConfigPrimitiveSpec.Boolean boolNode)
@@ -58,7 +66,7 @@ public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<
 
 	/**
 	 * Gets the current configuration value
-	 * @return the current temporary value
+	 * @return the current value
 	 */
 	@Override
 	public T getValue()
@@ -73,7 +81,7 @@ public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<
 	public void setValue(T newValue)
 	{
 		this.currentValue = newValue;
-		this.onValiChanged();
+		this.onValueChanged();
 	}
 
 	@Override
@@ -94,7 +102,7 @@ public sealed class ConfigPrimitive<T> implements ConfigNode, IReadableProperty<
 		return this.onChanged;
 	}
 
-	private void onValiChanged()
+	private void onValueChanged()
 	{
 		this.onChanged.dispatch(l -> l.onValueChanged(this.currentValue));
 	}

@@ -4,12 +4,20 @@ import java.util.Objects;
 
 import fr.max2.betterconfig.config.spec.ConfigUnknownSpec;
 
+/**
+ * A node containing a value with a type not handled by this API in a configuration tree
+ */
 public final class ConfigUnknown implements ConfigNode
 {
 	private final ConfigUnknownSpec spec;
 	private Object initialValue;
 	private Object value;
 
+	/**
+	 * Builds a {@code ConfigUnknown} for the given specification
+	 * @param spec the specification of the node to create
+	 * @return the newly created node
+	 */
 	private ConfigUnknown(ConfigUnknownSpec spec)
 	{
 		this.spec = spec;

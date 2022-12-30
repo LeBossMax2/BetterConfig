@@ -5,6 +5,9 @@ import java.util.List;
 import fr.max2.betterconfig.config.ConfigTableKey;
 import fr.max2.betterconfig.config.spec.ConfigTableSpec;
 
+/**
+ * A node containing a table in a configuration tree
+ */
 public final class ConfigTable implements ConfigNode
 {
 	private final ConfigTableSpec spec;
@@ -18,6 +21,11 @@ public final class ConfigTable implements ConfigNode
 		).toList();
 	}
 
+	/**
+	 * Builds a {@code ConfigTable} for the given specification
+	 * @param spec the specification of the node to create
+	 * @return the newly created table node
+	 */
 	public static ConfigTable make(ConfigTableSpec spec)
 	{
 		return new ConfigTable(spec);
@@ -35,7 +43,10 @@ public final class ConfigTable implements ConfigNode
 		return null; // TODO table getValue
 	}
 
-	public List<Entry> getEntryValues()
+	/**
+	 * Returns the list of entries in this table
+	 */
+	public List<Entry> entries()
 	{
 		return this.entryValues;
 	}
@@ -76,7 +87,9 @@ public final class ConfigTable implements ConfigNode
 
 	public static record Entry
 	(
+		/** The name of the entry */
 		ConfigTableKey key,
+		/** The configuration value of the entry */
 		ConfigNode node
 	)
 	{ }
