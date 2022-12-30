@@ -45,7 +45,7 @@ public class ConfigExtension
 		if (configs.isEmpty())
 			return; // No config screen if the mod has no config
 
-		LOGGER.debug("Registering extension point for " + modId);
+		LOGGER.debug("Registering ConfigScreenFactory extension point for " + modId);
 		mod.registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class, () -> new ConfigScreenHandler.ConfigScreenFactory(BetterConfigScreen.factory(mod, configs)));
 	}
 

@@ -1,5 +1,8 @@
 package fr.max2.betterconfig.config.spec;
 
+/**
+ * Represents the specification for a primitive value in a configuration
+ */
 public sealed abstract class ConfigPrimitiveSpec<T> implements ConfigSpec
 	permits
 		ConfigPrimitiveSpec.Boolean,
@@ -7,6 +10,7 @@ public sealed abstract class ConfigPrimitiveSpec<T> implements ConfigSpec
 		ConfigPrimitiveSpec.Enum,
 		ConfigPrimitiveSpec.Number
 {
+	/** The object holding the implementation-specific behavior */
 	private final SpecData<T> data;
 
 	public ConfigPrimitiveSpec(SpecData<T> data)
@@ -30,7 +34,7 @@ public sealed abstract class ConfigPrimitiveSpec<T> implements ConfigSpec
 	/**
 	 * Checks if the given value is a valid value
 	 * @param value the value to check
-	 * @return true if the value matches the spec, false otherwise
+	 * @return true if the value matches the specification, false otherwise
 	 */
 	public boolean isAllowed(T value)
 	{
@@ -38,7 +42,7 @@ public sealed abstract class ConfigPrimitiveSpec<T> implements ConfigSpec
 	}
 
 	/**
-	 * Correct the given value to match the spec
+	 * Corrects the given value to match the specification
 	 * @param value the value to fix
 	 * @return a valid value
 	 */
@@ -110,6 +114,7 @@ public sealed abstract class ConfigPrimitiveSpec<T> implements ConfigSpec
 		}
 	}
 
+	/** Defines the behavior of the {@link ConfigPrimitiveSpec} */
 	public static interface SpecData<T>
 	{
 		/**
@@ -120,12 +125,12 @@ public sealed abstract class ConfigPrimitiveSpec<T> implements ConfigSpec
 		/**
 		 * Checks if the given value is a valid value
 		 * @param value the value to check
-		 * @return true if the value matches the spec, false otherwise
+		 * @return true if the value matches the specification, false otherwise
 		 */
 		boolean isAllowed(T value);
 
 		/**
-		 * Correct the given value to match the spec
+		 * Correct the given value to match the specification
 		 * @param value the value to fix
 		 * @return a valid value
 		 */

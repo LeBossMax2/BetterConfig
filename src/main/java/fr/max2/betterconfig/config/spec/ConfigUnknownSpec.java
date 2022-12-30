@@ -1,5 +1,13 @@
 package fr.max2.betterconfig.config.spec;
 
 
-public final record ConfigUnknownSpec(Object specData) implements ConfigSpec
+/**
+ * Represents the specification for value with a type not handled by this API in a configuration
+ */
+public final record ConfigUnknownSpec
+(
+	/** The object holding implementation-specific additional information about the possible valid configuration values */
+	Object specData
+)
+implements ConfigSpec
 { }
