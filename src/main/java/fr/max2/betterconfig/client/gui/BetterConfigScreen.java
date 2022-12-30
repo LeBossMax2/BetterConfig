@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Preconditions;
 
+import fr.max2.betterconfig.client.gui.better.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.ComponentScreen;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import fr.max2.betterconfig.client.gui.style.StyleSheetManager;
@@ -31,8 +32,6 @@ public class BetterConfigScreen extends ComponentScreen
 {
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	/** The config user interface builder */
-	private final IConfigUIBuilder uiBuilder;
 	/** The mod this configuration is from */
 	private final ModContainer mod;
 
@@ -50,11 +49,10 @@ public class BetterConfigScreen extends ComponentScreen
 
 	private boolean autoSave = true;
 
-	protected BetterConfigScreen(IConfigUIBuilder uiBuilder, StyleSheet styleSheet, ModContainer mod, List<ModConfig> configs, int index)
+	protected BetterConfigScreen(StyleSheet styleSheet, ModContainer mod, List<ModConfig> configs, int index)
 	{
 		// TODO change to translatable
 		super(Component.literal(mod.getModId() + " configuration : " + configs.get(index).getFileName()), styleSheet);
-		this.uiBuilder = uiBuilder;
 		this.mod = mod;
 		this.modConfigs = configs;
 		this.configIndex = index;
@@ -67,7 +65,8 @@ public class BetterConfigScreen extends ComponentScreen
 		if (this.currentTables[this.configIndex] == null)
 			this.currentTables[this.configIndex] = ForgeConfig.make(this.modConfigs.get(this.configIndex).<ForgeConfigSpec>getSpec().self(), this::onPropertyChanged);
 		// Builds the user interface
-		this.setContent(this.uiBuilder.build(this, this.currentTables[this.configIndex]));
+		// TODO [?] Get ui builder from mod properties
+		this.setContent(BetterConfigBuilder.build(this, this.currentTables[this.configIndex]));
 	}
 
 	@Override
@@ -106,7 +105,7 @@ public class BetterConfigScreen extends ComponentScreen
 		{
 			this.autoSave = false;
 			// Reopen gui
-			BetterConfigScreen newScreen = new BetterConfigScreen(this.uiBuilder, this.getStyleSheet(), this.mod, this.modConfigs, this.configIndex);
+			BetterConfigScreen newScreen = new BetterConfigScreen(this.getStyleSheet(), this.mod, this.modConfigs, this.configIndex);
 			newScreen.setPrevScreen(this.prevScreen);
 			this.minecraft.setScreen(newScreen);
 		}
@@ -235,9 +234,6 @@ public class BetterConfigScreen extends ComponentScreen
 			throw new RuntimeException("Exception loading stylesheet: " + styleSheetLoc, e);
 		}
 
-		// TODO [#2] Get ui builder from mod properties
-		IConfigUIBuilder uiBuilder = IConfigUIBuilder.DEFAULT;
-
-		return new BetterConfigScreen(uiBuilder, styleSheet, mod, configs, 0);
+		return new BetterConfigScreen(styleSheet, mod, configs, 0);
 	}
 }
