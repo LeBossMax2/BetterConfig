@@ -74,9 +74,7 @@ public final class ConfigList implements ConfigNode
 	public Entry addValue(int index)
 	{
 		Preconditions.checkPositionIndex(index, this.valueList.size());
-		var id = new Index();
-		var newNode = this.elementBuilder.get();
-		var entry = new Entry(id, newNode);
+		var entry = new Entry(new Index(index), this.elementBuilder.get());
 		this.valueList.add(index, entry);
 		this.updateElementIndicesFrom(index);
 		this.onValueChanged();
@@ -177,9 +175,9 @@ public final class ConfigList implements ConfigNode
 	{
 		private int index;
 
-		public Index()
+		public Index(int initialIndex)
 		{
-			this.index = -1;
+			this.index = initialIndex;
 		}
 
 		private void set(int index)

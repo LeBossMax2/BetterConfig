@@ -31,12 +31,6 @@ public enum ReadableLists
 		}
 
 		@Override
-		public List<? extends IIndexedProperty<? extends T>> getIndexedProperties()
-		{
-			return this.parent.getIndexedProperties();
-		}
-
-		@Override
 		public IEvent<? super IListListener<? super T>> onChanged()
 		{
 			return this.parent.onChanged();

@@ -13,8 +13,6 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 {
 	protected final EventDispatcher<IListListener<? super T>> onChanged = EventDispatcher.unordered();
 	protected final List<IReadableProperty<T>> elementProperties;
-	protected List<IndexedPropertyBase<T>> indexedPropertiesMut;
-	protected List<IIndexedProperty<T>> indexedProperties;
 
 	protected ListBase()
 	{
@@ -34,21 +32,6 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 	}
 
 	@Override
-	public List<IIndexedProperty<T>> getIndexedProperties()
-	{
-		if (this.indexedProperties == null)
-		{
-			this.indexedPropertiesMut = new ArrayList<>();
-			for (int i = 0; i < this.size(); i++)
-			{
-				this.indexedPropertiesMut.add(i, new IndexedPropertyBase<>(i, ListBase.this.getElementProperties().get(i)));
-			}
-			this.indexedProperties = Collections.unmodifiableList(this.indexedPropertiesMut);
-		}
-		return this.indexedProperties;
-	}
-
-	@Override
 	public IEvent<IListListener<? super T>> onChanged()
 	{
 		return this.onChanged;
@@ -56,34 +39,13 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 
 	protected void addElement(int index, P newProperty)
 	{
-		ListBase.this.parent.add(index, newProperty);
-
-		if (this.indexedPropertiesMut != null)
-		{
-			this.indexedPropertiesMut.add(index, new IndexedPropertyBase<>(index, ListBase.this.getElementProperties().get(index)));
-
-			for (int i = index + 1; i < this.indexedPropertiesMut.size(); i++)
-			{
-				this.indexedPropertiesMut.get(i).updateIndex(i);
-			}
-		}
-
+		this.parent.add(index, newProperty);
 		this.onChanged.dispatch(l -> l.onElementAdded(index, newProperty.getValue()));
 	}
 
 	protected P removeElement(int index)
 	{
 		P property = ListBase.this.parent.remove(index);
-
-		if (this.indexedPropertiesMut != null)
-		{
-			this.indexedPropertiesMut.remove(index);
-
-			for (int i = index; i < this.indexedPropertiesMut.size(); i++)
-			{
-				this.indexedPropertiesMut.get(i).updateIndex(i);
-			}
-		}
 
 		this.onChanged.dispatch(l -> l.onElementRemoved(index, property.getValue()));
 		return property;
@@ -117,41 +79,6 @@ public abstract class ListBase<T, P extends IReadableProperty<T>> extends Mapped
 			this.currentValue = newValue;
 			this.onChanged.dispatch(l -> l.onValueChanged(newValue));
 			return oldValue;
-		}
-	}
-
-	protected static class IndexedPropertyBase<T> implements IIndexedProperty<T>
-	{
-		private int index;
-		private final IReadableProperty<T> parent;
-
-		public IndexedPropertyBase(int index, IReadableProperty<T> parent)
-		{
-			this.index = index;
-			this.parent = parent;
-		}
-
-		@Override
-		public T getValue()
-		{
-			return this.parent.getValue();
-		}
-
-		@Override
-		public IEvent<IListener<? super T>> onChanged()
-		{
-			return this.parent.onChanged();
-		}
-
-		public void updateIndex(int index)
-		{
-			this.index = index;
-		}
-
-		@Override
-		public int getIndex()
-		{
-			return this.index;
 		}
 	}
 }

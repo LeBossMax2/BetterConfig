@@ -14,7 +14,6 @@ import fr.max2.betterconfig.config.value.ConfigNode;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.ConfigUnknown;
-import fr.max2.betterconfig.util.property.list.IIndexedProperty;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
@@ -92,11 +91,10 @@ public class BetterConfigBuilder
 		GuiGroup mainGroup = new GuiGroup(mainElements);
 		mainGroup.addClass("better:list_group");
 
-		IReadableList<ConfigList.Entry> values = list.getValueList();
 		mainElements.add(new BetterButton(this.screen, Component.translatable(GuiTexts.ADD_ELEMENT_KEY), Component.translatable(GuiTexts.ADD_FIRST_TOOLTIP_KEY))
 				.addOnPressed(() -> list.addValue(0)));
 
-		IReadableList<IBetterElement> content = values.derived((index, elem) -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), values.getIndexedProperties().get(index)));
+		IReadableList<IBetterElement> content = list.getValueList().derived((index, elem) -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), elem.index()));
 		IListListener<IBetterElement> listListener = new IListListener<>()
 		{
 			@Override
@@ -141,11 +139,11 @@ public class BetterConfigBuilder
 		return button;
 	}
 
-	private IBetterElement buildListElementGui(ConfigList list, ConfigName identifier, ConfigNode elem, IIndexedProperty<?> entry)
+	private IBetterElement buildListElementGui(ConfigList list, ConfigName identifier, ConfigNode elem, ConfigList.Index index)
 	{
 		IBetterElement child = this.visitNode(identifier, elem);
 
-		return new ListElementEntry(this.screen, child, () -> list.removeValueAt(entry.getIndex()));
+		return new ListElementEntry(this.screen, child, () -> list.removeValueAt(index.get()));
 	}
 
 	private <T> IBetterElement visitPrimitive(ConfigName identifier, ConfigPrimitive<T> primitive)
