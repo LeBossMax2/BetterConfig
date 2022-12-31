@@ -23,8 +23,8 @@ import net.minecraft.sounds.SoundEvents;
  */
 public class Button extends UnitComponent
 {
+	private final EventDispatcher<OnPress> onPressed = EventDispatcher.ordered();
 	private Component message;
-	private EventDispatcher<OnPress> onPressed = EventDispatcher.ordered();
 	private boolean isActive = true;
 
 	public Button(Component displayString, OnTooltip overlay)

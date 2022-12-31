@@ -3,6 +3,7 @@ package fr.max2.betterconfig.client.gui.component;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.Size;
@@ -25,6 +26,7 @@ public class ComponentScreen extends Screen implements IComponentParent
 	protected ComponentScreen(Component title, StyleSheet styleSheet)
 	{
 		super(title);
+		Preconditions.checkNotNull(styleSheet);
 		this.styleSheet = styleSheet;
 	}
 	

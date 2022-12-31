@@ -1,6 +1,7 @@
 package fr.max2.betterconfig.client.gui.component.widget;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import com.google.common.base.Strings;
@@ -20,9 +21,6 @@ import net.minecraft.network.chat.Component;
  */
 public class NumberField<N> extends CompositeComponent
 {
-	/** The default width of the '+' and '-' buttons */
-	public static final int BUTTON_SIZE = 20;
-	
 	/** The text field to directly enter the number */
 	protected final TextField inputField;
 	/** The minus button to decrement the number */
@@ -61,7 +59,7 @@ public class NumberField<N> extends CompositeComponent
 		this.plusButton = new Button(Increment.NORMAL.getPlusText())
 				.addOnPressed(() -> applyOperator(Operator.PLUS));
 		this.plusButton.addClass("number_field:plus_button");
-		this.children.addAll(Arrays.asList(this.minusButton, this.inputField, this.plusButton));
+		this.children.addAll(List.of(this.minusButton, this.inputField, this.plusButton));
 		this.inputField.widget.setFilter(this::isValid);
 		this.setValue(value);
 	}

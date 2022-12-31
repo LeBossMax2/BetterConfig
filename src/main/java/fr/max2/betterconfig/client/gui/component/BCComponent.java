@@ -42,8 +42,8 @@ public abstract class BCComponent<LP> extends GuiComponent implements IComponent
 
 	public static final OnTooltip NO_OVERLAY = OnTooltip.NO_TOOLTIP;
 
-	protected final Map<PropertyIdentifier<?>, Supplier<?>> propertyMap = new HashMap<>();
-	protected final Map<StyleProperty<?>, Object> styleOverride = new HashMap<>();
+	private final Map<PropertyIdentifier<?>, Supplier<?>> propertyMap = new HashMap<>();
+	private final Map<StyleProperty<?>, Object> styleOverride = new HashMap<>();
 	protected final String type;
 	protected final List<String> classes = new ArrayList<>();
 	protected IComponentParent layoutManager;

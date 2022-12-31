@@ -172,8 +172,7 @@ public class ScrollPane extends BCComponent<IScrollComponent> implements IScroll
 	private int getScrollThumbSize(Rectangle rect)
 	{
 		int size = (int) ((float) (rect.size.height * rect.size.height) / this.getContentHeight());
-		size = Mth.clamp(size, 32, rect.size.height);
-		return size;
+		return Mth.clamp(size, 32, rect.size.height);
 	}
 
 	protected void ensureAreaVisible(Rectangle area)

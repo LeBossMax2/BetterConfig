@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.client.gui.component.widget;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -24,7 +23,7 @@ public class Text extends UnitComponent
 
 	public Text(Component text, Alignment verticalAlignment, Alignment horizontalAlignment)
 	{
-		this(Arrays.asList(text), verticalAlignment, horizontalAlignment);
+		this(List.of(text), verticalAlignment, horizontalAlignment);
 	}
 
 	public Text(List<Component> text, Alignment verticalAlignment, Alignment horizontalAlignment)

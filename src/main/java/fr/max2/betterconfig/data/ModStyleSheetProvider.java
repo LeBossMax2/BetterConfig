@@ -64,19 +64,21 @@ public class ModStyleSheetProvider implements DataProvider
 	private static final class DefaultStyleSheet
 	{
 		/** The left and right padding around the screen */
-		public static final int X_PADDING = 10;
+		private static final int X_PADDING = 10;
 		/** The top and bottom padding around the screen */
-		public static final int Y_PADDING = 10;
+		private static final int Y_PADDING = 10;
 		/** The height of the value widget */
-		public static final int VALUE_HEIGHT = 20;
+		private static final int VALUE_HEIGHT = 20;
 		/** The width of the value widget */
-		public static final int VALUE_WIDTH = 150;
+		private static final int VALUE_WIDTH = 150;
 		/** The height of the value entries */
-		public static final int VALUE_CONTAINER_HEIGHT = 24;
+		private static final int VALUE_CONTAINER_HEIGHT = 24;
 		/** The width of the indentation added for each nested section */
 		private static final int SECTION_TAB_SIZE = 22;
 		/** The x position of the input field of the search bar */
 		private static final int SEARCH_LABEL_WIDTH = 80;
+		/** The default width of the '+' and '-' buttons */
+		private static final int NUMBER_FIELD_BUTTON_SIZE = 20;
 
 		private static final StyleRule BETTER_NUMBER_FIELD_STYLE = when().hasClass("better:number_field").then()
 				.set(SIZE_OVERRIDE, new Size(VALUE_WIDTH, VALUE_HEIGHT))
@@ -87,10 +89,10 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(DIR, Axis.HORIZONTAL)
 				.build();
 		private static final StyleRule NUMBER_FIELD_MINUS_STYLE = when().hasClass("number_field:minus_button").then()
-				.set(SIZE_OVERRIDE, new Size(NumberField.BUTTON_SIZE, Size.UNCONSTRAINED))
+				.set(SIZE_OVERRIDE, new Size(NUMBER_FIELD_BUTTON_SIZE, Size.UNCONSTRAINED))
 				.build();
 		private static final StyleRule NUMBER_FIELD_PLUS_STYLE = when().hasClass("number_field:plus_button").then()
-				.set(SIZE_OVERRIDE, new Size(NumberField.BUTTON_SIZE, Size.UNCONSTRAINED))
+				.set(SIZE_OVERRIDE, new Size(NUMBER_FIELD_BUTTON_SIZE, Size.UNCONSTRAINED))
 				.build();
 
 		private static final StyleRule FILTERED_OUT_STYLE = when().is(IBetterElement.FILTERED_OUT).then()
