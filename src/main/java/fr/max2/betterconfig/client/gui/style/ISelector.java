@@ -191,16 +191,16 @@ public interface ISelector extends Predicate<IPropertySource>, ISerializableInte
 		@Override
 		protected Type getConcreteType(String operator, Type interfaceType)
 		{
-			switch (operator)
+			return switch (operator)
 			{
-			case "not": return Not.class;
-			case "and": return And.class;
-			case "or": return Or.class;
-			case "equals": return Equals.class;
-			case "contains": return Contains.class;
-			case "combinator": return Combinator.class;
-			default: return null;
-			}
+				case "not" -> Not.class;
+				case "and" -> And.class;
+				case "or" -> Or.class;
+				case "equals" -> Equals.class;
+				case "contains" -> Contains.class;
+				case "combinator" -> Combinator.class;
+				default -> null;
+			};
 		}
 	}
 }

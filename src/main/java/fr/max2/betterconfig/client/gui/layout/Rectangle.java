@@ -25,29 +25,19 @@ public class Rectangle
 	
 	public int getPos(Axis axis)
 	{
-		switch (axis)
+		return switch (axis)
 		{
-		case HORIZONTAL:
-			return this.x;
-		case VERTICAL:
-			return this.y;
-		default:
-			return -1;
-		}
+			case HORIZONTAL -> this.x;
+			case VERTICAL -> this.y;
+		};
 	}
 	
 	public void setPos(Axis axis, int pos)
 	{
 		switch (axis)
 		{
-		case HORIZONTAL:
-			this.x = pos;
-			break;
-		case VERTICAL:
-			this.y = pos;
-			break;
-		default:
-			break;
+			case HORIZONTAL -> this.x = pos;
+			case VERTICAL -> this.y = pos;
 		}
 	}
 	

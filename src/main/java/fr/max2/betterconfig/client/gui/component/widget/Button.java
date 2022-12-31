@@ -111,14 +111,11 @@ public class Button extends UnitComponent
 
 		switch (keyCode)
 		{
-		case GLFW.GLFW_KEY_ENTER:
-		case GLFW.GLFW_KEY_KP_ENTER:
-		case GLFW.GLFW_KEY_SPACE:
-			this.onPress();
-			state.consume();
-			break;
-		default:
-			break;
+			case GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER, GLFW.GLFW_KEY_SPACE ->
+			{
+				this.onPress();
+				state.consume();
+			}
 		}
 	}
 

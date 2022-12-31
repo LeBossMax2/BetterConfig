@@ -10,15 +10,11 @@ public enum Alignment
 	
 	public int getOffset(int availableSpace)
 	{
-		switch (this)
+		return switch (this)
 		{
-		default:
-		case MIN:
-			return 0;
-		case CENTER:
-			return (availableSpace + 1) / 2;
-		case MAX:
-			return availableSpace;
-		}
+			case MIN	-> 0;
+			case CENTER	-> (availableSpace + 1) / 2;
+			case MAX	-> availableSpace;
+		};
 	}
 }

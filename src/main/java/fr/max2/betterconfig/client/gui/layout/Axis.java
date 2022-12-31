@@ -8,14 +8,10 @@ public enum Axis
 	
 	public Axis perpendicular()
 	{
-		switch (this)
+		return switch (this)
 		{
-		case HORIZONTAL:
-			return VERTICAL;
-		case VERTICAL:
-			return HORIZONTAL;
-		default:
-			return null;
-		}
+			case HORIZONTAL -> VERTICAL;
+			case VERTICAL -> HORIZONTAL;
+		};
 	}
 }

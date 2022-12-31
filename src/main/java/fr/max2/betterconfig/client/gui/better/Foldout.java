@@ -152,15 +152,12 @@ public class Foldout extends CompositeComponent implements IBetterElement
 
 			switch (keyCode)
 			{
-			case GLFW.GLFW_KEY_ENTER:
-			case GLFW.GLFW_KEY_KP_ENTER:
-			case GLFW.GLFW_KEY_SPACE:
-				this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-				Foldout.this.toggleFolding();
-				state.consume();
-				break;
-			default:
-				break;
+				case GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER, GLFW.GLFW_KEY_SPACE ->
+				{
+					this.layoutManager.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+					Foldout.this.toggleFolding();
+					state.consume();
+				}
 			}
 		}
 

@@ -29,20 +29,11 @@ public final class IntegerType<N extends Number> implements INumberType<N>
 	@Override
 	public N applyOperation(N value, Operator op, Increment inc)
 	{
-		long left;
-		switch (inc)
+		long left = switch (inc)
 		{
-		case HIGH:
-			left = 10;
-			break;
-		case LOW:
-			left = 1;
-			break;
-		default:
-		case NORMAL:
-			left = 1;
-			break;
-		}
+			case HIGH -> 10;
+			case NORMAL, LOW -> 1;
+		};
 		
 		return this.converter.apply(value.longValue() + op.getMultiplier() * left);
 	}

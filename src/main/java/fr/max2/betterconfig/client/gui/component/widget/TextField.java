@@ -71,13 +71,11 @@ public class TextField extends WidgetComponent<EditBox>
 
 		switch (keyCode)
 		{
-		case GLFW.GLFW_KEY_ENTER:
-		case GLFW.GLFW_KEY_KP_ENTER:
-			this.onValidate(this.widget.getValue());
-			state.consume();
-			break;
-		default:
-			break;
+			case GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER ->
+			{
+				this.onValidate(this.widget.getValue());
+				state.consume();
+			}
 		}
 	}
 

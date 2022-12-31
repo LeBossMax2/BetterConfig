@@ -24,12 +24,16 @@ public interface IStyleOperation<T> extends ISerializableInterface
 			Type valueType = getGenericType(interfaceType, 0);
 			switch (operator)
 			{
-			case "set": return TypeUtils.parameterize(AssignmentOperation.class, valueType);
+			case "set":
+				return TypeUtils.parameterize(AssignmentOperation.class, valueType);
 			case "item":
+			{
 				if (((ParameterizedType)valueType).getRawType() != List.class)
 					throw new JsonParseException("Type " + valueType + " cannot be indexed");
 				return TypeUtils.parameterize(ListIndexingOperation.class, getGenericType(valueType, 0));
-			default: return null;
+			}
+			default:
+				return null;
 			}
 		}
 	}

@@ -16,13 +16,13 @@ public interface IMaterial extends ISerializableInterface
 		@Override
 		protected Type getConcreteType(String operator, Type interfaceType)
 		{
-			switch (operator)
+			return switch (operator)
 			{
-			case "color": return ColorMaterial.class;
-			case "texture": return TextureMaterial.class;
-			case "9-slice": return NineSliceMaterial.class;
-			default: return null;
-			}
+				case "color" -> ColorMaterial.class;
+				case "texture" -> TextureMaterial.class;
+				case "9-slice" -> NineSliceMaterial.class;
+				default -> null;
+			};
 		}
 	}
 }

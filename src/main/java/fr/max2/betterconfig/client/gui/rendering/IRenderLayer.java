@@ -16,12 +16,12 @@ public interface IRenderLayer extends ISerializableInterface
 		@Override
 		protected Type getConcreteType(String operator, Type interfaceType)
 		{
-			switch (operator)
+			return switch (operator)
 			{
-			case "none": return NoRendering.class;
-			case "box": return DrawBox.class;
-			default: return null;
-			}
+				case "none" -> NoRendering.class;
+				case "box" -> DrawBox.class;
+				default -> null;
+			};
 		}
 	}
 }

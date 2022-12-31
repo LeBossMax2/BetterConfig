@@ -39,20 +39,12 @@ public final class RealType<N extends Number> implements INumberType<N>
 	@Override
 	public N applyOperation(N value, Operator op, Increment inc)
 	{
-		double left;
-		switch (inc)
+		double left = switch (inc)
 		{
-		case HIGH:
-			left = 10.0;
-			break;
-		case LOW:
-			left = 0.1;
-			break;
-		default:
-		case NORMAL:
-			left = 1.0;
-			break;
-		}
+			case HIGH	-> 10.0;
+			case NORMAL	-> 1.0;
+			case LOW	-> 0.1;
+		};
 		
 		return this.converter.apply(value.doubleValue() + op.getMultiplier() * left);
 	}
