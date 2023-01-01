@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.Nullable;
+
 import fr.max2.betterconfig.BetterConfig;
 import fr.max2.betterconfig.client.gui.component.IComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -18,10 +20,11 @@ public class StyleSheet
 	public static final String STYLESHEET_DIR = "stylesheets";
 	public static final ResourceLocation DEFAULT_STYLESHEET = new ResourceLocation(BetterConfig.MODID, "default_stylesheet");
 
+	@Nullable
 	private final StyleSheet parent;
 	private final Map<StyleProperty<?>, List<ProcessedStyleRule<?>>> rules;
 
-	private StyleSheet(StyleSheet parent, List<StyleRule> rules)
+	private StyleSheet(@Nullable StyleSheet parent, List<StyleRule> rules)
 	{
 		this.parent = parent;
 		this.rules = new HashMap<>();
@@ -103,7 +106,7 @@ public class StyleSheet
 		{
 			StyleSheet parent = null;
 			if (this.parentSheet != null)
-				parent = StyleSheetManager.INSTANCE.getStyleSheet(this.parentSheet);
+				parent = StyleSheetManager.INSTANCE.getStyleSheet(this.parentSheet).orElse(null);
 
 			return new StyleSheet(parent, this.rules);
 		}

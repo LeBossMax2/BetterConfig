@@ -226,7 +226,7 @@ public class BetterConfigScreen extends ComponentScreen
 		StyleSheet styleSheet;
 		try
 		{
-			styleSheet = StyleSheetManager.INSTANCE.getStyleSheet(styleSheetLoc);
+			styleSheet = StyleSheetManager.INSTANCE.getStyleSheet(styleSheetLoc).orElse(null);
 		}
 		catch (IOException e)
 		{
