@@ -52,8 +52,8 @@ public class StyleSerializer
 	
 	private StyleSerializer(List<PropertyIdentifier<?>> componentProperties, List<StyleProperty<?>> styleProperties)
 	{
-		this.componentProperties = componentProperties.stream().collect(ImmutableMap.toImmutableMap(prop -> prop.name.toString(), Function.identity()));
-		this.styleProperties = styleProperties.stream().collect(ImmutableMap.toImmutableMap(prop -> prop.name.toString(), Function.identity()));
+		this.componentProperties = componentProperties.stream().collect(ImmutableMap.toImmutableMap(prop -> prop.name().toString(), Function.identity()));
+		this.styleProperties = styleProperties.stream().collect(ImmutableMap.toImmutableMap(prop -> prop.name().toString(), Function.identity()));
 	}
 	
 	public PropertyIdentifier<?> getComponentProperty(String propertyIdentifier)

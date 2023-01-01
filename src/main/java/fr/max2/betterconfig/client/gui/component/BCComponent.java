@@ -18,7 +18,6 @@ import fr.max2.betterconfig.client.gui.layout.ILayoutConfig;
 import fr.max2.betterconfig.client.gui.layout.Rectangle;
 import fr.max2.betterconfig.client.gui.layout.Size;
 import fr.max2.betterconfig.client.gui.rendering.IRenderLayer;
-import fr.max2.betterconfig.client.gui.style.ListPropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.PropertyIdentifier;
 import fr.max2.betterconfig.client.gui.style.StyleProperty;
 import net.minecraft.client.gui.GuiComponent;
@@ -30,14 +29,14 @@ import net.minecraft.resources.ResourceLocation;
 
 public abstract class BCComponent<LP> extends GuiComponent implements IComponent
 {
-	public static final PropertyIdentifier<String> COMPONENT_TYPE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_type"), String.class);
-	public static final ListPropertyIdentifier<String> COMPONENT_CLASSES = new ListPropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"), String.class);
-	public static final PropertyIdentifier<IComponent> PARENT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "parent"), IComponent.class);
-	public static final PropertyIdentifier<Boolean> HOVERED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "hovered"), Boolean.class);
-	public static final PropertyIdentifier<Boolean> FOCUSED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "focused"), Boolean.class);
+	public static final PropertyIdentifier<String> COMPONENT_TYPE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_type"));
+	public static final PropertyIdentifier<List<String>> COMPONENT_CLASSES = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "component_classes"));
+	public static final PropertyIdentifier<IComponent> PARENT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "parent"));
+	public static final PropertyIdentifier<Boolean> HOVERED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "hovered"));
+	public static final PropertyIdentifier<Boolean> FOCUSED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "focused"));
 
-	public static final StyleProperty<List<IRenderLayer>> BACKGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "background"), TypeUtils.parameterize(List.class, IRenderLayer.class), Collections.emptyList());
-	public static final StyleProperty<List<IRenderLayer>> FOREGROUND = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "foreground"), TypeUtils.parameterize(List.class, IRenderLayer.class), Collections.emptyList());
+	public static final StyleProperty<List<IRenderLayer>> BACKGROUND = new StyleProperty<List<IRenderLayer>>(new ResourceLocation(BetterConfig.MODID, "background"), TypeUtils.parameterize(List.class, IRenderLayer.class), Collections.emptyList());
+	public static final StyleProperty<List<IRenderLayer>> FOREGROUND = new StyleProperty<List<IRenderLayer>>(new ResourceLocation(BetterConfig.MODID, "foreground"), TypeUtils.parameterize(List.class, IRenderLayer.class), Collections.emptyList());
 	public static final StyleProperty<Integer> TEXT_COLOR = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "text_color"), 0xFF_FF_FF_FF);
 	public static final StyleProperty<Style> TEXT_STYLE = new StyleProperty<>(new ResourceLocation(BetterConfig.MODID, "text_style"), Style.EMPTY);
 

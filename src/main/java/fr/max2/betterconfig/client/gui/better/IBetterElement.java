@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 /** An interface for ui elements with a simple layout system */
 public interface IBetterElement extends IComponent
 {
-	public static final PropertyIdentifier<Boolean> FILTERED_OUT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "filtered_out"), Boolean.class);
+	public static final PropertyIdentifier<Boolean> FILTERED_OUT = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "filtered_out"));
 	
 	boolean filterElements(ConfigFilter filter);
 }

@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public abstract class WidgetComponent<W extends AbstractWidget> extends UnitComponent
 {
-	public static final PropertyIdentifier<Boolean> ACTIVE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "active"), Boolean.class);
+	public static final PropertyIdentifier<Boolean> ACTIVE = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "active"));
 
 	public final W widget;
 

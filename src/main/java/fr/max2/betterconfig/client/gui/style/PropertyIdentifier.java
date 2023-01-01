@@ -12,21 +12,15 @@ import com.google.gson.JsonSerializer;
 
 import net.minecraft.resources.ResourceLocation;
 
-public class PropertyIdentifier<T>
+public record PropertyIdentifier<T>
+(
+	ResourceLocation name
+)
 {
-	public final ResourceLocation name;
-	public final Class<?> type;
-
-	public PropertyIdentifier(ResourceLocation name, Class<? super T> type)
-	{
-		this.name = name;
-		this.type = type;
-	}
-	
 	@Override
 	public String toString()
 	{
-		return this.name + " (" + this.type.getName() + ")";
+		return this.name.toString();
 	}
 	
 	public static class Serializer implements JsonSerializer<PropertyIdentifier<?>>, JsonDeserializer<PropertyIdentifier<?>>

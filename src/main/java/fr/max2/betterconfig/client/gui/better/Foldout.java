@@ -34,7 +34,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	/** The height of the fouldout header */
 	public static final int FOLDOUT_HEADER_HEIGHT = 24;
 
-	public static final PropertyIdentifier<Boolean> FOLDED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "folded"), Boolean.class);
+	public static final PropertyIdentifier<Boolean> FOLDED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "folded"));
 
 	/** The parent screen */
 	private final BetterConfigScreen screen;

@@ -25,17 +25,18 @@ public class StyleSheet
 	{
 		this.parent = parent;
 		this.rules = new HashMap<>();
+
 		for (StyleRule rule : rules)
 		{
-			for (StyleValue<?> v : rule.getValues())
+			for (StyleValue<?> styleValue : rule.values())
 			{
-				List<ProcessedStyleRule<?>> r = this.rules.get(v.getProperty());
-				if (r == null)
+				List<ProcessedStyleRule<?>> processedRules = this.rules.get(styleValue.property());
+				if (processedRules == null)
 				{
-					r = new ArrayList<>();
-					this.rules.put(v.getProperty(), r);
+					processedRules = new ArrayList<>();
+					this.rules.put(styleValue.property(), processedRules);
 				}
-				r.add(new ProcessedStyleRule<>(rule.getCondition(), v));
+				processedRules.add(new ProcessedStyleRule<>(rule.condition(), styleValue));
 			}
 		}
 
@@ -49,25 +50,28 @@ public class StyleSheet
     {
             T res = this.computePropertyStram(property)
                             .filter(rule -> rule.matches(component))
-                            .map(ProcessedStyleRule::getPropertyEffect)
-                            .reduce(null, (val, effect) -> effect.updateValue(val, property.defaultValue), (a, b) ->
-                            {
-                            	throw new UnsupportedOperationException();
-                            });
-            return res == null ? property.defaultValue : res;
+                            .map(ProcessedStyleRule::propertyEffect)
+                            .reduce(
+								null,
+								(val, effect) -> effect.updateValue(val, property.defaultValue()),
+								(a, b) ->
+								{
+									throw new UnsupportedOperationException();
+								});
+            return res == null ? property.defaultValue() : res;
     }
 
     private <T> Stream<ProcessedStyleRule<T>> computePropertyStram(StyleProperty<T> property)
     {
             Stream<ProcessedStyleRule<T>> valueStream = Stream.empty();
 
-            if (this.parent != null)
-                valueStream = Stream.concat(valueStream, this.parent.computePropertyStram(property));
-
             @SuppressWarnings("unchecked")
             List<ProcessedStyleRule<T>> rules = (List<ProcessedStyleRule<T>>)(List<?>)this.rules.get(property);
             if (rules != null)
-                    valueStream = rules.stream();
+				valueStream = rules.stream();
+
+			if (this.parent != null)
+				valueStream = Stream.concat(valueStream, this.parent.computePropertyStram(property));
 
             return valueStream;
     }
@@ -75,12 +79,7 @@ public class StyleSheet
 	public static class Builder
 	{
 		private ResourceLocation parentSheet = null;
-		private final List<StyleRule> rules;
-
-		public Builder()
-		{
-			this.rules = new ArrayList<>();
-		}
+		private final List<StyleRule> rules = new ArrayList<>();
 
 		public Builder add(List<StyleRule> rules)
 		{
@@ -104,6 +103,7 @@ public class StyleSheet
 			StyleSheet parent = null;
 			if (this.parentSheet != null)
 				parent = StyleSheetManager.INSTANCE.getStyleSheet(this.parentSheet);
+
 			return new StyleSheet(parent, this.rules);
 		}
 	}

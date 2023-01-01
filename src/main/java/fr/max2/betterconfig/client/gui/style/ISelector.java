@@ -124,10 +124,10 @@ public interface ISelector extends Predicate<IPropertySource>, ISerializableInte
 
 	public static class Contains<T> implements ISelector
 	{
-		private final ListPropertyIdentifier<T> property;
+		private final PropertyIdentifier<List<T>> property;
 		private final T value;
 
-		public Contains(ListPropertyIdentifier<T> property, T value)
+		public Contains(PropertyIdentifier<List<T>> property, T value)
 		{
 			this.property = property;
 			this.value = value;

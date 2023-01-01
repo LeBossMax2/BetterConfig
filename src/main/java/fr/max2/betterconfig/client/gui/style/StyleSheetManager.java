@@ -42,9 +42,9 @@ public enum StyleSheetManager implements ResourceManagerReloadListener
 		Resource res = Minecraft.getInstance().getResourceManager().getResource(resourceLocation).orElse(null);
 		if (res == null)
 			return null;
-		try (InputStream is = res.open())
+		try (InputStream inputStream = res.open())
 		{
-			sheet = GsonHelper.fromJson(GSON, new InputStreamReader(is, StandardCharsets.UTF_8), StyleSheet.Builder.class).build();
+			sheet = GsonHelper.fromJson(GSON, new InputStreamReader(inputStream, StandardCharsets.UTF_8), StyleSheet.Builder.class).build();
 		}
 
 		this.cache.put(sheetLocation, sheet);

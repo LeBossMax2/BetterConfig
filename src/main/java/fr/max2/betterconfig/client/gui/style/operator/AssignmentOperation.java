@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 public class AssignmentOperation<T> implements IStyleOperation<T>
 {
-	public final T value;
+	private final T value;
 
 	public AssignmentOperation(T value)
 	{

@@ -22,27 +22,12 @@ import fr.max2.betterconfig.client.gui.style.operator.IStyleOperation;
 import fr.max2.betterconfig.client.gui.style.operator.ListIndexingOperation;
 import fr.max2.betterconfig.client.gui.style.operator.AssignmentOperation;
 
-public class StyleRule
+public record StyleRule
+(
+	ISelector condition,
+	List<StyleValue<?>> values
+)
 {
-	private final ISelector condition;
-	private final List<StyleValue<?>> values;
-
-	public StyleRule(ISelector condition, List<StyleValue<?>> values)
-	{
-		this.condition = condition;
-		this.values = values;
-	}
-
-	public ISelector getCondition()
-	{
-		return this.condition;
-	}
-
-	public List<StyleValue<?>> getValues()
-	{
-		return this.values;
-	}
-
 	public static IConditionBuilder<StyleRuleBuilder> when()
 	{
 		return new StyleRuleBuilder().when();
@@ -115,7 +100,7 @@ public class StyleRule
 			return this.condition(new ISelector.Equals<>(property, value));
 		}
 
-		default <T> Res contains(ListPropertyIdentifier<T> property, T value)
+		default <T> Res contains(PropertyIdentifier<List<T>> property, T value)
 		{
 			return this.condition(new ISelector.Contains<>(property, value));
 		}
@@ -229,7 +214,7 @@ public class StyleRule
 			JsonObject values = new JsonObject();
 			for (StyleValue<?> val : src.values)
 			{
-				values.add(val.getProperty().name.toString(), context.serialize(val.getPropertyEffect(), TypeUtils.parameterize(IStyleOperation.class, val.getProperty().type)));
+				values.add(val.property().name().toString(), context.serialize(val.propertyEffect(), TypeUtils.parameterize(IStyleOperation.class, val.property().type())));
 			}
 			obj.add("values", values);
 
@@ -247,7 +232,7 @@ public class StyleRule
 			for (Entry<String, JsonElement> cond : obj.getAsJsonObject("values").entrySet())
 			{
 				StyleProperty<?> prop = this.parent.getStyleProperty(cond.getKey());
-				values.add(new StyleValue<>(prop, context.deserialize(cond.getValue(), TypeUtils.parameterize(IStyleOperation.class, prop.type))));
+				values.add(new StyleValue<>(prop, context.deserialize(cond.getValue(), TypeUtils.parameterize(IStyleOperation.class, prop.type()))));
 			}
 
 			return new StyleRule(condition, values);

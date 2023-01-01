@@ -1,6 +1,8 @@
 package fr.max2.betterconfig.client.gui.style;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -12,24 +14,21 @@ import com.google.gson.JsonSerializer;
 
 import net.minecraft.resources.ResourceLocation;
 
-public class StyleProperty<T>
+public record StyleProperty<T>
+(
+	ResourceLocation name,
+	Type type,
+	T defaultValue
+)
 {
-	public final ResourceLocation name;
-	public final Type type;
-	public final T defaultValue;
-
-	public StyleProperty(ResourceLocation name, Type type, T defaultValue)
-	{
-		this.name = name;
-		this.type = type;
-		this.defaultValue = defaultValue;
-	}
+	public StyleProperty
+	{ }
 
 	public StyleProperty(ResourceLocation name, T defaultValue)
 	{
 		this(name, defaultValue.getClass(), defaultValue);
 	}
-	
+
 	@Override
 	public String toString()
 	{
