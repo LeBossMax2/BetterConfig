@@ -2,11 +2,9 @@ package fr.max2.betterconfig.config.impl.value;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
-import fr.max2.betterconfig.config.impl.ConfigLocation;
 import fr.max2.betterconfig.config.impl.spec.ForgeSpec;
 import fr.max2.betterconfig.config.value.ConfigList;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
@@ -20,16 +18,10 @@ public class ForgeConfig
 {
 	public static ConfigTable make(ForgeConfigSpec forgeSpec, Consumer<ForgeConfigProperty<?>> changeListener)
 	{
-		var table = ConfigTable.make(ForgeSpec.makeSpec(forgeSpec, getSpecComments(forgeSpec)));
+		var table = ConfigTable.make(ForgeSpec.makeSpec(forgeSpec));
 		initializeTableNode(table, changeListener, forgeSpec.getValues());
 		table.setAsInitialValue();
 		return table;
-	}
-
-	/** Gets the comments from the spec */
-	private static Function<ConfigLocation, String> getSpecComments(ForgeConfigSpec spec)
-	{
-		return loc -> spec.getLevelComment(loc.getPath());
 	}
 
 	private static void initializeTableNode(ConfigTable table, Consumer<ForgeConfigProperty<?>> changeListener, UnmodifiableConfig configValues)

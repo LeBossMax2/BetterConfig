@@ -1,7 +1,8 @@
 package fr.max2.betterconfig.config.impl.spec;
 
 import java.util.List;
-import java.util.function.Function;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.base.Strings;
@@ -17,49 +18,42 @@ import fr.max2.betterconfig.config.spec.ConfigUnknownSpec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ValueSpec;
 
 public class ForgeSpec
 {
-	public static ConfigTableSpec makeSpec(UnmodifiableConfig forgeSpec, Function<ConfigLocation, String> levelComments)
+	public static ConfigTableSpec makeSpec(ForgeConfigSpec forgeSpec)
 	{
-		return makeTableSpecNode(ConfigLocation.ROOT, forgeSpec, levelComments);
+		return makeTableSpecNode(ConfigLocation.ROOT, forgeSpec, new TableInfoProvider(forgeSpec));
 	}
 
-	private static ConfigTableSpec makeTableSpecNode(ConfigLocation loc, UnmodifiableConfig forgeSpec, Function<ConfigLocation, String> levelComments)
+	private static ConfigTableSpec makeTableSpecNode(ConfigLocation loc, UnmodifiableConfig forgeSpec, TableInfoProvider tableInfo)
 	{
 		ImmutableList.Builder<ConfigTableSpec.Entry> builder = ImmutableList.builder();
 		for (var entry : forgeSpec.valueMap().entrySet())
 		{
-			builder.add(makeTableSpecEntry(entry.getKey(), entry.getValue(), loc, levelComments));
+			builder.add(makeTableSpecEntry(entry.getKey(), entry.getValue(), loc, tableInfo));
 		}
 		return new ConfigTableSpec(builder.build());
 	}
 
-	private static ConfigTableSpec.Entry makeTableSpecEntry(String key, Object forgeSpecObject, ConfigLocation tableLoc, Function<ConfigLocation, String> levelComments)
+	private static ConfigTableSpec.Entry makeTableSpecEntry(String key, Object forgeSpecObject, ConfigLocation tableLoc, TableInfoProvider tableInfo)
 	{
 		if (forgeSpecObject instanceof UnmodifiableConfig forgeSpecTable)
         {
-			// TODO use level translation key (ForgeConfigSpec#getLevelTranslationKey)
 			var location = new ConfigLocation(tableLoc, key);
-            var name = Component.literal(key).withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW);
+			var name =
+				getDisplayName(tableInfo.getLevelTranslationKey(location), key)
+					.withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW);
 
-            var tableSpec = ForgeSpec.makeTableSpecNode(location, forgeSpecTable, levelComments);
-        	return new ConfigTableSpec.Entry(new ConfigTableKey(key, name, levelComments.apply(location)), tableSpec);
+            var tableSpec = ForgeSpec.makeTableSpecNode(location, forgeSpecTable, tableInfo);
+        	return new ConfigTableSpec.Entry(new ConfigTableKey(key, name, tableInfo.getLevelComment(location)), tableSpec);
         }
 		else if (forgeSpecObject instanceof ValueSpec forgeSpec)
 		{
-			Component name;
-			// Try getting name from translation key
-			var translationKey = forgeSpec.getTranslationKey();
-			if (!Strings.isNullOrEmpty(translationKey) && Language.getInstance().has(translationKey))
-			{
-				name = Component.translatable(translationKey);
-			}
-			else // Get name from path
-			{
-				name = Component.literal(key);
-			}
+			var name = getDisplayName(forgeSpec.getTranslationKey(), key);
 
 			var valSpec = makeValueSpecNode(forgeSpec, getValueClass(forgeSpec));
 			return new ConfigTableSpec.Entry(new ConfigTableKey(key, name, forgeSpec.getComment()), valSpec);
@@ -134,5 +128,41 @@ public class ForgeSpec
 			return value.getClass();
 
 		return Object.class;
+	}
+
+	private static MutableComponent getDisplayName(@Nullable String translationKey, String identifier)
+	{
+		// Try getting name from translation key
+		if (!Strings.isNullOrEmpty(translationKey) && Language.getInstance().has(translationKey))
+		{
+			return Component.translatable(translationKey);
+		}
+		else
+		{
+			// Get name from identifier
+			return Component.literal(identifier);
+		}
+	}
+
+	private static class TableInfoProvider
+	{
+		private final ForgeConfigSpec forgeSpec;
+
+		public TableInfoProvider(ForgeConfigSpec forgeSpec)
+		{
+			this.forgeSpec = forgeSpec;
+		}
+
+		/** Gets the comments from the spec */
+		String getLevelComment(ConfigLocation loc)
+		{
+			return this.forgeSpec.getLevelComment(loc.getPath());
+		}
+
+		/** Gets the translation keys from the spec */
+		String getLevelTranslationKey(ConfigLocation loc)
+		{
+			return this.forgeSpec.getLevelTranslationKey(loc.getPath());
+		}
 	}
 }

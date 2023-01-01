@@ -34,7 +34,7 @@ public class ModLanguagesProvider implements DataProvider
 	protected void addTranslations()
     {
 		this.add(GuiTexts.CONFIG_SCREEN_TITLE_KEY, "%s configuration: %s", "Configuration %s : %s");
-		this.add(GuiTexts.CONFIG_TOOLTIP_KEY, "File: %s", "Fichier: %s");
+		this.add(GuiTexts.CONFIG_TOOLTIP_KEY, "File: '%s'", "Fichier: '%s'");
 		this.add(GuiTexts.COMMON_CONFIG_KEY, "Common", "Commun");
 		this.add(GuiTexts.CLIENT_CONFIG_KEY, "Client", "Client");
 		this.add(GuiTexts.SERVER_CONFIG_KEY, "Server", "Serveur");
