@@ -25,6 +25,8 @@ public final class GuiTexts
 	public static final String CANCEL_CONFIG_KEY = BetterConfig.MODID + ".config.cancel";
 	/** The text on the save button */
 	public static final String SAVE_CONFIG_KEY = "gui.done";
+	/** The text on the open configuration button */
+	public static final String OPEN_CONFIG_FILE_KEY = BetterConfig.MODID + ".config.open_file";
 	/** The text of the undo button */
 	public static final String UNDO_BUTTON_KEY = BetterConfig.MODID + ".undo";
 	/** The tooltip of the undo button */

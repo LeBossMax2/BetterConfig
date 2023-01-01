@@ -19,6 +19,7 @@ import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfig;
 import fr.max2.betterconfig.config.value.ConfigTable;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -63,7 +64,7 @@ public class BetterConfigScreen extends ComponentScreen
 	protected void init()
 	{
 		if (this.currentTables[this.configIndex] == null)
-			this.currentTables[this.configIndex] = ForgeConfig.make(this.modConfigs.get(this.configIndex).<ForgeConfigSpec>getSpec().self(), this::onPropertyChanged);
+			this.currentTables[this.configIndex] = ForgeConfig.make(this.getCurrentConfig().<ForgeConfigSpec>getSpec().self(), this::onPropertyChanged);
 		// Builds the user interface
 		// TODO [?] Get ui builder from mod properties
 		this.setContent(BetterConfigBuilder.build(this, this.currentTables[this.configIndex]));
@@ -109,6 +110,11 @@ public class BetterConfigScreen extends ComponentScreen
 			newScreen.setPrevScreen(this.prevScreen);
 			this.minecraft.setScreen(newScreen);
 		}
+	}
+
+	public void openConfigFile()
+	{
+		Util.getPlatform().openUri(this.getCurrentConfig().getFullPath().toUri());
 	}
 
 	/**

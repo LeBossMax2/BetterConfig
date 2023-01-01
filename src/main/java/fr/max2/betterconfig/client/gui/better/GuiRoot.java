@@ -74,13 +74,14 @@ public class GuiRoot extends CompositeComponent
 		BetterButton saveButton = new BetterButton(Component.translatable(GuiTexts.SAVE_CONFIG_KEY));
 		saveButton.addOnPressed(this.screen::onClose);
 		saveButton.addClass("better:save");
-		HBox buttonBar = new HBox(List.of(cancelButton, saveButton));
+		BetterButton openFileButton = new BetterButton(Component.translatable(GuiTexts.OPEN_CONFIG_FILE_KEY));
+		openFileButton.addOnPressed(this.screen::openConfigFile);
+		openFileButton.addClass("better:open_config_file");
+		HBox buttonBar = new HBox(List.of(cancelButton, openFileButton, saveButton));
 		buttonBar.addClass("better:bottom_bar");
 		this.children.add(buttonBar);
 
 		this.setStyle(ComponentLayoutConfig.SIZE_OVERRIDE, new Size(this.screen.width, this.screen.height));
-
-		// TODO add a open config file button
 	}
 
 	// Layout

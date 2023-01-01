@@ -43,6 +43,7 @@ public class ModLanguagesProvider implements DataProvider
 		this.add(GuiTexts.TRUE_OPTION_KEY, "ON", "Oui");
 		this.add(GuiTexts.FALSE_OPTION_KEY, "OFF", "Non");
 		this.add(GuiTexts.CANCEL_CONFIG_KEY, "Cancel changes", "Annuler les modifications");
+		this.add(GuiTexts.OPEN_CONFIG_FILE_KEY, "Open config file", "Ouvrir le fichier de config");
 
 		this.add(GuiTexts.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
 		this.add(GuiTexts.SEARCH_BAR_KEY, "Search", "Rechercher");
