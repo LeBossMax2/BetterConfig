@@ -17,10 +17,10 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 	{
 		super("better:list_entry");
 		this.content = content;
-		BetterButton button = new BetterButton.Icon(screen, 0, 0, Component.literal("X"), Component.translatable(GuiTexts.REMOVE_TOOLTIP_KEY));
-		button.addOnPressed(deleteAction);
-		button.addClass("better:list_remove");
-		this.children.addAll(List.of(button, content));
+		BetterButton deleteButton = new BetterButton.Icon(screen, 0, 0, Component.translatable(GuiTexts.REMOVE_ELEMENT_KEY), Component.translatable(GuiTexts.REMOVE_TOOLTIP_KEY));
+		deleteButton.addOnPressed(deleteAction);
+		deleteButton.addClass("better:list_remove");
+		this.children.addAll(List.of(deleteButton, content));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 	}
 

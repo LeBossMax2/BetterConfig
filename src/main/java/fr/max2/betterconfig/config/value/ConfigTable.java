@@ -40,7 +40,7 @@ public final class ConfigTable implements ConfigNode
 	@Override
 	public Object getValue()
 	{
-		return null; // TODO table getValue
+		return null; // TODO [#5] table getValue
 	}
 
 	/**

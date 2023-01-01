@@ -15,6 +15,7 @@ import fr.max2.betterconfig.client.gui.better.BetterConfigBuilder;
 import fr.max2.betterconfig.client.gui.component.ComponentScreen;
 import fr.max2.betterconfig.client.gui.style.StyleSheet;
 import fr.max2.betterconfig.client.gui.style.StyleSheetManager;
+import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.impl.value.ForgeConfigProperty;
 import fr.max2.betterconfig.config.impl.value.ForgeConfig;
 import fr.max2.betterconfig.config.value.ConfigTable;
@@ -51,8 +52,7 @@ public class BetterConfigScreen extends ComponentScreen
 
 	protected BetterConfigScreen(StyleSheet styleSheet, ModContainer mod, List<ModConfig> configs, int index)
 	{
-		// TODO change to translatable
-		super(Component.literal(mod.getModId() + " configuration : " + configs.get(index).getFileName()), styleSheet);
+		super(Component.translatable(GuiTexts.CONFIG_SCREEN_TITLE_KEY, mod.getModId(), configs.get(index).getFileName()), styleSheet);
 		this.mod = mod;
 		this.modConfigs = configs;
 		this.configIndex = index;

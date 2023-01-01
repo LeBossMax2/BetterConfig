@@ -40,6 +40,7 @@ public class ForgeSpec
 	{
 		if (forgeSpecObject instanceof UnmodifiableConfig forgeSpecTable)
         {
+			// TODO use level translation key (ForgeConfigSpec#getLevelTranslationKey)
 			var location = new ConfigLocation(tableLoc, key);
             var name = Component.literal(key).withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW);
 

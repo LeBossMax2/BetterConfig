@@ -5,6 +5,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
+import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.util.property.IListener;
 import net.minecraft.network.chat.Component;
@@ -36,7 +37,7 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	{
 		return new OptionButton<>(
 			List.of(false, true),
-			bool -> Component.translatable(bool ? TRUE_OPTION_KEY : FALSE_OPTION_KEY),
+			bool -> Component.translatable(bool ? GuiTexts.TRUE_OPTION_KEY : GuiTexts.FALSE_OPTION_KEY),
 			property);
 	}
 

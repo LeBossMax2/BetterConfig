@@ -51,6 +51,7 @@ public class ConfigTableKey
 	 */
 	public List<? extends Component> getDisplayComment()
 	{
+		// TODO [#5] Add translatable comments
 		if (this.commentLines == null)
 		{
 			String comment = this.getCommentString();

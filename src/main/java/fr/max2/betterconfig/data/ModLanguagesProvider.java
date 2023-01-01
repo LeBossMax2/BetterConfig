@@ -7,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.base.Preconditions;
 
 import fr.max2.betterconfig.BetterConfig;
-import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -34,9 +33,15 @@ public class ModLanguagesProvider implements DataProvider
 
 	protected void addTranslations()
     {
-		this.add(CycleOptionButton.NO_OPTION_KEY, "NONE", "AUCUN");
-		this.add(CycleOptionButton.TRUE_OPTION_KEY, "ON", "Oui");
-		this.add(CycleOptionButton.FALSE_OPTION_KEY, "OFF", "Non");
+		this.add(GuiTexts.CONFIG_SCREEN_TITLE_KEY, "%s configuration: %s", "Configuration %s : %s");
+		this.add(GuiTexts.CONFIG_TOOLTIP_KEY, "File: %s", "Fichier: %s");
+		this.add(GuiTexts.COMMON_CONFIG_KEY, "Common", "Commun");
+		this.add(GuiTexts.CLIENT_CONFIG_KEY, "Client", "Client");
+		this.add(GuiTexts.SERVER_CONFIG_KEY, "Server", "Serveur");
+
+		this.add(GuiTexts.NO_OPTION_KEY, "NONE", "AUCUN");
+		this.add(GuiTexts.TRUE_OPTION_KEY, "ON", "Oui");
+		this.add(GuiTexts.FALSE_OPTION_KEY, "OFF", "Non");
 		this.add(GuiTexts.CANCEL_CONFIG_KEY, "Cancel changes", "Annuler les modifications");
 
 		this.add(GuiTexts.DEFAULT_VALUE_KEY, "Default: %s", "Par défaut : %s");
@@ -45,8 +50,10 @@ public class ModLanguagesProvider implements DataProvider
 		this.add(GuiTexts.ADD_ELEMENT_KEY, "Add", "Ajouter");
 		this.add(GuiTexts.ADD_FIRST_TOOLTIP_KEY, "Add a new element at the start of the list", "Ajouter un nouvel élément au début de la liste");
 		this.add(GuiTexts.ADD_LAST_TOOLTIP_KEY, "Add a new element at the end of the list", "Ajouter un nouvel élément à la fin de la liste");
+		this.add(GuiTexts.REMOVE_ELEMENT_KEY, "Remove", "Retirer");
 		this.add(GuiTexts.REMOVE_TOOLTIP_KEY, "Remove this element from the list", "Retirer cet élément de la liste");
-		this.add(GuiTexts.UNDO_TOOLTIP_KEY, "Undo", "Annuler le changement");
+		this.add(GuiTexts.UNDO_BUTTON_KEY, "Undo", "Annuler");
+		this.add(GuiTexts.UNDO_TOOLTIP_KEY, "Undo changes", "Annuler le changement");
 		this.add(GuiTexts.RESET_TOOLTIP_KEY, "Reset to default", "Réinitialiserà la valeur par défaut");
 
 		// Narration

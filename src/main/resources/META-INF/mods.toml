@@ -33,6 +33,8 @@ logoFile="BetterConfig-Logo.png" #optional
 # A text field displayed in the mod UI
 authors="Maaxed" #optional
 # The description text for the mod (multi line!) (#mandatory)
+displayTest="NONE" # Custom display test
+
 description='''
 BetterConfig adds a configuration screen for every mod.
 The focus of BetterConfig is to be compatible with every Forge mod, to allow for easy customization and to provide a good user experience.

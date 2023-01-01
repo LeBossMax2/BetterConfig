@@ -40,7 +40,7 @@ public class GuiRoot extends CompositeComponent
 		{
 			final int index = i;
 			// TODO [#2] Add meaningful tooltip : explanation of config types + file path
-			BetterButton b = new BetterButton(screen, Component.literal(config.getType().name()), Component.literal(config.getFileName()));
+			BetterButton b = new BetterButton(screen, getConfigTypeDisplayName(config.getType()), Component.translatable(GuiTexts.CONFIG_TOOLTIP_KEY, config.getFileName()));
 			b.addOnPressed(() -> this.screen.openConfig(index));
 			b.addClass("better:tab_button");
 			b.setActive(index != screen.getCurrentConfigIndex());
@@ -102,4 +102,14 @@ public class GuiRoot extends CompositeComponent
 		super.onRender(matrixStack, mouseX, mouseY, partialTicks);
 	}
 
+	private static Component getConfigTypeDisplayName(ModConfig.Type type)
+	{
+		String textKey = switch (type)
+		{
+			case COMMON -> GuiTexts.COMMON_CONFIG_KEY;
+			case CLIENT -> GuiTexts.CLIENT_CONFIG_KEY;
+			case SERVER -> GuiTexts.SERVER_CONFIG_KEY;
+		};
+		return Component.translatable(textKey);
+	}
 }

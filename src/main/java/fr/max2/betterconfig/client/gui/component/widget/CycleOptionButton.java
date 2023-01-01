@@ -3,7 +3,7 @@ package fr.max2.betterconfig.client.gui.component.widget;
 import java.util.List;
 import java.util.function.Function;
 
-import fr.max2.betterconfig.BetterConfig;
+import fr.max2.betterconfig.client.util.GuiTexts;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -12,12 +12,6 @@ import net.minecraft.network.chat.Component;
  */
 public class CycleOptionButton<V> extends Button
 {
-	/** The translation key of the text to show when no option is selected */
-	public static final String NO_OPTION_KEY = BetterConfig.MODID + ".option.no_value";
-	/** The translation key of the text to show when the selected option is true */
-	public static final String TRUE_OPTION_KEY = BetterConfig.MODID + ".option.true";
-	/** The translation key of the text to show when the selected option is false */
-	public static final String FALSE_OPTION_KEY = BetterConfig.MODID + ".option.false";
 	/** The list of available option values */
 	private final List<? extends V> acceptedValues;
 	/** The function to get the text to show from the selection option */
@@ -66,7 +60,7 @@ public class CycleOptionButton<V> extends Button
 	/** Gets the text corresponding to the given option value using the given translation function */
 	private static <V> Component getValueText(Function<? super V, Component> valueToText, V value)
 	{
-		return value == null ? Component.translatable(NO_OPTION_KEY) : valueToText.apply(value);
+		return value == null ? Component.translatable(GuiTexts.NO_OPTION_KEY) : valueToText.apply(value);
 	}
 
 }

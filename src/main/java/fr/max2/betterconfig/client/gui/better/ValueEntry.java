@@ -38,7 +38,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.property = property;
 		// TODO [#2] Gray out the button when value is unchanged
 		// TODO [#2] Add reset to default button
-		IComponent undoButton = new BetterButton.Icon(screen, 48, 0, Component.translatable(GuiTexts.UNDO_TOOLTIP_KEY), Component.translatable(GuiTexts.UNDO_TOOLTIP_KEY))
+		IComponent undoButton = new BetterButton.Icon(screen, 48, 0, Component.translatable(GuiTexts.UNDO_BUTTON_KEY), Component.translatable(GuiTexts.UNDO_TOOLTIP_KEY))
 				.addOnPressed(property::undoChanges)
 				.addClass("better:undo");
 		IComponent title = new Text(() -> List.of(this.identifier.getDisplayName()), Alignment.CENTER, Alignment.MIN);
@@ -81,7 +81,7 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		this.extraInfo.add(Component.literal(this.identifier.getName()).withStyle(ChatFormatting.YELLOW));
 		this.extraInfo.addAll(this.identifier.getDisplayComment());
 		if (this.property instanceof ConfigPrimitive<?> primitive)
-			this.extraInfo.add((Component.translatable(GuiTexts.DEFAULT_VALUE_KEY, Component.literal(Objects.toString(primitive.getSpec().getDefaultValue())))).withStyle(ChatFormatting.GRAY));
+			this.extraInfo.add(Component.translatable(GuiTexts.DEFAULT_VALUE_KEY, Component.literal(Objects.toString(primitive.getSpec().getDefaultValue()))).withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override
