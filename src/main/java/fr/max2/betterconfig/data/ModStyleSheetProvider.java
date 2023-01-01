@@ -12,7 +12,6 @@ import com.google.gson.GsonBuilder;
 
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
-import fr.max2.betterconfig.client.gui.component.widget.NumberField;
 import fr.max2.betterconfig.client.gui.component.widget.WidgetComponent;
 import fr.max2.betterconfig.client.gui.layout.Alignment;
 import fr.max2.betterconfig.client.gui.layout.Axis;
@@ -79,6 +78,8 @@ public class ModStyleSheetProvider implements DataProvider
 		private static final int SEARCH_LABEL_WIDTH = 80;
 		/** The default width of the '+' and '-' buttons */
 		private static final int NUMBER_FIELD_BUTTON_SIZE = 20;
+		/** The height of the foldout header */
+		private static final int FOLDOUT_HEADER_HEIGHT = 24;
 
 		private static final StyleRule BETTER_NUMBER_FIELD_STYLE = when().hasClass("better:number_field").then()
 				.set(SIZE_OVERRIDE, new Size(VALUE_WIDTH, VALUE_HEIGHT))
@@ -107,7 +108,7 @@ public class ModStyleSheetProvider implements DataProvider
 				.build();
 		private static final StyleRule FOLDOUT_HEADER_STYLE = when().type("better:foldout_header").then()
 				.set(DIR, Axis.HORIZONTAL)
-				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, Foldout.FOLDOUT_HEADER_HEIGHT))
+				.set(SIZE_OVERRIDE, new Size(Size.UNCONSTRAINED, FOLDOUT_HEADER_HEIGHT))
 				.set(VISIBILITY, Visibility.VISIBLE)
 				.build();
 

@@ -31,13 +31,7 @@ import net.minecraft.sounds.SoundEvents;
 /** The ui for a expand/collapse subsection */
 public class Foldout extends CompositeComponent implements IBetterElement
 {
-	/** The height of the fouldout header */
-	public static final int FOLDOUT_HEADER_HEIGHT = 24;
-
 	public static final PropertyIdentifier<Boolean> FOLDED = new PropertyIdentifier<>(new ResourceLocation(BetterConfig.MODID, "folded"));
-
-	/** The parent screen */
-	private final BetterConfigScreen screen;
 
 	private final ConfigName identifier;
 	/** The content that will be collapsed */
@@ -52,10 +46,9 @@ public class Foldout extends CompositeComponent implements IBetterElement
 	public Foldout(BetterConfigScreen screen, ConfigName identifier, IBetterElement content)
 	{
 		super("better:foldout");
-		this.screen = screen;
 		this.identifier = identifier;
 		this.content = content;
-		this.children.add(new Header());
+		this.children.add(new Header(screen));
 		this.children.add(this.content);
 		this.updateTexts();
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
@@ -96,10 +89,14 @@ public class Foldout extends CompositeComponent implements IBetterElement
 
 	public class Header extends UnitComponent
 	{
-		public Header()
+		/** The parent screen */
+		private final BetterConfigScreen screen;
+
+		public Header(BetterConfigScreen screen)
 		{
 			super("better:foldout_header");
-			this.overlay = new TextOverlay(Foldout.this.screen, Foldout.this.extraInfo);
+			this.screen = screen;
+			this.overlay = new TextOverlay(this.screen, Foldout.this.extraInfo);
 		}
 
 		// Rendering
@@ -114,7 +111,7 @@ public class Foldout extends CompositeComponent implements IBetterElement
 		{
 			Rectangle rect = this.getRect();
 			// Draw background
-			fill(matrixStack, rect.x, rect.y + 2, rect.getRight(), rect.y + FOLDOUT_HEADER_HEIGHT - 2, 0xC0_33_33_33);
+			fill(matrixStack, rect.getLeft(), rect.getTop() + 2, rect.getRight(), rect.getBottom() - 2, 0xC0_33_33_33);
 
 			// Draw foreground arrow icon
 			int arrowU = Foldout.this.folded ? 16 : 32;
@@ -124,8 +121,8 @@ public class Foldout extends CompositeComponent implements IBetterElement
 			blit(matrixStack, rect.x, rect.y + 4, arrowU, arrowV, 16, 16, 256, 256);
 
 			// Draw foreground text
-			Font font = Foldout.this.screen.getFont();
-			font.draw(matrixStack, Foldout.this.identifier.getDisplayName(), rect.x + 16, rect.y + 1 + (FOLDOUT_HEADER_HEIGHT - font.lineHeight) / 2, 0xFF_FF_FF_FF);
+			Font font = this.screen.getFont();
+			font.draw(matrixStack, Foldout.this.identifier.getDisplayName(), rect.x + 16, rect.y + 1 + (rect.size.height - font.lineHeight) / 2, 0xFF_FF_FF_FF);
 		}
 
 		// Input handling
