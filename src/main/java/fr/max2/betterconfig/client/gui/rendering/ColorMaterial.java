@@ -29,16 +29,16 @@ public class ColorMaterial implements IMaterial
 	{
 		Matrix4f matrix = poseStack.last().pose();
 		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferbuilder = tesselator.getBuilder();
+		BufferBuilder bufferBuilder = tesselator.getBuilder();
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		vertex(bufferbuilder, matrix, rect.getLeft(), rect.getBottom(), this.botLeftColor);
-		vertex(bufferbuilder, matrix, rect.getRight(), rect.getBottom(), this.botRightColor);
-		vertex(bufferbuilder, matrix, rect.getRight(), rect.getTop(), this.topRightColor);
-		vertex(bufferbuilder, matrix, rect.getLeft(), rect.getTop(), this.topLeftColor);
+		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		vertex(bufferBuilder, matrix, rect.getLeft(), rect.getBottom(), this.botLeftColor);
+		vertex(bufferBuilder, matrix, rect.getRight(), rect.getBottom(), this.botRightColor);
+		vertex(bufferBuilder, matrix, rect.getRight(), rect.getTop(), this.topRightColor);
+		vertex(bufferBuilder, matrix, rect.getLeft(), rect.getTop(), this.topLeftColor);
 		tesselator.end();
 		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
@@ -50,9 +50,9 @@ public class ColorMaterial implements IMaterial
 		return "color";
 	}
 
-	private static void vertex(BufferBuilder bufferbuilder, Matrix4f matrix, float x, float y, int[] color)
+	private static void vertex(BufferBuilder bufferBuilder, Matrix4f matrix, float x, float y, int[] color)
 	{
-		bufferbuilder.vertex(matrix, x, y, 0.0F).color(color[0], color[1], color[2], color[3]).endVertex();
+		bufferBuilder.vertex(matrix, x, y, 0.0F).color(color[0], color[1], color[2], color[3]).endVertex();
 	}
 
 	private static int[] splitRGBA(int color)

@@ -2,6 +2,8 @@ package fr.max2.betterconfig.client.gui.style.operator;
 
 import java.util.Map;
 
+import org.jetbrains.annotations.Nullable;
+
 public class StructOperator<T> implements IStyleOperation<T>
 {
 	private StructDefinition<T> definition;
@@ -19,7 +21,7 @@ public class StructOperator<T> implements IStyleOperation<T>
 	}
 
 	@Override
-	public T updateValue(T prevValue, T defaultValue)
+	public T updateValue(@Nullable T prevValue, @Nullable T defaultValue)
 	{
 		T value = prevValue;
 		if (value == null)

@@ -14,7 +14,7 @@ public class NumberTypes
 	{
 		register(Byte.class, IntegerType.BYTE);
 		register(Short.class, IntegerType.SHORT);
-		register(Integer.class, IntegerType.INTERGER);
+		register(Integer.class, IntegerType.INTEGER);
 		register(Long.class, IntegerType.LONG);
 		register(Float.class, RealType.FLOAT);
 		register(Double.class, RealType.DOUBLE);

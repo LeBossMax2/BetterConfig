@@ -47,7 +47,10 @@ public class BetterConfigBuilder
 
 	private GuiGroup buildTable(ConfigTable table)
 	{
-		List<IBetterElement> content = table.entries().stream().map(entry -> this.visitNode(new TableChildInfo(entry.key()), entry.node())).toList();
+		List<IBetterElement> content = table.entries()
+			.stream()
+			.map(entry -> this.buildEntry(new TableChildInfo(entry.key()), entry.node()))
+			.toList();
 		GuiGroup tableGroup = new GuiGroup(content);
 		tableGroup.addClass("better:table_group");
 		return tableGroup;
@@ -55,19 +58,19 @@ public class BetterConfigBuilder
 
 	// Table entry visitor
 
-	private IBetterElement visitNode(ConfigName identifier, ConfigNode node)
+	private IBetterElement buildEntry(ConfigName identifier, ConfigNode node)
 	{
 		if (node instanceof ConfigTable table)
 		{
-			return this.visitTable(identifier, table);
+			return new Foldout(this.screen, identifier, this.buildTable(table));
 		}
 		else if (node instanceof ConfigList list)
 		{
-			return this.visitList(identifier, list);
+			return this.buildEntryList(identifier, list);
 		}
 		else if (node instanceof ConfigPrimitive<?> primitive)
 		{
-			return this.visitPrimitive(identifier, primitive);
+			return this.buildEntryPrimitive(identifier, primitive);
 		}
 		else if (node instanceof ConfigUnknown unknown)
 		{
@@ -79,13 +82,7 @@ public class BetterConfigBuilder
 		}
 	}
 
-
-	private IBetterElement visitTable(ConfigName identifier, ConfigTable table)
-	{
-		return new Foldout(this.screen, identifier, this.buildTable(table));
-	}
-
-	private IBetterElement visitList(ConfigName identifier, ConfigList list)
+	private IBetterElement buildEntryList(ConfigName identifier, ConfigList list)
 	{
 		IReadableList<IComponent> mainElements = new ObservableList<>();
 		GuiGroup mainGroup = new GuiGroup(mainElements);
@@ -127,7 +124,7 @@ public class BetterConfigBuilder
 
 
 		if (content.size() >= 1)
-			mainElements.add(this.buildAddLastButton(list));
+			mainElements.add(this.buildAddLastButton(list)); // TODO Use style to hide add last button when the list is empty
 
 		return new Foldout(this.screen, identifier, mainGroup);
 	}
@@ -141,12 +138,12 @@ public class BetterConfigBuilder
 
 	private IBetterElement buildListElementGui(ConfigList list, ConfigName identifier, ConfigNode elem, ConfigList.Index index)
 	{
-		IBetterElement child = this.visitNode(identifier, elem);
+		IBetterElement child = this.buildEntry(identifier, elem);
 
 		return new ListElementEntry(this.screen, child, () -> list.removeValueAt(index.get()));
 	}
 
-	private <T> IBetterElement visitPrimitive(ConfigName identifier, ConfigPrimitive<T> primitive)
+	private <T> IBetterElement buildEntryPrimitive(ConfigName identifier, ConfigPrimitive<T> primitive)
 	{
 		IComponent widget;
 		if (primitive instanceof ConfigPrimitive.Boolean boolNode)

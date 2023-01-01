@@ -332,8 +332,8 @@ public class ScrollPane extends BCComponent<IScrollComponent> implements IScroll
 	protected void drawBackground(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Rectangle rect)
 	{
 		Matrix4f mat = matrixStack.last().pose();
-		Tesselator tessellator = Tesselator.getInstance();
-		BufferBuilder bufferbuilder = tessellator.getBuilder();
+		Tesselator tesselator = Tesselator.getInstance();
+		BufferBuilder bufferBuilder = tesselator.getBuilder();
 
 		int left = rect.getLeft();
 		int top = rect.getTop();
@@ -342,12 +342,12 @@ public class ScrollPane extends BCComponent<IScrollComponent> implements IScroll
 
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, GuiComponent.BACKGROUND_LOCATION);
-		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-		bufferbuilder.vertex(mat, left , bot, 0.0f).uv(left  / 32.0f, (bot + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
-		bufferbuilder.vertex(mat, right, bot, 0.0f).uv(right / 32.0f, (bot + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
-		bufferbuilder.vertex(mat, right, top, 0.0f).uv(right / 32.0f, (top + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
-		bufferbuilder.vertex(mat, left , top, 0.0f).uv(left  / 32.0f, (top + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
-		tessellator.end();
+		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+		bufferBuilder.vertex(mat, left , bot, 0.0f).uv(left  / 32.0f, (bot + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
+		bufferBuilder.vertex(mat, right, bot, 0.0f).uv(right / 32.0f, (bot + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
+		bufferBuilder.vertex(mat, right, top, 0.0f).uv(right / 32.0f, (top + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
+		bufferBuilder.vertex(mat, left , top, 0.0f).uv(left  / 32.0f, (top + this.getScrollDistance()) / 32.0f).color(32, 32, 32, 255).endVertex();
+		tesselator.end();
 	}
 
 	protected void drawForeground(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Rectangle rect)
@@ -368,7 +368,7 @@ public class ScrollPane extends BCComponent<IScrollComponent> implements IScroll
 		this.content.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 
-	private void drawSrollBar(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Rectangle rect)
+	private void drawScrollBar(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Rectangle rect)
 	{
 		int top = rect.getTop();
 
@@ -412,7 +412,7 @@ public class ScrollPane extends BCComponent<IScrollComponent> implements IScroll
 
 			if (this.getMaxScroll(rect) > 0)
 			{
-				this.drawSrollBar(matrixStack, mouseX, mouseY, partialTicks, rect);
+				this.drawScrollBar(matrixStack, mouseX, mouseY, partialTicks, rect);
 			}
 
 			this.drawForeground(matrixStack, mouseX, mouseY, partialTicks, rect);

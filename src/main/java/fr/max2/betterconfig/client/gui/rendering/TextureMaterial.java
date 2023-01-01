@@ -47,13 +47,13 @@ public class TextureMaterial implements IMaterial
         RenderSystem.setShaderTexture(0, this.atlasId);
 		Matrix4f matrix = poseStack.last().pose();
 		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder bufferbuilder = tesselator.getBuilder();
+		BufferBuilder bufferBuilder = tesselator.getBuilder();
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		vertex(bufferbuilder, matrix, rect.getLeft(), rect.getBottom(), this.minU, this.maxV);
-		vertex(bufferbuilder, matrix, rect.getRight(), rect.getBottom(), this.maxU, this.maxV);
-		vertex(bufferbuilder, matrix, rect.getRight(), rect.getTop(), this.maxU, this.minV);
-		vertex(bufferbuilder, matrix, rect.getLeft(), rect.getTop(), this.minU, this.minV);
+		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		vertex(bufferBuilder, matrix, rect.getLeft(), rect.getBottom(), this.minU, this.maxV);
+		vertex(bufferBuilder, matrix, rect.getRight(), rect.getBottom(), this.maxU, this.maxV);
+		vertex(bufferBuilder, matrix, rect.getRight(), rect.getTop(), this.maxU, this.minV);
+		vertex(bufferBuilder, matrix, rect.getLeft(), rect.getTop(), this.minU, this.minV);
 		tesselator.end();
 	}
 
@@ -63,8 +63,8 @@ public class TextureMaterial implements IMaterial
 		return "texture";
 	}
 
-	private static void vertex(BufferBuilder bufferbuilder, Matrix4f matrix, float x, float y, float u, float v)
+	private static void vertex(BufferBuilder bufferBuilder, Matrix4f matrix, float x, float y, float u, float v)
 	{
-		bufferbuilder.vertex(matrix, x, y, 0.0F).uv(u, v).endVertex();
+		bufferBuilder.vertex(matrix, x, y, 0.0F).uv(u, v).endVertex();
 	}
 }

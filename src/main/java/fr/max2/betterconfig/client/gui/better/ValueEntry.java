@@ -1,7 +1,6 @@
 package fr.max2.betterconfig.client.gui.better;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,8 +41,8 @@ public class ValueEntry extends CompositeComponent implements IBetterElement
 		IComponent undoButton = new BetterButton.Icon(screen, 48, 0, Component.translatable(GuiTexts.UNDO_TOOLTIP_KEY), Component.translatable(GuiTexts.UNDO_TOOLTIP_KEY))
 				.addOnPressed(property::undoChanges)
 				.addClass("better:undo");
-		IComponent title = new Text(() -> Arrays.asList(this.identifier.getDisplayName()), Alignment.CENTER, Alignment.MIN);
-		this.children.addAll(Arrays.asList(title, content, undoButton));
+		IComponent title = new Text(() -> List.of(this.identifier.getDisplayName()), Alignment.CENTER, Alignment.MIN);
+		this.children.addAll(List.of(title, content, undoButton));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 
 		this.overlay = new TextOverlay(screen, this.extraInfo)

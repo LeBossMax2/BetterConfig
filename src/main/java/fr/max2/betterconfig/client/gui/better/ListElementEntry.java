@@ -1,6 +1,6 @@
 package fr.max2.betterconfig.client.gui.better;
 
-import java.util.Arrays;
+import java.util.List;
 
 import fr.max2.betterconfig.client.gui.BetterConfigScreen;
 import fr.max2.betterconfig.client.gui.component.CompositeComponent;
@@ -20,7 +20,7 @@ public class ListElementEntry extends CompositeComponent implements IBetterEleme
 		BetterButton button = new BetterButton.Icon(screen, 0, 0, Component.literal("X"), Component.translatable(GuiTexts.REMOVE_TOOLTIP_KEY));
 		button.addOnPressed(deleteAction);
 		button.addClass("better:list_remove");
-		this.children.addAll(Arrays.asList(button, content));
+		this.children.addAll(List.of(button, content));
 		this.registerProperty(FILTERED_OUT, () -> this.filteredOut);
 	}
 

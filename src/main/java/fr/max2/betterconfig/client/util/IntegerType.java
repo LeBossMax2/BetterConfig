@@ -6,7 +6,7 @@ public final class IntegerType<N extends Number> implements INumberType<N>
 {
 	public static final IntegerType<Byte> BYTE = new IntegerType<>(Byte::parseByte, Number::byteValue);
 	public static final IntegerType<Short> SHORT = new IntegerType<>(Short::parseShort, Number::shortValue);
-	public static final IntegerType<Integer> INTERGER = new IntegerType<>(Integer::parseInt, Number::intValue);
+	public static final IntegerType<Integer> INTEGER = new IntegerType<>(Integer::parseInt, Number::intValue);
 	public static final IntegerType<Long> LONG = new IntegerType<>(Long::parseLong, Number::longValue);
 	
 	/** The function to parse the number */

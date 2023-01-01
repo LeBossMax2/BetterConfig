@@ -185,16 +185,16 @@ public abstract class CompositeComponent extends BCComponent<ICompositeComponent
 	public void updateNarration(NarrationElementOutput narrationOutput)
 	{
 		narrationOutput = narrationOutput.nest();
-		ImmutableList<NarratableEntry> immutablelist = this.getChildren().stream().filter(NarratableEntry::isActive).collect(ImmutableList.toImmutableList());
-		Screen.NarratableSearchResult res = Screen.findNarratableWidget(immutablelist, this.lastNarratable);
+		ImmutableList<NarratableEntry> narratableEntries = this.getChildren().stream().filter(NarratableEntry::isActive).collect(ImmutableList.toImmutableList());
+		Screen.NarratableSearchResult res = Screen.findNarratableWidget(narratableEntries, this.lastNarratable);
 		if (res != null)
 		{
 			if (res.priority.isTerminal())
 				this.lastNarratable = res.entry;
 
-			if (immutablelist.size() > 1)
+			if (narratableEntries.size() > 1)
 			{
-				narrationOutput.add(NarratedElementType.POSITION, Component.translatable("narrator.position.list", res.index + 1, immutablelist.size()));
+				narrationOutput.add(NarratedElementType.POSITION, Component.translatable("narrator.position.list", res.index + 1, narratableEntries.size()));
 
 				if (res.priority == NarratableEntry.NarrationPriority.FOCUSED)
 					narrationOutput.add(NarratedElementType.USAGE, Component.translatable("narration.component_list.usage"));

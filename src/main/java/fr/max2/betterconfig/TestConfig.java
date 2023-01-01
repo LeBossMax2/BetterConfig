@@ -1,6 +1,5 @@
 package fr.max2.betterconfig;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -49,14 +48,14 @@ public class TestConfig
 				.translation("mod.my.enum")
 				.defineEnum("myEnum", Dist.CLIENT);
 
-			spec.comment("This is an interger")
+			spec.comment("This is an integer")
 				.defineInRange("myInt", 5, 0, 10);
 
 			spec.comment("This is a double")
 				.defineInRange("myDouble", 5.0, 0.0, 100.0);
 
 			spec.comment("This is a list")
-				.defineList("myDoubles", Arrays.asList(0.0), val ->
+				.defineList("myDoubles", List.of(0.0), val ->
 				{
 					if (!(val instanceof Double))
 						return false;
@@ -64,7 +63,7 @@ public class TestConfig
 					return true;
 				});
 
-			spec.defineList("myListsOfStrings", Arrays.asList(Arrays.asList("Exemple")), val ->
+			spec.defineList("myListsOfStrings", List.of(List.of("Example")), val ->
 				{
 					if (!(val instanceof List))
 						return false;

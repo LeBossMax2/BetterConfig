@@ -1,7 +1,6 @@
 package fr.max2.betterconfig.client.gui.better;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -45,12 +44,12 @@ public class GuiRoot extends CompositeComponent
 			b.addOnPressed(() -> this.screen.openConfig(index));
 			b.addClass("better:tab_button");
 			b.setActive(index != screen.getCurrentConfigIndex());
-			i++;
 			tabs.add(b);
+			i++;
 		}
-		HBox tabHolder = new HBox(tabs);
-		tabHolder.addClass("better:tab_bar");
-		this.children.add(tabHolder);
+		HBox tabBar = new HBox(tabs);
+		tabBar.addClass("better:tab_bar");
+		this.children.add(tabBar);
 
 		// Search bar
 		Component searchText = Component.translatable(GuiTexts.SEARCH_BAR_KEY);
@@ -59,7 +58,7 @@ public class GuiRoot extends CompositeComponent
 		TextField searchField = new TextField(screen.getFont(), searchText);
 		searchField.addClass("better:search_field");
 		searchField.setResponder(this::updateFilter);
-		HBox searchBar = new HBox(Arrays.asList(searchLabel, searchField));
+		HBox searchBar = new HBox(List.of(searchLabel, searchField));
 		searchBar.addClass("better:search_bar");
 		this.children.add(searchBar);
 
@@ -75,7 +74,7 @@ public class GuiRoot extends CompositeComponent
 		BetterButton saveButton = new BetterButton(Component.translatable(GuiTexts.SAVE_CONFIG_KEY));
 		saveButton.addOnPressed(this.screen::onClose);
 		saveButton.addClass("better:save");
-		HBox buttonBar = new HBox(Arrays.asList(cancelButton, saveButton));
+		HBox buttonBar = new HBox(List.of(cancelButton, saveButton));
 		buttonBar.addClass("better:bottom_bar");
 		this.children.add(buttonBar);
 

@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.client.gui.style;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -23,7 +22,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class StyleSerializer
 {
-	public static StyleSerializer INSTANCE = new StyleSerializer(Arrays.asList(
+	public static StyleSerializer INSTANCE = new StyleSerializer(List.of(
 			BCComponent.COMPONENT_TYPE,
 			BCComponent.COMPONENT_CLASSES,
 			BCComponent.PARENT,
@@ -32,7 +31,7 @@ public class StyleSerializer
 			WidgetComponent.ACTIVE,
 			IBetterElement.FILTERED_OUT,
 			Foldout.FOLDED
-		), Arrays.asList(
+		), List.of(
 			ComponentLayoutConfig.SIZE_OVERRIDE,
 			ComponentLayoutConfig.OUTER_PADDING,
 			ComponentLayoutConfig.VISIBILITY,

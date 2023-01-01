@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.client.gui.component.widget;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -23,7 +22,7 @@ public class TextOverlay implements OnTooltip
 
 	public TextOverlay(Screen screen, Component text)
 	{
-		this(screen, Arrays.asList(text));
+		this(screen, List.of(text));
 	}
 
 	@Override

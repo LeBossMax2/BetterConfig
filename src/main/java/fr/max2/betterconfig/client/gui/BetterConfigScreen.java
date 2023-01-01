@@ -151,7 +151,7 @@ public class BetterConfigScreen extends ComponentScreen
 	 */
 	public void openConfig(int index)
 	{
-		Preconditions.checkElementIndex(index, this.modConfigs.size(), "index must be insize mod config list");
+		Preconditions.checkElementIndex(index, this.modConfigs.size(), "index must be inside mod config list");
 		this.configIndex = index;
 		this.init(this.minecraft, this.width, this.height);
 

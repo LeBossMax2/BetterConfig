@@ -15,13 +15,13 @@ public final class RealType<N extends Number> implements INumberType<N>
 	/** The function to convert a number into the represented integer */
 	private final Function<Number, N> converter;
 	/** The format to use to convert the number into string */
-	private final DecimalFormat formater;
+	private final DecimalFormat formatter;
 
 	private RealType(Function<String, N> parser, Function<Number, N> converter, String format)
 	{
 		this.parser = parser;
 		this.converter = converter;
-		this.formater = new DecimalFormat(format, DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		this.formatter = new DecimalFormat(format, DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public final class RealType<N extends Number> implements INumberType<N>
 	@Override
 	public String intoString(N value)
 	{
-		return value == null ? "null" : this.formater.format(value.doubleValue());
+		return value == null ? "null" : this.formatter.format(value.doubleValue());
 	}
 
 	@Override

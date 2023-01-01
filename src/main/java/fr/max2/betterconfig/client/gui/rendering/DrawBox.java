@@ -7,19 +7,19 @@ import fr.max2.betterconfig.client.gui.layout.Rectangle;
 
 public class DrawBox implements IRenderLayer
 {
-	private Padding positionning;
+	private Padding positioning;
 	private IMaterial material;
 
-	public DrawBox(Padding positionning, IMaterial material)
+	public DrawBox(Padding positioning, IMaterial material)
 	{
-		this.positionning = positionning;
+		this.positioning = positioning;
 		this.material = material;
 	}
 
 	@Override
 	public void renderLayer(Rectangle rect, PoseStack poseStack, int mouseX, int mouseY, float partialTick)
 	{
-		this.material.renderMaterial(this.positionning.pad(rect), poseStack, mouseX, mouseY, partialTick);
+		this.material.renderMaterial(this.positioning.pad(rect), poseStack, mouseX, mouseY, partialTick);
 	}
 
 	@Override

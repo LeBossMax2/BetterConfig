@@ -46,35 +46,36 @@ public class StyleSheet
 		}
 	}
 
-    public <T> T computePropertyValue(IComponent component, StyleProperty<T> property)
-    {
-            T res = this.computePropertyStram(property)
-                            .filter(rule -> rule.matches(component))
-                            .map(ProcessedStyleRule::propertyEffect)
-                            .reduce(
-								null,
-								(val, effect) -> effect.updateValue(val, property.defaultValue()),
-								(a, b) ->
-								{
-									throw new UnsupportedOperationException();
-								});
-            return res == null ? property.defaultValue() : res;
-    }
+	public <T> T computePropertyValue(IComponent component, StyleProperty<T> property)
+	{
+		T res =
+			this.computePropertyStream(property)
+				.filter(rule -> rule.matches(component))
+				.map(ProcessedStyleRule::propertyEffect)
+				.reduce(
+					null,
+					(val, effect) -> effect.updateValue(val, property.defaultValue()),
+					(a, b) ->
+					{
+						throw new UnsupportedOperationException();
+					});
+		return res == null ? property.defaultValue() : res;
+	}
 
-    private <T> Stream<ProcessedStyleRule<T>> computePropertyStram(StyleProperty<T> property)
-    {
-            Stream<ProcessedStyleRule<T>> valueStream = Stream.empty();
+	private <T> Stream<ProcessedStyleRule<T>> computePropertyStream(StyleProperty<T> property)
+	{
+		Stream<ProcessedStyleRule<T>> valueStream = Stream.empty();
 
-            @SuppressWarnings("unchecked")
-            List<ProcessedStyleRule<T>> rules = (List<ProcessedStyleRule<T>>)(List<?>)this.rules.get(property);
-            if (rules != null)
-				valueStream = rules.stream();
+		@SuppressWarnings("unchecked")
+		List<ProcessedStyleRule<T>> rules = (List<ProcessedStyleRule<T>>)(List<?>)this.rules.get(property);
+		if (rules != null)
+			valueStream = rules.stream();
 
-			if (this.parent != null)
-				valueStream = Stream.concat(valueStream, this.parent.computePropertyStram(property));
+		if (this.parent != null)
+			valueStream = Stream.concat(valueStream, this.parent.computePropertyStream(property));
 
-            return valueStream;
-    }
+		return valueStream;
+	}
 
 	public static class Builder
 	{

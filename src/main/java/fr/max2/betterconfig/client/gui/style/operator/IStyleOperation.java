@@ -4,9 +4,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.reflect.TypeUtils;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonParseException;
 

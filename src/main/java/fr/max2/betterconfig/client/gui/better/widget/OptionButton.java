@@ -1,6 +1,5 @@
 package fr.max2.betterconfig.client.gui.better.widget;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -36,7 +35,7 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	public static OptionButton<Boolean> booleanOption(ConfigPrimitive<Boolean> property)
 	{
 		return new OptionButton<>(
-			Arrays.asList(false, true),
+			List.of(false, true),
 			bool -> Component.translatable(bool ? TRUE_OPTION_KEY : FALSE_OPTION_KEY),
 			property);
 	}
@@ -45,8 +44,8 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	public static <E extends Enum<E>> OptionButton<E> enumOption(ConfigPrimitive<E> property)
 	{
 		return new OptionButton<>(
-			Arrays.asList(property.getSpec().valueClass().getEnumConstants()),
-			enuw -> Component.literal(enuw.name()),
+			List.of(property.getSpec().valueClass().getEnumConstants()),
+			enumValue -> Component.literal(enumValue.name()),
 			property);
 	}
 

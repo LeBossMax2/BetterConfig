@@ -22,11 +22,11 @@ public final class GuiTexts
 	public static final String ADD_FIRST_TOOLTIP_KEY = BetterConfig.MODID + ".list.add.first.tooltip";
 	/** The translation key for the tooltip on the add element button at the end of lists */
 	public static final String ADD_LAST_TOOLTIP_KEY = BetterConfig.MODID + ".list.add.last.tooltip";
-	/** The translation key for the tooltop of the button to remove elements from the list */
+	/** The translation key for the tooltip of the button to remove elements from the list */
 	public static final String REMOVE_TOOLTIP_KEY = BetterConfig.MODID + ".list.remove.tooltip";
-	/** The translation key for the tooltop of undo button */
+	/** The translation key for the tooltip of undo button */
 	public static final String UNDO_TOOLTIP_KEY = BetterConfig.MODID + ".undo.tooltip";
-	/** The translation key for the tooltop of reset button */
+	/** The translation key for the tooltip of reset button */
 	public static final String RESET_TOOLTIP_KEY = BetterConfig.MODID + ".reset.tooltip";
 
 	// Narration
