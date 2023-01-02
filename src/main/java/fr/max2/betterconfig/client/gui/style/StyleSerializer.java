@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
+import fr.max2.betterconfig.client.gui.better.ListGroup;
 import fr.max2.betterconfig.client.gui.component.BCComponent;
 import fr.max2.betterconfig.client.gui.component.widget.WidgetComponent;
 import fr.max2.betterconfig.client.gui.layout.ComponentLayoutConfig;
@@ -30,7 +31,8 @@ public class StyleSerializer
 			BCComponent.FOCUSED,
 			WidgetComponent.ACTIVE,
 			IBetterElement.FILTERED_OUT,
-			Foldout.FOLDED
+			Foldout.FOLDED,
+			ListGroup.EMPTY
 		), List.of(
 			ComponentLayoutConfig.SIZE_OVERRIDE,
 			ComponentLayoutConfig.OUTER_PADDING,

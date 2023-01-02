@@ -17,7 +17,7 @@ public class DerivedList<T, R> extends ListBase<R, IReadableProperty<R>>
 			this.parent.add(new DerivedProperty(property));
 		}
 
-		parent.onChanged().add(new IListListener<T>()
+		parent.onChanged().add(new IListListener<T>() // TODO remove listener when DerivedList is invalidated
 		{
 			@Override
 			public void onElementAdded(int index, T newValue)

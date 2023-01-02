@@ -14,9 +14,7 @@ import fr.max2.betterconfig.config.value.ConfigNode;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.ConfigUnknown;
-import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
-import fr.max2.betterconfig.util.property.list.ObservableList;
 import net.minecraft.network.chat.Component;
 
 
@@ -84,56 +82,9 @@ public class BetterConfigBuilder
 
 	private IBetterElement buildEntryList(ConfigName identifier, ConfigList list)
 	{
-		IReadableList<IComponent> mainElements = new ObservableList<>();
-		GuiGroup mainGroup = new GuiGroup(mainElements);
-		mainGroup.addClass("better:list_group");
-
-		mainElements.add(new BetterButton(this.screen, Component.translatable(GuiTexts.ADD_ELEMENT_KEY), Component.translatable(GuiTexts.ADD_FIRST_TOOLTIP_KEY))
-				.addOnPressed(() -> list.addValue(0)));
-
 		IReadableList<IBetterElement> content = list.getValueList().derived(elem -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), elem.index()));
-		IListListener<IBetterElement> listListener = new IListListener<>()
-		{
-			@Override
-			public void onElementAdded(int index, IBetterElement newValue)
-			{
-				if (content.size() == 1)
-					mainElements.add(BetterConfigBuilder.this.buildAddLastButton(list)); // Add "add last" button
-			}
 
-			@Override
-			public void onElementRemoved(int index, IBetterElement oldValue)
-			{
-				oldValue.invalidate();
-
-				if (content.size() == 0)
-					mainElements.remove(2); // Remove "add last" button
-			}
-		};
-		mainElements.add(1, new GuiGroup(content)
-		{
-			@Override
-			public void invalidate()
-			{
-				super.invalidate();
-				content.onChanged().remove(listListener);
-			}
-		});
-
-		content.onChanged().add(listListener);
-
-
-		if (content.size() >= 1)
-			mainElements.add(this.buildAddLastButton(list)); // TODO Use style to hide add last button when the list is empty
-
-		return new Foldout(this.screen, identifier, mainGroup);
-	}
-
-	private BetterButton buildAddLastButton(ConfigList list)
-	{
-		BetterButton button = new BetterButton(this.screen, Component.translatable(GuiTexts.ADD_ELEMENT_KEY), Component.translatable(GuiTexts.ADD_LAST_TOOLTIP_KEY));
-		button.addOnPressed(() -> list.addValue(list.getValueList().size()));
-		return button;
+		return new Foldout(this.screen, identifier, new ListGroup(this.screen, new GuiGroup(content), list));
 	}
 
 	private IBetterElement buildListElementGui(ConfigList list, ConfigName identifier, ConfigNode elem, ConfigList.Index index)

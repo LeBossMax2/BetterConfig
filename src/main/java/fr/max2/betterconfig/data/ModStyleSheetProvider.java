@@ -12,6 +12,7 @@ import com.google.gson.GsonBuilder;
 
 import fr.max2.betterconfig.client.gui.better.Foldout;
 import fr.max2.betterconfig.client.gui.better.IBetterElement;
+import fr.max2.betterconfig.client.gui.better.ListGroup;
 import fr.max2.betterconfig.client.gui.component.widget.WidgetComponent;
 import fr.max2.betterconfig.client.gui.layout.Alignment;
 import fr.max2.betterconfig.client.gui.layout.Axis;
@@ -122,6 +123,18 @@ public class ModStyleSheetProvider implements DataProvider
 				.set(OUTER_PADDING, new Padding(0, 0, 0, SECTION_TAB_SIZE))
 				.build();
 
+		private static final StyleRule LIST_ADD_LAST_STYLE = when()
+			.and()
+				.parent()
+					.and()
+						.hasClass("better:list_group")
+						.is(ListGroup.EMPTY)
+						.end()
+				.hasClass("better:list_add_last")
+				.end()
+			.then()
+				.set(VISIBILITY, Visibility.COLLAPSED)
+				.build();
 		private static final StyleRule LIST_ENTRY_STYLE = when().type("better:list_entry").then()
 				.set(DIR, Axis.HORIZONTAL)
 				.set(OUTER_PADDING, new Padding(0, 0, 0, -VALUE_HEIGHT))
@@ -243,7 +256,7 @@ public class ModStyleSheetProvider implements DataProvider
 		{
 			return new StyleSheet.Builder().add(
 					FILTERED_OUT_STYLE, ROOT_STYLE, SEARCH_BAR_STYLE, SEARCH_LABEL_STYLE, TAB_BAR_STYLE, BOTTOM_BAR_STYLE, FOLDOUT_STYLE, FOLDOUT_HEADER_STYLE, FOLDED_STYLE,
-					LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HIDDEN_STYLE, LIST_ENTRY_REMOVE_STYLE,
+					LIST_ADD_LAST_STYLE, LIST_ENTRY_STYLE, LIST_ENTRY_REMOVE_HIDDEN_STYLE, LIST_ENTRY_REMOVE_STYLE,
 					VALUE_ENTRY_STYLE, ENTRY_UNDO_HIDDEN_STYLE,
 					OPTION_BUTTON_STYLE, STRING_INPUT_FIELD_STYLE, UNKNOWN_OPTION_STYLE, ROOT_GROUP_STYLE, TABLE_STYLE, LIST_STYLE,
 					BETTER_NUMBER_FIELD_STYLE, NUMBER_FIELD_STYLE, NUMBER_FIELD_PLUS_STYLE, NUMBER_FIELD_MINUS_STYLE,
