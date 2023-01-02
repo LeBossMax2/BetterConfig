@@ -25,13 +25,13 @@ public class EventDispatcher<Listener> implements IEvent<Listener>
 	}
 
 	@Override
-	public void add(Listener listener)
+	public IEvent.Guard add(Listener listener)
 	{
 		this.listeners.add(listener);
+		return new Guard<>(this, listener);
 	}
 
-	@Override
-	public void remove(Listener listener)
+	private void remove(Listener listener)
 	{
 		this.listeners.remove(listener);
 	}
@@ -39,5 +39,19 @@ public class EventDispatcher<Listener> implements IEvent<Listener>
 	public void dispatch(Consumer<Listener> action)
 	{
 		this.listeners.forEach(action);
+	}
+
+	private static record Guard<L>
+	(
+		EventDispatcher<L> event,
+		L listener
+	)
+	implements IEvent.Guard
+	{
+		@Override
+		public void close()
+		{
+			this.event.remove(this.listener);
+		}
 	}
 }

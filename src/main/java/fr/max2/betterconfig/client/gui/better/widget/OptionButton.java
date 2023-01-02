@@ -7,14 +7,14 @@ import java.util.stream.Collectors;
 import fr.max2.betterconfig.client.gui.component.widget.CycleOptionButton;
 import fr.max2.betterconfig.client.util.GuiTexts;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
-import fr.max2.betterconfig.util.property.IListener;
+import fr.max2.betterconfig.util.IEvent;
 import net.minecraft.network.chat.Component;
 
 /** The widget for option buttons */
 public class OptionButton<V> extends CycleOptionButton<V>
 {
 	private final ConfigPrimitive<V> property;
-	private final IListener<V> propertyListener;
+	private final IEvent.Guard propertyGuard;
 
 	private OptionButton(List<? extends V> acceptedValues,
 		Function<? super V, Component> valueToText, ConfigPrimitive<V> property)
@@ -28,8 +28,7 @@ public class OptionButton<V> extends CycleOptionButton<V>
 		this.addClass("better:option_button");
 
 		this.property = property;
-		this.propertyListener = this::setCurrentValue;
-		this.property.onChanged().add(this.propertyListener);
+		this.propertyGuard = this.property.onChanged().add(this::setCurrentValue);
 	}
 
 	/** Creates a widget for boolean values */
@@ -53,6 +52,6 @@ public class OptionButton<V> extends CycleOptionButton<V>
 	@Override
 	public void invalidate()
 	{
-		this.property.onChanged().remove(this.propertyListener);
+		this.propertyGuard.close();
 	}
 }

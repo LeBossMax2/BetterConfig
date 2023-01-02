@@ -10,7 +10,7 @@ public interface IReadableList<T> extends List<T>
 {
 	List<? extends IReadableProperty<? extends T>> getElementProperties();
 
-	default <R> IReadableList<R> derived(Function<T, R> mapper)
+	default <R> DerivedList<?, R> derived(Function<T, R> mapper)
 	{
 		return new DerivedList<>(this, mapper);
 	}

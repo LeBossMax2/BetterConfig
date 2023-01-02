@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import fr.max2.betterconfig.client.gui.layout.CompositeLayoutConfig;
+import fr.max2.betterconfig.util.IEvent;
 import fr.max2.betterconfig.util.property.list.IListListener;
 import fr.max2.betterconfig.util.property.list.IReadableList;
 import fr.max2.betterconfig.util.property.list.ObservableList;
@@ -18,13 +19,14 @@ import net.minecraft.network.chat.Component;
 public abstract class CompositeComponent extends BCComponent<ICompositeComponent> implements ICompositeComponent
 {
 	protected final IReadableList<IComponent> children;
+	private final IEvent.Guard childrenGard;
 	protected NarratableEntry lastNarratable;
 
 	public CompositeComponent(String type, IReadableList<IComponent> children)
 	{
 		super(type);
 		this.children = children;
-		this.children.onChanged().add(new IListListener<IComponent>()
+		this.childrenGard = this.children.onChanged().add(new IListListener<IComponent>()
 		{
 			@Override
 			public void onElementAdded(int index, IComponent newValue)
@@ -92,6 +94,12 @@ public abstract class CompositeComponent extends BCComponent<ICompositeComponent
 	{
 		super.init(layoutManager, parent);
 		ICompositeComponent.super.init(layoutManager, parent);
+	}
+
+	@Override
+	public void invalidate()
+	{
+		this.childrenGard.close();
 	}
 
 	// Rendering

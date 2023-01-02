@@ -14,7 +14,7 @@ import fr.max2.betterconfig.config.value.ConfigNode;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
 import fr.max2.betterconfig.config.value.ConfigTable;
 import fr.max2.betterconfig.config.value.ConfigUnknown;
-import fr.max2.betterconfig.util.property.list.IReadableList;
+import fr.max2.betterconfig.util.property.list.DerivedList;
 import net.minecraft.network.chat.Component;
 
 
@@ -82,9 +82,18 @@ public class BetterConfigBuilder
 
 	private IBetterElement buildEntryList(ConfigName identifier, ConfigList list)
 	{
-		IReadableList<IBetterElement> content = list.getValueList().derived(elem -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), elem.index()));
+		DerivedList<?, IBetterElement> content = list.getValueList().derived(elem -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), elem.index()));
 
-		return new Foldout(this.screen, identifier, new ListGroup(this.screen, new GuiGroup(content), list));
+		var contentGroup = new GuiGroup(content)
+		{
+			public void invalidate()
+			{
+				super.invalidate();
+				content.close();
+			};
+		};
+
+		return new Foldout(this.screen, identifier, new ListGroup(this.screen, contentGroup, list));
 	}
 
 	private IBetterElement buildListElementGui(ConfigList list, ConfigName identifier, ConfigNode elem, ConfigList.Index index)

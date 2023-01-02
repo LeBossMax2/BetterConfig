@@ -5,7 +5,7 @@ import fr.max2.betterconfig.client.gui.better.ConfigName;
 import fr.max2.betterconfig.client.gui.better.Constants;
 import fr.max2.betterconfig.client.gui.component.widget.TextField;
 import fr.max2.betterconfig.config.value.ConfigPrimitive;
-import fr.max2.betterconfig.util.property.IListener;
+import fr.max2.betterconfig.util.IEvent;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 
@@ -14,7 +14,7 @@ public class StringInputField extends TextField
 {
 	/** The property to edit */
 	private final ConfigPrimitive<String> property;
-	private final IListener<String> propertyListener;
+	private final IEvent.Guard propertyGuard;
 
 	private StringInputField(Font fontRenderer, ConfigPrimitive<String> property, Component title)
 	{
@@ -24,8 +24,7 @@ public class StringInputField extends TextField
 		this.setValue(property.getValue());
 		this.setResponder(this::updateTextColor);
 
-		this.propertyListener = this::setValue;
-		this.property.onChanged().add(this.propertyListener);
+		this.propertyGuard = this.property.onChanged().add(this::setValue);
 	}
 
 	/** Updates the color of the text to indicates an error */
@@ -46,7 +45,7 @@ public class StringInputField extends TextField
 	@Override
 	public void invalidate()
 	{
-		this.property.onChanged().remove(this.propertyListener);
+		this.propertyGuard.close();
 	}
 
 	/** Creates a widget for string values */

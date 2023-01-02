@@ -2,11 +2,13 @@ package fr.max2.betterconfig.util.property.list;
 
 import java.util.function.Function;
 
+import fr.max2.betterconfig.util.IEvent;
 import fr.max2.betterconfig.util.property.IReadableProperty;
 
-public class DerivedList<T, R> extends ListBase<R, IReadableProperty<R>>
+public class DerivedList<T, R> extends ListBase<R, DerivedList<T, R>.DerivedProperty> implements AutoCloseable
 {
 	private final Function<? super T, R> derivationMapper;
+	private final IEvent.Guard parentGuard;
 
 	public DerivedList(IReadableList<T> parent, Function<? super T, R> mapper)
 	{
@@ -17,7 +19,7 @@ public class DerivedList<T, R> extends ListBase<R, IReadableProperty<R>>
 			this.parent.add(new DerivedProperty(property));
 		}
 
-		parent.onChanged().add(new IListListener<T>() // TODO remove listener when DerivedList is invalidated
+		this.parentGuard = parent.onChanged().add(new IListListener<T>()
 		{
 			@Override
 			public void onElementAdded(int index, T newValue)
@@ -33,12 +35,27 @@ public class DerivedList<T, R> extends ListBase<R, IReadableProperty<R>>
 		});
 	}
 
-	private class DerivedProperty extends ListBase.PropertyBase<R>
+	public class DerivedProperty extends ListBase.PropertyBase<R> implements AutoCloseable
 	{
-		public DerivedProperty(IReadableProperty<? extends T> baseProperty)
+		private final IEvent.Guard baseGuard;
+
+		private DerivedProperty(IReadableProperty<? extends T> baseProperty)
 		{
 			super(DerivedList.this.derivationMapper.apply(baseProperty.getValue()));
-			baseProperty.onChanged().add(newVal -> this.setValue(DerivedList.this.derivationMapper.apply(newVal)));
+			this.baseGuard = baseProperty.onChanged().add(newVal -> this.setValue(DerivedList.this.derivationMapper.apply(newVal)));
 		}
+
+		@Override
+		public void close()
+		{
+			this.baseGuard.close();
+		}
+	}
+
+	@Override
+	public void close()
+	{
+		this.parentGuard.close();
+		this.parent.forEach(DerivedProperty::close);
 	}
 }
