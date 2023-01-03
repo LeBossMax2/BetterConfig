@@ -53,13 +53,13 @@ public abstract class CompositeComponent extends BCComponent<ICompositeComponent
 		this(type, new ObservableList<>());
 	}
 
-	public CompositeComponent(String type, List<? extends IComponent> initialChildren)
+	public CompositeComponent(String type, List<IComponent> initialChildren)
 	{
 		this(type, toReadable(initialChildren));
 	}
 
 	@SuppressWarnings("unchecked")
-	private static IReadableList<IComponent> toReadable(List<? extends IComponent> list)
+	private static IReadableList<IComponent> toReadable(List<IComponent> list)
 	{
 		if (list instanceof IReadableList<?> rl)
 		{

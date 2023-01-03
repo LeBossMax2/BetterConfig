@@ -45,9 +45,9 @@ public class BetterConfigBuilder
 
 	private GuiGroup buildTable(ConfigTable table)
 	{
-		List<IBetterElement> content = table.entries()
+		List<IComponent> content = table.entries()
 			.stream()
-			.map(entry -> this.buildEntry(new TableChildInfo(entry.key()), entry.node()))
+			.map(entry -> (IComponent)this.buildEntry(new TableChildInfo(entry.key()), entry.node()))
 			.toList();
 		GuiGroup tableGroup = new GuiGroup(content);
 		tableGroup.addClass("better:table_group");
@@ -82,7 +82,7 @@ public class BetterConfigBuilder
 
 	private IBetterElement buildEntryList(ConfigName identifier, ConfigList list)
 	{
-		DerivedList<?, IBetterElement> content = list.getValueList().derived(elem -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), elem.index()));
+		DerivedList<?, IComponent> content = list.getValueList().derived(elem -> this.buildListElementGui(list, new ListChildInfo(identifier, elem.index()), elem.node(), elem.index()));
 
 		var contentGroup = new GuiGroup(content)
 		{

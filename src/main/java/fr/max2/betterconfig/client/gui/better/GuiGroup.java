@@ -8,32 +8,22 @@ import fr.max2.betterconfig.client.gui.component.IComponent;
 /** The ui for a group of components */
 public class GuiGroup extends CompositeComponent implements IBetterElement
 {
-	/** The list of entries of the group */
-	private final List<IBetterElement> betterElements;
-
-	public GuiGroup(List<? extends IComponent> content)
+	public GuiGroup(List<IComponent> content)
 	{
 		super("better:group", content);
-		// TODO [#2] Create custom filter readable list
-		this.betterElements = this.children.stream().filter(cmp -> cmp instanceof IBetterElement).map(cmp -> (IBetterElement)cmp).toList();
 	}
 
 	@Override
 	public boolean filterElements(ConfigFilter filter)
 	{
 		boolean allHidden = true;
-		for (IBetterElement child : this.betterElements)
+		for (IComponent child : this.children)
 		{
-			allHidden &= child.filterElements(filter);
+			if (child instanceof IBetterElement betterChild)
+				allHidden &= betterChild.filterElements(filter);
 		}
 		if (filter.matches())
 			return false;
 		return allHidden;
-	}
-
-	@Override
-	public void invalidate()
-	{
-		super.invalidate();
 	}
 }
